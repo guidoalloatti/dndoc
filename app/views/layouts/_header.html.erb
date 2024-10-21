@@ -1,0 +1,41 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">The D&D Object Mistery</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <%= link_to 'Home', root_path, class: "nav-link" %>
+        </li>
+        <li class="nav-item">
+          <%= link_to 'Items', items_path, class: "nav-link" %>
+        </li>
+        <li class="nav-item">
+          <%= link_to 'Categories', categories_path, class: "nav-link" %>
+        </li>
+        <li class="nav-item">
+          <%= link_to 'Effects', effects_path, class: "nav-link" %>
+        </li>
+        <li class="nav-item">
+          <%= link_to 'Rarities', rarities_path, class: "nav-link" %>
+        </li>
+        <li class="nav-item">
+          <%= link_to 'Weapons', weapons_path, class: "nav-link" %>
+        </li>
+      </ul>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end mx-auto">
+        <%= link_to 'Create Random Item', create_random_items_path, class: 'btn btn-sm btn-outline-primary mx-1' %>
+        
+        <a onclick="window.location.replace('/items/new')" class="btn btn-sm btn-outline-info mx-1">New Item</a>
+
+        <%= link_to 'New Random Item', new_weapon_path, class: 'btn btn-sm btn-outline-danger mx-1' %>
+        <%= link_to 'New Effect', new_effect_path, class: 'btn btn-sm btn-outline-secondary mx-1' %>
+        <%= link_to 'New Category', new_category_path, class: 'btn btn-sm btn-outline-success mx-1' %>
+        <%= link_to 'New Rarity', new_rarity_path, class: 'btn btn-sm btn-outline-warning mx-1' %>
+      </div>
+    </div>
+  </div>
+</nav>

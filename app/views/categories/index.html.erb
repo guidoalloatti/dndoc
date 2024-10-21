@@ -1,0 +1,30 @@
+<%= render "layouts/subheader", :locals => {:count => @categories.count, :name => "Categories"} %>
+
+<div class="container mt-3">
+  <table class="table table-bordered table-striped table-hover">
+		<thead class="table-primary">
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Min Weight</th>
+        <th>Max Weight</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @categories.each do |category| %>
+        <tr>
+          <td><%= category.name %></td>
+          <td><%= truncate(category.description, length: 100) %></td>
+          <td><%= category.min_weight %> lbs.</td>
+          <td><%= category.max_weight %> lbs.</td>
+          <td style="min-width: 185px;">
+            <%= link_to 'Show', category_path(category), class: "btn btn-outline-primary btn-sm" %>
+            <%= link_to 'Edit', edit_category_path(category), class: "btn btn-outline-success btn-sm" %>
+            <%= link_to 'Delete', category_path(category), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-outline-danger btn-sm" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div	>

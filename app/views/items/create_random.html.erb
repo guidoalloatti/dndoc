@@ -1,0 +1,42 @@
+<%= render "layouts/subheader", :locals => {:count => 0, :name => "Generate Items"} %>
+
+<hr class="cool-hr">
+
+<%= form_with url: create_random_items_path, method: :post, data: { turbo: false }, local: true do |form| %>
+<div class="container overflow-hidden">
+  <div class="row">
+      <div class="col-5 text-center">
+        <div class="form-group">
+          <%= form.label :category_id, "Category", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
+          <%= form.collection_select :category_id, @categories, :id, :name, prompt: "Choose a category", class: "dropdown-menu" %>
+        </div>
+
+        <div class="form-group">
+          <%= form.label :power_level, "Power", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
+          <%= form.select :power_level, options_for_select(@power_levels), prompt: "Choose power level", class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="col-1 vertical-span"></div>
+
+      <div class="col-5" style="padding-left: 2%">
+        <div class="card-group">
+          <div class="card" style="width: 18rem; max-width: 400px; margin: 25px; border: 1px solid gray; border-radius: 5px;">
+            <%= image_tag "hero.png", alt: "Hero Image", class: "img-fluid", style: "max-height: 175px" %>
+            <div class="card-body">
+              <h5 class="card-title">Creating... </h5>
+              <p class="card-text">In here we can create a new object.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <%= form.submit "Generate Item", class: "btn btn-lg btn-outline-primary " %>
+    <hr class="cool-hr">
+    <%= form.submit "Generate Fully Random Item", class: "btn btn-sm btn-success mt-2" %>
+  </div>
+  <% end %>
+</div>
+

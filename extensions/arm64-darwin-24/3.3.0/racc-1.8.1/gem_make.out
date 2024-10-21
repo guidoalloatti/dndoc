@@ -1,0 +1,18 @@
+current directory: /Users/guidoalloatti/projects/dndoc/gems/racc-1.8.1/ext/racc/cparse
+/Users/guidoalloatti/.rbenv/versions/3.3.0/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-de5s6s sitelibdir\=./.gem.20241021-95490-de5s6s clean
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-de5s6s sitelibdir\=./.gem.20241021-95490-de5s6s
+compiling cparse.c
+linking shared-object racc/cparse.bundle
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-de5s6s sitelibdir\=./.gem.20241021-95490-de5s6s install
+/opt/homebrew/bin/ginstall -c -m 0755 cparse.bundle ./.gem.20241021-95490-de5s6s/racc
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-de5s6s sitelibdir\=./.gem.20241021-95490-de5s6s clean

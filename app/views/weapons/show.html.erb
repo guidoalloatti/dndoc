@@ -1,0 +1,7 @@
+<h1><%= @weapon.name %></h1>
+<p><strong>Cost:</strong> <%= @weapon.cost %></p>
+<p><strong>Damage:</strong> <%= @weapon.damage %></p>
+<p><strong>Weight:</strong> <%= @weapon.weight %> lbs</p>
+<p><strong>Properties:</strong> <%= @weapon.properties %></p>
+<%= link_to 'Edit', edit_weapon_path(@weapon) %> |
+<%= link_to 'Back', weapons_path %>

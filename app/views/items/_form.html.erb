@@ -1,0 +1,96 @@
+<div class="container mt-5">
+  <h2>Create a New Item</h2>
+
+  <%= form_with(model: @item, local: true) do |form| %>
+    <!-- Select Name -->
+    <div class="form-group mb-3">
+      <%= form.label :name, 'Item Name', class: "form-label" %>
+      <div class="input-group">
+        <%= form.text_field :name, class: 'form-control', placeholder: 'Enter item name' %>
+        <button id="generateNameBtn" class="btn btn-outline-primary">Generate</button>
+      </div>
+    </div>
+
+    <!-- Select Category -->
+    <div class="form-group mb-3">
+      <%= form.label :category_id, 'Select Category', class: "form-label" %>
+      <br>
+
+      <select class="form-select" id="addCategory">
+        <% categories.each do |category| %>
+          <option value='<%= category.id %>'><%= category.name %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <!-- Select Weapon Type -->
+    <div class="mb-3" id="addWeapons" style="display:none;">
+      <%= form.label :rarity_id, 'Weapon' %>
+      <br>
+      <select class="form-select" id="addWeaponDropdown">
+        <% weapons.each do |weapon| %>
+          <option value='<%= weapon.id %>'><%= weapon.name %></option>
+        <% end %>
+      </select>
+      <small>Note: Weapons Selection is only available when selecting the Weapons category.</small>
+    </div>
+
+    <!-- Select Rarity -->  
+    <div class="mb-3">
+      <%= form.label :rarity_id, 'Rarity' %>
+      <select class="form-select mt-3" id="addRarity"></select>
+      <small>Note: Rarity level affects the maximum allowed power.</small>
+    </div>
+
+    <!-- Item Power -->
+    <div class="mb-3">
+      <%= form.label :power, 'Item Power (Max 10)' %>
+      <%= form.number_field :power, max: 10, min: 0, class: 'form-control', placeholder: 'Enter item power' %>
+    </div>
+    
+    <!-- Add Effects -->
+    <div class="form-group mt-4 mb-4">
+      <div class="row">
+        <div class="col">
+          <%= form.label :effect_ids, 'Effects', id: "effectsLabel", class: "form-label" %>
+        </div>
+
+        <div class="col text-end">
+          <button id="addEffectBtn" class="btn btn-sm btn-outline-primary">Add Effect</button>
+          <button id="resetEffects" class="btn btn-sm btn-outline-danger">Reset All Effects</button>
+        </div>
+      </div>
+
+      <select class="form-select mt-3" id="addEffect"></select>
+      <small>Each effect will consume power, total power should not exceed 10</small>
+    </div>
+
+    <!-- Selected Effects -->
+    <div class="mb-3">
+      <h5>Selected Effects</h5>
+      <ul id="selectedEffects" class="list-group"></ul>
+    </div>
+
+    <!-- Power Usage -->
+    <div class="mb-3">
+      <label for="powerProgress" class="form-label">Total Power Used</label>
+      <div class="progress">
+        <div id="powerProgress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
+      </div>
+      <small id="powerUsageText" class="form-text text-muted">Power used: 0/10</small>
+    </div>
+
+    <hr class="cool-hr">
+
+    <div class="form-group">
+      <button id="createItem" class="btn btn-outline-primary disabled">Create Object</button>
+    </div>
+  <% end %>
+</div>
+
+
+
+
+
+
+

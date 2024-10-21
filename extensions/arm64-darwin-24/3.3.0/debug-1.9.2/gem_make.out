@@ -1,0 +1,19 @@
+current directory: /Users/guidoalloatti/projects/dndoc/gems/debug-1.9.2/ext/debug
+/Users/guidoalloatti/.rbenv/versions/3.3.0/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/debug-1.9.2/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-i2hc7j sitelibdir\=./.gem.20241021-95490-i2hc7j clean
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/debug-1.9.2/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-i2hc7j sitelibdir\=./.gem.20241021-95490-i2hc7j
+compiling debug.c
+compiling iseq_collector.c
+linking shared-object debug/debug.bundle
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/debug-1.9.2/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-i2hc7j sitelibdir\=./.gem.20241021-95490-i2hc7j install
+/opt/homebrew/bin/ginstall -c -m 0755 debug.bundle ./.gem.20241021-95490-i2hc7j/debug
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/debug-1.9.2/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-i2hc7j sitelibdir\=./.gem.20241021-95490-i2hc7j clean

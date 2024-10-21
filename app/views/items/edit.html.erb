@@ -1,0 +1,5 @@
+<%= render "layouts/subheader", :locals => {:count => 0, :name => "Edit Item"} %>
+<div class="text-center" style="">
+	<%= link_to 'Back to Items Index', items_path, class: "btn btn-outline-primary mt-3" %>
+</div>
+<%= render 'form', item: @item, weapons: @weapons, effects: @effects, categories: @categories, rarities: @rarities %>

@@ -1,0 +1,40 @@
+<%= render "layouts/subheader", :locals => {:count => @effects.count, :name => "Effects"} %>
+
+<div class="container mt-3">  
+  <table class="table table-bordered table-striped table-hover">
+    <thead class="table-primary">
+      <tr>
+      	<th>Id</th>
+        <th>Name</th>
+        <th>Effect Type</th>
+        <th>Power Level</th>
+        <th>Categories</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @effects.each do |effect| %>
+        <tr>
+        	<td><%= effect.id %></td>
+          <td><%= effect.name %></td>
+          <td><%= effect.effect_type %></td>
+          <td><%= effect.power_level %></td>
+          <td>
+          	<% effect.categories.each do |category| %>
+          	<li>
+          			<%= category.name %>
+          	</li>
+          	<% end %>
+          </td>
+          <td><%= truncate(effect.description, length: 100) %></td>
+          <td style="min-width: 185px;">
+            <%= link_to 'Show', effect_path(effect), class: 'btn btn-sm btn-outline-primary' %>
+            <%= link_to 'Edit', edit_effect_path(effect), class: 'btn btn-sm btn-outline-success' %>
+            <%= link_to 'Delete', effect_path(effect), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-sm btn-outline-danger' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

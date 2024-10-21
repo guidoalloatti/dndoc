@@ -1,0 +1,56 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS (and SCSS, if configured) file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require application
+ */
+
+.cool-hr {
+  border: none;
+  height: 3px;
+  background: linear-gradient(to right, lightgray, black);
+  border-radius: 5px;
+  margin: 20px 0;
+  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0);
+  transition: all 0.3s ease-in-out;
+}
+
+.cool-dotted-hr {
+  border: none;
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.cool-dotted-hr:before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: lightseagreen;
+  border-radius: 50%;
+  margin: 10px;
+}
+
+#category_id, #power_level {
+	margin-top: 50px;
+	color: #0d6efd;
+    background: white;
+    padding: 7px 16px 10px 10px;
+    border-radius: 0 5px 5px 0;
+    margin-left: -16px;
+    font-weight: 600;
+    width: 220px;
+}
+
+.vertical-span {
+	border-right: 3px solid lightgray;
+}

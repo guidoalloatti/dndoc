@@ -1,0 +1,18 @@
+current directory: /Users/guidoalloatti/projects/dndoc/gems/websocket-driver-0.7.6/ext/websocket-driver
+/Users/guidoalloatti/.rbenv/versions/3.3.0/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/websocket-driver-0.7.6/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-rtrn4h sitelibdir\=./.gem.20241021-95490-rtrn4h clean
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/websocket-driver-0.7.6/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-rtrn4h sitelibdir\=./.gem.20241021-95490-rtrn4h
+compiling websocket_mask.c
+linking shared-object websocket_mask.bundle
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/websocket-driver-0.7.6/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-rtrn4h sitelibdir\=./.gem.20241021-95490-rtrn4h install
+/opt/homebrew/bin/ginstall -c -m 0755 websocket_mask.bundle ./.gem.20241021-95490-rtrn4h
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/websocket-driver-0.7.6/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-rtrn4h sitelibdir\=./.gem.20241021-95490-rtrn4h clean

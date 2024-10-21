@@ -1,0 +1,14 @@
+<h1><%= @item.name %></h1>
+<p><%= @item.description %></p>
+<p>Type: <%= @item.item_type %></p>
+<p>Rarity: <%= @item.rarity %></p>
+<p>Category: <%= @item.category.name %></p>
+
+<h2>Effects</h2>
+<% @item.effects.each do |effect| %>
+  <p><%= effect.name %> - <%= effect.description %> (Power: <%= effect.power_level %>)</p>
+<% end %>
+
+<%= link_to 'Add Effect', new_item_effect_path(@item) %>
+<%= link_to 'Edit', edit_item_path(@item) %> |
+<%= link_to 'Back', items_path %>

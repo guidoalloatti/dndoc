@@ -1,0 +1,16 @@
+current directory: /Users/guidoalloatti/projects/dndoc/gems/json-2.7.2/ext/json
+/Users/guidoalloatti/.rbenv/versions/3.3.0/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/json-2.7.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-wn6mxp sitelibdir\=./.gem.20241021-95490-wn6mxp clean
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/json-2.7.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-wn6mxp sitelibdir\=./.gem.20241021-95490-wn6mxp
+make: Nothing to be done for `all'.
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/json-2.7.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-wn6mxp sitelibdir\=./.gem.20241021-95490-wn6mxp install
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/json-2.7.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-wn6mxp sitelibdir\=./.gem.20241021-95490-wn6mxp clean

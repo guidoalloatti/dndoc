@@ -1,0 +1,29 @@
+<%= render "layouts/subheader", :locals => {:count => @rarities.count, :name => "Rarities"} %>
+
+<div class="container mt-3">  
+	<table class="table table-bordered table-hover table-striped">
+	  <thead class="table-primary">
+	    <tr>
+	      <th>Name</th>
+	      <th>Price Range (GC)</th>
+	      <th>Power Range</th>
+	      <th>Actions</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <% @rarities.each do |rarity| %>
+	      <tr>
+	        <td><%= rarity.name %></td>
+	        <td><%= "#{rarity.min_price} - #{rarity.max_price}" %></td>
+	        <td><%= "#{rarity.min_power} - #{rarity.max_power}" %></td>
+	        <td style="min-width: 185px;">
+            <%= link_to 'Show', rarity_path(rarity), class: "btn btn-outline-primary btn-sm" %>
+            <%= link_to 'Edit', edit_rarity_path(rarity), class: "btn btn-outline-success btn-sm" %>
+            <%= link_to 'Delete', rarity_path(rarity), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-outline-danger btn-sm" %>
+          </td>
+	      </tr>
+	    <% end %>
+	  </tbody>
+	</table>
+</div>
+

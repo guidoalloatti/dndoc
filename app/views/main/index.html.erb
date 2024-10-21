@@ -1,0 +1,55 @@
+<%= render "layouts/subheader", :locals => {:count => 0, :name => "Home"} %>
+
+<div class="container text-center mt-3">
+	<div class="row card-group">
+		<div class="card" style="max-width: 800px; margin: 25px; border: 1px solid gray; border-radius: 0 0 15px 15px; padding: 0">
+			<%= image_tag "hero.png", alt: "Hero Image", class: "img-fluid" %>
+		  <div class="card-body">
+		    <h5 class="card-title">Create Random Object</h5>
+		    <p class="card-text">We can create a new object.</p>
+		    <%= link_to 'Create Random Item', create_random_items_path, class: 'btn btn-outline-success' %>	    
+		  </div>
+		</div>
+	</div>
+
+	<hr class="cool-hr">
+
+	<div class="row card-group">
+		<div class="card" style="margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
+			<%= image_tag "hero2.png", alt: "Hero Image", class: "img-fluid" %>
+		  <div class="card-body">
+		    <h5 class="card-title">Items</h5>
+		    <p class="card-text">We can edit or create new object.</p>
+		    <%= link_to 'Items', items_path, class: 'btn btn-outline-primary' %>
+		  </div>
+		</div>
+
+
+		<div class="card" style="max-width: 320px;margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
+			<%= image_tag "hero3.png", alt: "Hero Image", class: "img-fluid" %>
+		  <div class="card-body">
+		    <h5 class="card-title">Effects</h5>
+		    <p class="card-text">We can handle effects.</p>
+		    <%= link_to 'Effects', effects_path, class: 'btn btn-outline-secondary' %>
+		  </div>
+		</div>
+
+		<div class="card" style="max-width: 320px;margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
+			<%= image_tag "hero4.png", alt: "Hero Image", class: "img-fluid" %>
+		  <div class="card-body">
+		    <h5 class="card-title">Categories</h5>
+		    <p class="card-text">We can handle categories.</p>
+		    <%= link_to 'Categories', categories_path, class: 'btn btn-outline-info' %>
+		  </div>
+		</div>
+
+		<div class="card" style="max-width: 320px;margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
+			<%= image_tag "hero5.png", alt: "Hero Image", class: "img-fluid" %>
+		  <div class="card-body">
+		    <h5 class="card-title">Weapons</h5>
+		    <p class="card-text">We can handle weapons.</p>
+		    <%= link_to 'Weapons', weapons_path, class: 'btn btn-outline-danger' %>
+		  </div>
+		</div>
+	</div>
+</div>

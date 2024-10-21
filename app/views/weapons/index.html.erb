@@ -1,0 +1,33 @@
+<%= render "layouts/subheader", :locals => {:count => @weapons.count, :name => "Weapons"} %>
+
+<div class="container mt-3">
+  <table class="table table-hover table-bordered table-striped">
+    <thead class="table-primary">
+      <tr>
+      <th>Name</th>
+      <th>Cost</th>
+      <th>Damage</th>
+      <th>Weight</th>
+      <th>Properties</th>
+      <th colspan="3"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @weapons.each do |weapon| %>
+        <tr>
+          <td><%= weapon.name %></td>
+          <td><%= weapon.cost %></td>
+          <td><%= weapon.damage %></td>
+          <td><%= weapon.weight %></td>
+          <td><%= weapon.properties %></td>
+          </td>
+          <td style="min-width: 185px;">
+            <%= link_to 'Show', weapon_path(weapon), class: "btn btn-outline-primary btn-sm" %>
+            <%= link_to 'Edit', edit_weapon_path(weapon), class: "btn btn-outline-success btn-sm" %>
+            <%= link_to 'Delete', weapon_path(weapon), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-outline-danger btn-sm" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

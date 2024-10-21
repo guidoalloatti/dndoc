@@ -1,0 +1,48 @@
+<%= render "layouts/subheader", :locals => {:count => @items.count, :name => "Items"} %>
+
+<div class="container mt-3">  
+  <table class="table table-hover table-bordered table-striped">
+    <thead class="table-primary">
+      <tr>
+      	<th>Id</th>
+        <th>Item Name</th>
+        <th>Category</th>
+        <th>Rarity</th>
+        <th>Requires Attunement</th>
+        <th>Price (MO)</th>
+        <th>Weight (lbs)</th>
+        <th>Power</th>
+        <th>Effect</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @items.each do |item| %>
+        <tr>
+        	<td><%= item.id %></td>
+          <td><%= item.name %></td>
+          <td><%= item.category.name %></td>
+          <td><%= item.rarity.name %></td>
+          <td><%= item.requires_attunement ? "Yes" : "No" %></td>
+          <td><%= item.price %></td>
+          <td><%= item.weight %></td>
+          <td><%= item.power %></td>
+          <td>
+          	<% item.effects.each do |effect| %>
+          	<li>
+          			<%= "#{effect.description} (#{effect.power_level})" %>
+          	</li>
+          	<% end %>
+          </td>
+          <td style="min-width: 185px;">
+          	<div style="display: flex; gap: 5px;">
+            	<%= link_to 'Show', item_path(item), class: "btn btn-outline-primary btn-sm" %>
+            	<%= link_to 'Edit', edit_item_path(item), class: "btn btn-outline-success btn-sm" %>
+		         	<%= button_to 'Delete', item_path(item), method: :delete, data: { confirm: 'Are you sure you want to remove this item?' }, class: "btn btn-outline-danger btn-sm" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

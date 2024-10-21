@@ -1,0 +1,22 @@
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bootsnap-1.18.4/ext/bootsnap
+/Users/guidoalloatti/.rbenv/versions/3.3.0/bin/ruby extconf.rb
+checking for fdatasync() in unistd.h... yes
+checking for whether -D_GNU_SOURCE is accepted as CPPFLAGS... yes
+checking for whether -O3 is accepted as CFLAGS... yes
+checking for whether -std=c99 is accepted as CFLAGS... yes
+creating Makefile
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-6z70dw sitelibdir\=./.gem.20241021-95490-6z70dw clean
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-6z70dw sitelibdir\=./.gem.20241021-95490-6z70dw
+compiling bootsnap.c
+linking shared-object bootsnap/bootsnap.bundle
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-6z70dw sitelibdir\=./.gem.20241021-95490-6z70dw install
+/opt/homebrew/bin/ginstall -c -m 0755 bootsnap.bundle ./.gem.20241021-95490-6z70dw/bootsnap
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-6z70dw sitelibdir\=./.gem.20241021-95490-6z70dw clean

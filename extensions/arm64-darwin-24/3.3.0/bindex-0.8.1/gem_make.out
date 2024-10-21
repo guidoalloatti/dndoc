@@ -1,0 +1,18 @@
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bindex-0.8.1/ext/skiptrace
+/Users/guidoalloatti/.rbenv/versions/3.3.0/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-nto8wh sitelibdir\=./.gem.20241021-95490-nto8wh clean
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-nto8wh sitelibdir\=./.gem.20241021-95490-nto8wh
+compiling cruby.c
+linking shared-object skiptrace/internal/cruby.bundle
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-nto8wh sitelibdir\=./.gem.20241021-95490-nto8wh install
+/opt/homebrew/bin/ginstall -c -m 0755 cruby.bundle ./.gem.20241021-95490-nto8wh/skiptrace/internal
+
+current directory: /Users/guidoalloatti/projects/dndoc/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20241021-95490-nto8wh sitelibdir\=./.gem.20241021-95490-nto8wh clean
