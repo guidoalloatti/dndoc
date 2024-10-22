@@ -6,13 +6,6 @@ let weaponSelectContainer = ""
 let startRarity = 6
 let path = window.location.pathname
 
-// $(window).on("load", function () {
-//   console.log("WTF")
-//   if(path != "/items/new" && path != "/items/edit") {
-//     console.log("pimpy")
-//   }
-// });
-
 $(document).ready(function($) {
   
   function replaceUrl(url) {
@@ -25,7 +18,7 @@ $(document).ready(function($) {
     }
   });
 
-  if(path != "/items/new" && path != "/items/edit") {
+  if(path != "/items/new" && path != "/items/edit" && path != "/items/create_random") {
     return;
   }
 
@@ -188,7 +181,6 @@ $(document).ready(function($) {
     let effectType = $("#addEffect :selected")[0].dataset.type
 
     var arr = Array.from(document.getElementById('selectedEffects').children).some(function(listItem) {
-      console.log(listItem.dataset.type, effectType)
       return listItem.dataset.type === effectType;
     });
 
@@ -219,182 +211,242 @@ $(document).ready(function($) {
   }
 
   // Changes on the rarity
-  document.getElementById('addRarity').addEventListener('change', function(event) {
-    event.preventDefault()
+  if($("#addRarity").length == 1) {    
+    document.getElementById('addRarity').addEventListener('change', function(event) {
+      event.preventDefault()
 
-    let rarity = $("#addRarity option:selected").text();
-    maxPower = getMaxPowerByRarity(rarity);
+      let rarity = $("#addRarity option:selected").text();
+      maxPower = getMaxPowerByRarity(rarity);
 
-    $("#item_power").val(maxPower)
-  });
+      $("#item_power").val(maxPower)
+    });
 
-  // Changes on the power level
-  document.getElementById('item_power').addEventListener('change', function(event) {
-    event.preventDefault()
+    // Changes on the power level
+    if($("#item_power").length == 1) {    
+      document.getElementById('item_power').addEventListener('change', function(event) {
+        event.preventDefault()
 
-    maxPower = $("#item_power").val()
-    let rarity = getRarityValByMaxPower(maxPower) 
-    updateProgressBar()
+        maxPower = $("#item_power").val()
+        let rarity = getRarityValByMaxPower(maxPower) 
+        updateProgressBar()
 
-    $("#addRarity").val(rarity)
-  });
+        $("#addRarity").val(rarity)
+      });
+    }
+  }
 
   // Changes to category when it is Weapons
-  document.getElementById('addCategory').addEventListener('change', function(event) {
-    let categoryName = $("#addCategory :selected").text()
+  if($("#addCategory").length == 1) {
+    document.getElementById('addCategory').addEventListener('change', function(event) {
+      let categoryName = $("#addCategory :selected").text()
 
-    categoryName == "Weapons" ? $("#addWeapons").show() : $("#addWeapons").hide()
+      categoryName == "Weapons" ? $("#addWeapons").show() : $("#addWeapons").hide()
 
-    hanldeEffectsByCategory(categoryName)
-  });
+      hanldeEffectsByCategory(categoryName)
+    });
+  }
 
   // Get name from the backend
-  document.getElementById('generateNameBtn').addEventListener('click', function(event) {
-    event.preventDefault()
+  if($("#generateNameBtn").length == 1) {
+    document.getElementById('generateNameBtn').addEventListener('click', function(event) {
+      event.preventDefault()
 
-    let weapon = ""
-    let effects = []
-    let category = $("#addCategory :selected").val()
-    if ($("#addCategory :selected").text() == "Weapons") weapon = $("#addWeaponDropdown :selected").text()
-    
-    let power = $("#item_power").val()
-    $.each($("#selectedEffects")[0].children, function(i, li) {
-      effects.push(li.dataset.effectId)
+      let weapon = ""
+      let effects = []
+      let category = $("#addCategory :selected").val()
+      if ($("#addCategory :selected").text() == "Weapons") weapon = $("#addWeaponDropdown :selected").text()
+      
+      let power = $("#item_power").val()
+      $.each($("#selectedEffects")[0].children, function(i, li) {
+        effects.push(li.dataset.effectId)
+      });
+
+      $("#generateNameBtn").prop('disabled', true).text('Generating...')
+
+      $.ajax({
+        url: '/items/get_item_name',
+        type: 'POST',
+        data: {
+          category: category,
+          weapon: weapon,
+          power: power,
+          effects: effects,
+        },
+        success: function(response) {
+          console.log('Success:', response);
+          $("#item_name").val(response.data)
+          $("#generateNameBtn").prop('disabled', false).text('Generated');
+        },
+        error: function(error) {
+          console.error('Error:', error);
+          $("#generateNameBtn").prop('disabled', false).text('Error Generating...');
+        }
+      });
     });
+  }
 
-    $("#generateNameBtn").prop('disabled', true).text('Generating...')
+  // Event fot reset effects
+  if($("#resetEffects").length == 1) {
+    document.getElementById('resetEffects').addEventListener('click', function(event) {
+      event.preventDefault()
 
-    $.ajax({
-      url: '/items/get_item_name',
-      type: 'POST',
-      data: {
-        category: category,
-        weapon: weapon,
-        power: power,
-        effects: effects,
-      },
-      success: function(response) {
-        console.log('Success:', response);
-        $("#item_name").val(response.data)
-        $("#generateNameBtn").prop('disabled', false).text('Generated');
-      },
-      error: function(error) {
-        console.error('Error:', error);
-        $("#generateNameBtn").prop('disabled', false).text('Error Generating...');
+      selectedEffect = document.getElementById('addEffect');
+      effectPower = parseInt(selectedEffect.options[selectedEffect.selectedIndex].dataset.power);
+
+      $("#selectedEffects").text("")
+      totalPower = 0
+
+      updateProgressBar()
+
+      $("#addEffectBtn").removeAttr("disabled");
+    });
+  }
+
+  // Change Rarity on Random Create
+  const rarityElement = document.getElementById('rarity');
+  const powerLevelElement = document.getElementById('power_level');
+
+  if (rarityElement) {
+    rarityElement.addEventListener('change', function() {
+      const rarity = rarityElement.options[rarityElement.selectedIndex].text;
+      const power = getMaxPowerByRarity(rarity);
+      
+      if (powerLevelElement) {
+        powerLevelElement.value = power;
       }
     });
-  });
+  }
 
-  document.getElementById('resetEffects').addEventListener('click', function(event) {
-    event.preventDefault()
+  // Change Power on Random Create
 
-    selectedEffect = document.getElementById('addEffect');
-    effectPower = parseInt(selectedEffect.options[selectedEffect.selectedIndex].dataset.power);
 
-    $("#selectedEffects").text("")
-    totalPower = 0
-
-    updateProgressBar()
-
-    $("#addEffectBtn").removeAttr("disabled");
-  });
 
   // Add effect button
-  document.getElementById('addEffectBtn').addEventListener('click', function() {
-    event.preventDefault()
+  if($("#addEffectBtn").length == 1) {
+    document.getElementById('addEffectBtn').addEventListener('click', function() {
+      event.preventDefault()
 
-    selectedEffect = document.getElementById('addEffect');
-    effectPower = parseInt(selectedEffect.options[selectedEffect.selectedIndex].dataset.power);
-    effectId =  parseInt(selectedEffect.options[selectedEffect.selectedIndex].dataset.id);
-    effectType = selectedEffect.options[selectedEffect.selectedIndex].dataset.type;
-    
-    // Check if the effect is already added
-    if (isEffectAlreadySelected()) {
-      alert('This effect has already been added!');
-      return;
-    }
-
-    // Check if the effect type is already added
-    if (isEffectTypeAlreadySelected()) {
-      alert('This effect type has already been added!');
-      return;
-    }
-
-    if (totalPower + effectPower <= maxPower) {
-      totalPower += effectPower;
-
-      var effectName = selectedEffect.options[selectedEffect.selectedIndex].text;
-      const li = document.createElement('li');
-      li.className = 'list-group-item d-flex justify-content-between align-items-center'
-      li.innerHTML = `${effectName}<button class="btn btn-sm btn-outline-danger remove-effect-btn">Remove</button>`;
-      li.dataset.effectId = effectId
-      li.dataset.power = effectPower
-      li.dataset.type = effectType
-
-      document.getElementById('selectedEffects').appendChild(li);
-
-      updateProgressBar()
-
-      if(totalPower >= maxPower ) {
-        $("#addEffectBtn").prop('disabled', true)
-        $("#createItem").prop('disabled', false)
-        $("#createItem").removeClass("disabled")
-        $("#createItem").removeClass("btn-outline-primary")
-        $("#createItem").addClass("btn-primary")
+      selectedEffect = document.getElementById('addEffect');
+      effectPower = parseInt(selectedEffect.options[selectedEffect.selectedIndex].dataset.power);
+      effectId =  parseInt(selectedEffect.options[selectedEffect.selectedIndex].dataset.id);
+      effectType = selectedEffect.options[selectedEffect.selectedIndex].dataset.type;
+      
+      // Check if the effect is already added
+      if (isEffectAlreadySelected()) {
+        alert('This effect has already been added!');
+        return;
       }
 
-    } else {
-      alert('Total power exceeded!');
-    }
-  });
+      // Check if the effect type is already added
+      if (isEffectTypeAlreadySelected()) {
+        alert('This effect type has already been added!');
+        return;
+      }
+
+      if (totalPower + effectPower <= maxPower) {
+        totalPower += effectPower;
+
+        var effectName = selectedEffect.options[selectedEffect.selectedIndex].text;
+        const div = document.createElement('div');
+        div.className = 'list-group-item d-flex justify-content-between align-items-center'
+        div.innerHTML = `${effectName}<button class="btn btn-sm btn-outline-danger remove-effect-btn">Remove</button>`;
+        div.dataset.effectId = effectId
+        div.dataset.power = effectPower
+        div.dataset.type = effectType
+
+        document.getElementById('selectedEffects').appendChild(div);
+
+        updateProgressBar()
+
+        if(totalPower >= maxPower ) {
+          $("#addEffectBtn").prop('disabled', true)
+          $("#createItem").prop('disabled', false)
+          $("#createItem").removeClass("disabled")
+          $("#createItem").removeClass("btn-outline-primary")
+          $("#createItem").addClass("btn-primary")
+        }
+
+      } else {
+        $("#notification_message").text('Effect cannot be created: total power exceeded.')
+        $("#notifications").removeClass('success')
+        $("#notifications").addClass('danger')
+        $("#notifications").show("slow", "swing")
+
+        setTimeout(function(){
+          $("#notifications").hide("slow", "swing")
+        }, 4000)
+      }
+    });
+  }
 
   // Create Item
-  document.getElementById('createItem').addEventListener('click', function(event) {
-    event.preventDefault()
+  if($("#createItem").length == 1) {
+    document.getElementById('createItem').addEventListener('click', function(event) {
+      event.preventDefault()
 
-    var category = $("#addCategory :selected").val()
-    var name = $("#item_name").val()
-    var rarity = $("#addRarity :selected").text()
-    var weapon = category == "Weapons" ? $("#addWeaponDropdown :selected").text() : ""
-    var effects = []
-    $.each($("#selectedEffects")[0].children, function(i, li) {
-      effects.push(li.dataset.effectId)
-    });
-    var power = $("#item_power").val()
+      var category = $("#addCategory :selected").val()
+      var name = $("#item_name").val()
+      var rarity = $("#addRarity :selected").text()
+      var weapon = category == "Weapons" ? $("#addWeaponDropdown :selected").text() : ""
+      var effects = []
+      $.each($("#selectedEffects")[0].children, function(i, li) {
+        effects.push(li.dataset.effectId)
+      });
+      var power = $("#item_power").val()
 
-    $.ajax({
-      url: '/items/create_item',
-      type: 'POST',
-      data: {
-        name: name,
-        category: category,
-        weapon: weapon,
-        rarity: rarity,
-        power: power,
-        effects: effects,
-      },
-      success: function(response) {
-        console.log('Success:', response);
-      },
-      error: function(error) {
-        console.error('Error:', error);
-      }
+      $.ajax({
+        url: '/items/create_item',
+        type: 'POST',
+        data: {
+          name: name,
+          category: category,
+          weapon: weapon,
+          rarity: rarity,
+          power: power,
+          effects: effects,
+        },
+        success: function(response) {
+          console.log('Success:', response);
+          $("#notification_message").text("The " + $("#addCategory :selected").text() + " " + name + " was created!")
+          $("#notifications").removeClass('danger')
+          $("#notifications").addClass('success')
+          $("#notifications").show("slow", "swing")
+
+          setTimeout(function(){
+            $("#notifications").hide("slow", "swing")
+          }, 4000)
+
+        },
+        error: function(error) {
+          console.error('Error:', error);
+          $("#notification_message").text("Object " + name + " was NOT created! " + JSON.stringify(error))
+          $("#notifications").removeClass('success')
+          $("#notifications").addClass('danger')
+          $("#notifications").show("slow", "swing")
+
+          setTimeout(function(){
+            $("#notifications").hide("slow", "swing")
+          }, 12000)
+        }
+      });
     });
-  });
+  }
   
   // Remove effect from the list and update total power
-  document.getElementById('selectedEffects').addEventListener('click', function(event) {
-    if (event.target.classList.contains('remove-effect-btn')) {
-      const listItem = event.target.parentElement;  // Get the parent list item (effect)
-      const effectPower = parseInt(listItem.dataset.power);  // Get the power level of the effect being removed
+  if($("#selectedEffects").length == 1) {
+    document.getElementById('selectedEffects').addEventListener('click', function(event) {
+      if (event.target.classList.contains('remove-effect-btn')) {
+        const listItem = event.target.parentElement;  // Get the parent list item (effect)
+        const effectPower = parseInt(listItem.dataset.power);  // Get the power level of the effect being removed
 
-      // Update total power by subtracting the power of the removed effect
-      totalPower -= effectPower;
+        // Update total power by subtracting the power of the removed effect
+        totalPower -= effectPower;
 
-      // Remove the effect from the list
-      listItem.remove();
+        // Remove the effect from the list
+        listItem.remove();
 
-      updateProgressBar()
-    }
-  });
+        updateProgressBar()
+      }
+    });
+  }
 });

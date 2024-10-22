@@ -4,7 +4,8 @@
 
 <%= form_with url: create_random_items_path, method: :post, data: { turbo: false }, local: true do |form| %>
 <div class="container overflow-hidden">
-  <div class="row">
+  <div class="row" style="height: 400px">
+
       <div class="col-5 text-center">
         <div class="form-group">
           <%= form.label :category_id, "Category", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
@@ -15,6 +16,15 @@
           <%= form.label :power_level, "Power", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
           <%= form.select :power_level, options_for_select(@power_levels), prompt: "Choose power level", class: "form-control" %>
         </div>
+
+        <div class="form-group">
+          <%= form.label :rarity, "Rarity", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
+          <%= form.collection_select :rarity, @rarities, :id, :name, prompt: "Choose rarity", class: "form-control" %>
+        </div>
+
+        <div class="form-group">
+          
+        </div>
       </div>
 
       <div class="col-1 vertical-span"></div>
@@ -22,9 +32,9 @@
       <div class="col-5" style="padding-left: 2%">
         <div class="card-group">
           <div class="card" style="width: 18rem; max-width: 400px; margin: 25px; border: 1px solid gray; border-radius: 5px;">
-            <%= image_tag "hero.png", alt: "Hero Image", class: "img-fluid", style: "max-height: 175px" %>
+            <%= image_tag "hero.png", alt: "Hero Image", class: "img-fluid", style: "max-height: 275px" %>
             <div class="card-body">
-              <h5 class="card-title">Creating... </h5>
+              <h5 class="card-title">Creating something amazing... </h5>
               <p class="card-text">In here we can create a new object.</p>
           </div>
         </div>

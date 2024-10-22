@@ -99,6 +99,7 @@ class ItemsController < ApplicationController
   def create_random
     @categories = Category.all
     @power_levels = (1..10).to_a
+    @rarities = Rarity.all
 
     power = params[:power_level]
     category_id = params[:category_id]
@@ -120,14 +121,14 @@ class ItemsController < ApplicationController
     rarity = Rarity.find_by(name: rarity_name)
     
     item = Item.create!(
-      name:               "temp name",
-      category:           category,
-      rarity:             rarity,
-      description:        "A very interesting item with mysterious properties.",
-      item_type:          "item type",
-      power:              power,
-      weight:             rand(category.min_weight..category.max_weight),
-      price:              rand(rarity.min_price..rarity.max_price),
+      name:                "temp name",
+      category:            category,
+      rarity:              rarity,
+      description:         "A very interesting item with mysterious properties.",
+      item_type:           "item type",
+      power:               power,
+      weight:              rand(category.min_weight..category.max_weight),
+      price:               rand(rarity.min_price..rarity.max_price),
       requires_attunement: power > 2,
     )
 
@@ -215,10 +216,10 @@ class ItemsController < ApplicationController
 
     def getEffect(power, category, effect_types)
       Effect.joins(:categories)
-                .where(categories: { id: category.id })
-                .where.not(effect_type: effect_types)
-                .where("power_level <= ?", power)
-                .sample
+            .where(categories: { id: category.id })
+            .where.not(effect_type: effect_types)
+            .where("power_level <= ?", power)
+            .sample
     end
 
     def getWeaponType
@@ -227,9 +228,9 @@ class ItemsController < ApplicationController
 
     def getRarityName(rarity_name)
       rarity_options = {
-          "Common" => ["Simple", "Regular", "Mundane", "Acceptable", "Mediocre", "Consistent", "Ordinary", "Usual", "Normal", "Plain", "Routine", "Standard", "Typical", "Familiar", "Generic"],
-          "Uncommon" => ["Good", "Improved", "Promising", "Advantageous", "Competent", "Helpful", "Respected", "Remarkable", "Noble", "Uncommon", "Distinct", "Noteworthy", "Notable", "Beneficial", "Unique"],
-          "Rare" => ["Powerful", "Great", "Prestigious", "Outstanding", "Exceptional", "Admirable", "Premium", "Notable", "Superior", "Renowned", "Exclusive", "Valuable", "Esteemed", "Rare", "Select"],
+          "Common"    => ["Simple", "Regular", "Mundane", "Acceptable", "Mediocre", "Consistent", "Ordinary", "Usual", "Normal", "Plain", "Routine", "Standard", "Typical", "Familiar", "Generic"],
+          "Uncommon"  => ["Good", "Improved", "Promising", "Advantageous", "Competent", "Helpful", "Respected", "Remarkable", "Noble", "Uncommon", "Distinct", "Noteworthy", "Notable", "Beneficial", "Unique"],
+          "Rare"      => ["Powerful", "Great", "Prestigious", "Outstanding", "Exceptional", "Admirable", "Premium", "Notable", "Superior", "Renowned", "Exclusive", "Valuable", "Esteemed", "Rare", "Select"],
           "Very Rare" => ["Amazing", "Spectacular", "Omniscient", "Chivalrous", "Marvelous", "Iconic", "Celestial", "Exquisite", "Eminent", "Admirable", "Astonishing", "Incredible", "Phenomenal", "Mystical", "Unrivaled"],
           "Legendary" => ["Legendary", "Overpowered", "Magnificent", "Heroic", "Immortalized", "Fabled", "Exalted", "Arcane", "Timeless", "Supreme", "Unmatched", "Divine", "Unparalleled", "Sovereign", "Glorious", "Imperial"],
           "Ancestral" => ["Ancestral", "Mythic", "Epic", "Primordial", "Primal", "Transcendent", "Divine", "Eternal", "Celestial", "Infinite", "Ancient", "Cosmic", "Primeval", "Originating", "Boundless"]

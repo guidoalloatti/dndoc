@@ -12,7 +12,7 @@
         <th>Price (MO)</th>
         <th>Weight (lbs)</th>
         <th>Power</th>
-        <th>Effect</th>
+        <th>Effect | Power | Type</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -28,11 +28,14 @@
           <td><%= item.weight %></td>
           <td><%= item.power %></td>
           <td>
-          	<% item.effects.each do |effect| %>
-          	<li>
-          			<%= "#{effect.description} (#{effect.power_level})" %>
-          	</li>
-          	<% end %>
+            <ul>
+            <% item.effects.each_with_index do |effect, i| %>
+              <li><%= "#{effect.description} | #{effect.power_level} | #{effect.effect_type}" %></li>
+              <% if item.effects.size-1 != i %>
+                <hr class="cool-hr-sm">
+              <% end %>
+            <% end %>
+            </ul>
           </td>
           <td style="min-width: 185px;">
           	<div style="display: flex; gap: 5px;">

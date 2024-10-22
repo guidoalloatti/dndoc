@@ -21,11 +21,13 @@
           <td><%= effect.effect_type %></td>
           <td><%= effect.power_level %></td>
           <td>
-          	<% effect.categories.each do |category| %>
-          	<li>
-          			<%= category.name %>
-          	</li>
-          	<% end %>
+            <ul>
+            	<% effect.categories.each do |category| %>
+            	<li>
+            			<%= category.name %>
+            	</li>
+            	<% end %>
+            </ul>
           </td>
           <td><%= truncate(effect.description, length: 100) %></td>
           <td style="min-width: 185px;">
