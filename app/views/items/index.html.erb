@@ -29,12 +29,12 @@
           <td><%= item.power %></td>
           <td>
             <ul>
-            <% item.effects.each_with_index do |effect, i| %>
-              <li><%= "#{effect.description} | #{effect.power_level} | #{effect.effect_type}" %></li>
-              <% if item.effects.size-1 != i %>
-                <hr class="cool-hr-sm">
-              <% end %>
-            <% end %>
+              <li>
+                  <% item.effects.each_with_index do |effect, i| %>
+                    <span class=""><%= "➜ Type: #{effect.effect_type} | Power: #{effect.power_level} | #{effect.description}" %></span>
+                    <br>       
+                  <% end %>
+                </li>
             </ul>
           </td>
           <td style="min-width: 185px;">

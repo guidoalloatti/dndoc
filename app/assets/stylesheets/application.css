@@ -121,9 +121,9 @@ li:hover::before {
   color: white;
 }
 
-li::before {
+/*li::before {
   content: "➜ ";
   font-size: 1em;
   color: #0d6efd;
   margin-right: 5px;
-}
+}*/

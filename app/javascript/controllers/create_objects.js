@@ -140,7 +140,7 @@ $(document).ready(function($) {
           'data-id': effect.id,
           'data-power': effect.power_level,
           'data-type': effect.effect_type,
-          text: effect.name + " | " + effect.description + " | " + effect.effect_type + " | Power: " + effect.power_level
+          text: "P: " + effect.power_level + " | " + effect.effect_type + " | " + effect.name + " | " + effect.description 
         })
       );
     });
@@ -317,9 +317,8 @@ $(document).ready(function($) {
     });
   }
 
-  // Change Power on Random Create
-
-
+  // Change Power on Random Createç
+  // TODO
 
   // Add effect button
   if($("#addEffectBtn").length == 1) {
@@ -333,14 +332,14 @@ $(document).ready(function($) {
       
       // Check if the effect is already added
       if (isEffectAlreadySelected()) {
-        alert('This effect has already been added!');
-        return;
+        alert('This effect has already been added!')
+        return
       }
 
       // Check if the effect type is already added
       if (isEffectTypeAlreadySelected()) {
-        alert('This effect type has already been added!');
-        return;
+        alert('This effect type has already been added!')
+        return
       }
 
       if (totalPower + effectPower <= maxPower) {

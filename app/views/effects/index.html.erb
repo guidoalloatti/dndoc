@@ -22,11 +22,12 @@
           <td><%= effect.power_level %></td>
           <td>
             <ul>
-            	<% effect.categories.each do |category| %>
             	<li>
-            			<%= category.name %>
+            	  <% effect.categories.each do |category| %>
+            			<%= "➜ #{category.name}" %>
+                  <br>
+            	  <% end %>
             	</li>
-            	<% end %>
             </ul>
           </td>
           <td><%= truncate(effect.description, length: 100) %></td>
