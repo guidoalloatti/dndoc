@@ -1,6 +1,55 @@
-<h1><%= @effect.name %></h1>
-<p><%= @effect.description %></p>
-<p>Power Level: <%= @effect.power_level %></p>
+<div class="container mt-5">
+  <div class="card shadow-lg border-0">
+    <div class="card-body">
+      <div class="text-center">
+        <h3 class="display-5 font-weight-bold text-primary"><%= @effect.name %></h3>
+        
+        <p class="display-6 text-secondary"><strong>Effect ID: </strong><%= @effect.id %></p>
+      </div>
+    </div>
+  </div>
 
-<%= link_to 'Edit', edit_effect_path(@effect) %> |
-<%= link_to 'Back to Effects', effects_path %>
+  <div class="row mt-4">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h4 class="text-secondary">Effect Details</h4>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Effect Type:</strong> <%= @effect.effect_type %></li>
+            <li class="list-group-item"><strong>Power Level:</strong> <%= @effect.power_level %></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+     <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h4 class="text-secondary">Effect</h4>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <p><%= @effect.description %></p>
+                </div>
+              </li>
+            </ul>
+            <hr class="hr-cool">
+           <h4 class="text-secondary">Categories</h4>
+            <% @effect.categories.each do |category| %>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <h6 class="mx-2 mt-1 mb-1"><%= category.name %></h6>
+              </li>
+            <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  	<hr class="hr-cool">
+
+  	<div class="mt-4 text-center">
+    	<%= link_to 'Edit', edit_effect_path(@effect), class: "btn btn-secondary btn-lg mx-2" %> 
+    	<%= link_to 'Back', effects_path, class: "btn btn-danger btn-lg mx-2" %>
+  	</div>
+  </div>
+</div>

@@ -1,9 +1,10 @@
 <%= render "layouts/subheader", :locals => {:count => 0, :name => "Generate Items"} %>
-
-<hr class="cool-hr">
+<div class="text-center">
+  <%= link_to 'Back to Items Index', items_path, class: "btn btn-sm btn-outline-primary mt-3" %>
+</div>
 
 <%= form_with url: create_random_items_path, method: :post, data: { turbo: false }, local: true do |form| %>
-<div class="container overflow-hidden">
+<div class="container overflow-hidden mt-5">
   <div class="row" style="height: 400px">
 
       <div class="col-5 text-center">
@@ -14,12 +15,12 @@
 
         <div class="form-group">
           <%= form.label :power_level, "Power", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
-          <%= form.select :power_level, options_for_select(@power_levels), prompt: "Choose power level", class: "form-control" %>
+          <%= form.select :power_level, options_for_select(@power_levels), class: "form-control" %>
         </div>
 
         <div class="form-group">
           <%= form.label :rarity, "Rarity", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
-          <%= form.collection_select :rarity, @rarities, :id, :name, prompt: "Choose rarity", class: "form-control" %>
+          <%= form.collection_select :rarity, @rarities, :id, :name, class: "form-control" %>
         </div>
 
         <div class="form-group">

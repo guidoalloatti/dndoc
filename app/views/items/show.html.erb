@@ -1,14 +1,60 @@
-<h1><%= @item.name %></h1>
-<p><%= @item.description %></p>
-<p>Type: <%= @item.item_type %></p>
-<p>Rarity: <%= @item.rarity %></p>
-<p>Category: <%= @item.category.name %></p>
+<div class="container mt-5">
+  <div class="card shadow-lg border-0">
+    <div class="card-body">
+      <div class="text-center">
+        <h1 class="display-5 font-weight-bold text-primary"><%= @item.name %></h1>
+        <p class="lead text-muted"><%= @item.description %></p>
+        <p class="display-6 text-secondary"><strong>Item ID: </strong><%= @item.id %></p>
+      </div>
+    </div>
+  </div>
 
-<h2>Effects</h2>
-<% @item.effects.each do |effect| %>
-  <p><%= effect.name %> - <%= effect.description %> (Power: <%= effect.power_level %>)</p>
-<% end %>
+  <div class="row mt-4">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h4 class="text-secondary">Item Details</h4>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Type:</strong> <%= @item.item_type %></li>
+            <li class="list-group-item"><strong>Rarity:</strong> <%= @item.rarity.name %></li>
+            <li class="list-group-item"><strong>Category:</strong> <%= @item.category.name %></li>
+            <li class="list-group-item"><strong>Power:</strong> <%= @item.power %></li>
+            <li class="list-group-item"><strong>Weight:</strong> <%= @item.weight %></li>
+            <li class="list-group-item"><strong>Price:</strong> <%= @item.price %></li>
+            <li class="list-group-item"><strong>Requires Attunement:</strong> <%= @item.requires_attunement ? "Yes" : "No" %></li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
-<%= link_to 'Add Effect', new_item_effect_path(@item) %>
-<%= link_to 'Edit', edit_item_path(@item) %> |
-<%= link_to 'Back', items_path %>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h4 class="text-secondary">Effects</h4>
+          <% if @item.effects.any? %>
+            <ul class="list-group list-group-flush">
+              <% @item.effects.each do |effect| %>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5 class="font-weight-bold mb-1"><%= effect.name %></h5>
+                    <p class="mb-0"><%= effect.description %></p>
+                  </div>
+                  <span class="badge badge-pill badge-primary">Power: <%= effect.power_level %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-muted">No effects added.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="hr-cool">
+
+  <div class="mt-4 text-center">
+    <%= link_to 'Edit', edit_item_path(@item), class: "btn btn-secondary btn-lg mx-2" %> 
+    <%= link_to 'Back', items_path, class: "btn btn-danger btn-lg mx-2" %>
+  </div>
+</div>

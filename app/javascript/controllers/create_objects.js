@@ -317,8 +317,18 @@ $(document).ready(function($) {
     });
   }
 
-  // Change Power on Random Createç
-  // TODO
+  // Change Power on Random Create
+  if (powerLevelElement) {
+    powerLevelElement.addEventListener('change', function() {
+      
+      const power = powerLevelElement.options[powerLevelElement.selectedIndex].text;
+      const rarity = getRarityValByMaxPower(power)
+      
+      if (powerLevelElement) {
+        rarityElement.value = rarity;
+      }
+    });
+  }
 
   // Add effect button
   if($("#addEffectBtn").length == 1) {
