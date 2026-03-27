@@ -83,6 +83,10 @@
               <li><hr class="dropdown-divider"></li>
               <li><%= link_to raw('<i class="bi bi-person me-2"></i>' + t('nav.profile')), profile_path, class: 'dropdown-item' %></li>
               <li><%= link_to raw('<i class="bi bi-gear me-2"></i>' + t('nav.account_settings')), edit_user_registration_path, class: 'dropdown-item' %></li>
+              <% if current_user.admin? %>
+                <li><hr class="dropdown-divider"></li>
+                <li><%= link_to raw('<i class="bi bi-shield-lock-fill me-2 text-danger"></i>' + t('admin.admin_panel')), admin_root_path, class: 'dropdown-item' %></li>
+              <% end %>
               <li><hr class="dropdown-divider"></li>
               <li><%= button_to raw('<i class="bi bi-box-arrow-right me-2"></i>' + t('nav.sign_out')), destroy_user_session_path, method: :delete, class: 'dropdown-item' %></li>
             </ul>

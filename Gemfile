@@ -62,8 +62,6 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "webpacker", "~> 5.4"
-
 # Pagination
 gem "pagy", "~> 9.0"
 

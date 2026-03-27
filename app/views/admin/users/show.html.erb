@@ -1,0 +1,113 @@
+<% rarity_colors = { 'Common' => 'secondary', 'Uncommon' => 'success', 'Rare' => 'info', 'Very Rare' => 'primary', 'Legendary' => 'warning', 'Ancestral' => 'danger' } %>
+
+<div class="container-fluid py-3 px-md-4" style="max-width: 1400px;">
+
+  <%# ── User Header ── %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body p-3">
+      <div class="d-flex align-items-center gap-3">
+        <%= link_to admin_users_path, class: "rounded-2 bg-body-tertiary p-2 d-flex text-decoration-none flex-shrink-0" do %>
+          <i class="bi bi-arrow-left text-muted"></i>
+        <% end %>
+
+        <%# Avatar %>
+        <% if @user.has_avatar? %>
+          <% if @user.avatar.attached? %>
+            <%= image_tag @user.avatar, class: "rounded-circle object-fit-cover flex-shrink-0", width: 48, height: 48 %>
+          <% else %>
+            <img src="<%= @user.avatar_url %>" class="rounded-circle object-fit-cover flex-shrink-0" width="48" height="48">
+          <% end %>
+        <% else %>
+          <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+            <span class="fs-5 fw-bold text-primary"><%= @user.initials %></span>
+          </div>
+        <% end %>
+
+        <%# Name + Meta %>
+        <div class="flex-grow-1 min-width-0">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <h5 class="fw-bold mb-0"><%= @user.full_name %></h5>
+            <% if @user.admin? %>
+              <span class="badge bg-danger bg-opacity-10 text-danger"><i class="bi bi-shield-fill me-1"></i>Admin</span>
+            <% else %>
+              <span class="badge bg-secondary bg-opacity-10 text-secondary">User</span>
+            <% end %>
+            <% if @user.google_linked? %>
+              <span class="badge bg-primary bg-opacity-10 text-primary"><i class="bi bi-google me-1"></i>Google</span>
+            <% end %>
+          </div>
+          <div class="text-muted small"><%= @user.email %></div>
+        </div>
+
+        <%# Stats (inline) %>
+        <div class="d-none d-md-flex align-items-center gap-4">
+          <div class="text-center">
+            <div class="fw-bold text-primary fs-5 lh-1"><%= @user.items.count %></div>
+            <div class="text-muted" style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;"><%= t('admin.total_items') %></div>
+          </div>
+          <div class="vr" style="height: 30px;"></div>
+          <div class="text-center">
+            <div class="fw-bold lh-1"><%= @user.created_at.strftime("%b %d, '%y") %></div>
+            <div class="text-muted" style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;"><%= t('admin.joined') %></div>
+          </div>
+        </div>
+
+        <%# Toggle Admin Button %>
+        <% unless @user == current_user %>
+          <%= button_to toggle_admin_admin_user_path(@user), method: :patch,
+                class: "btn btn-sm #{@user.admin? ? 'btn-outline-danger' : 'btn-outline-success'} flex-shrink-0",
+                data: { turbo_confirm: t('admin.confirm_role_change', name: @user.full_name, role: @user.admin? ? 'User' : 'Admin') } do %>
+            <i class="bi bi-<%= @user.admin? ? 'shield-x' : 'shield-plus' %> me-1"></i>
+            <span class="d-none d-sm-inline"><%= @user.admin? ? t('admin.revoke_admin') : t('admin.make_admin') %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# ── User's Items ── %>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-bold small text-uppercase text-muted mb-0">
+          <i class="bi bi-box-seam text-primary me-1"></i>
+          <%= t('admin.user_items', name: @user.first_name || @user.email.split('@').first) %>
+        </h6>
+        <% if @items.any? %>
+          <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size: 0.65rem;"><%= @pagy.count %> items</span>
+        <% end %>
+      </div>
+
+      <% if @items.any? %>
+        <% @items.each_with_index do |item, idx| %>
+          <div class="d-flex align-items-center gap-2 py-2 <%= idx < @items.size - 1 ? 'border-bottom' : '' %>">
+            <span class="badge bg-<%= rarity_colors[item.rarity&.name] || 'secondary' %> <%= item.rarity&.name == 'Legendary' ? 'text-dark' : '' %>" style="font-size: 0.55rem; width: 60px;"><%= item.rarity&.name %></span>
+            <div class="flex-grow-1 min-width-0">
+              <%= link_to item.name, item_path(item), class: "fw-semibold small text-decoration-none text-truncate d-block" %>
+            </div>
+            <span class="text-muted small d-none d-md-inline"><%= item.category&.name %></span>
+            <span class="badge bg-primary rounded-pill" style="font-size: 0.6rem;"><%= item.power %></span>
+            <% if item.effects.any? %>
+              <span class="badge bg-info bg-opacity-10 text-info" style="font-size: 0.6rem;"><%= item.effects.count %> fx</span>
+            <% end %>
+            <span class="text-muted" style="font-size: 0.6rem;"><%= item.created_at.strftime("%b %d") %></span>
+            <%= link_to item_path(item), class: "btn btn-sm btn-outline-primary p-1", style: "width: 26px; height: 26px;" do %>
+              <i class="bi bi-eye" style="font-size: 0.65rem;"></i>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if @pagy.pages > 1 %>
+          <div class="d-flex justify-content-center mt-3">
+            <%== pagy_bootstrap_nav(@pagy) %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-center py-4">
+          <i class="bi bi-inbox text-muted" style="font-size: 1.5rem;"></i>
+          <p class="text-muted small mt-1 mb-0"><%= t('admin.no_items') %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

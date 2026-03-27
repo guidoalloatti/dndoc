@@ -67,6 +67,10 @@ class User < ApplicationRecord
     provider == "google_oauth2"
   end
 
+  def admin?
+    admin
+  end
+
   # Skip current_password validation for Google-linked users who never set a password
   def update_without_password(params, *options)
     if params[:password].blank? && params[:password_confirmation].blank?

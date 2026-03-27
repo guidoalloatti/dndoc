@@ -5,6 +5,15 @@ Rails.application.routes.draw do
   }
 
   scope "(:locale)", locale: /en|es/ do
+    namespace :admin do
+      root "dashboard#index"
+      resources :users, only: [:index, :show] do
+        member do
+          patch :toggle_admin
+        end
+      end
+    end
+
     resource :profile, only: [:show, :edit, :update]
 
     resources :items do
