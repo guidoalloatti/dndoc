@@ -80,6 +80,4 @@ test:
 #
 production:
   <<: *default
-  database: dndoc_production
-  username: dndoc
-  password: <%= ENV["DNDOC_DATABASE_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>
