@@ -4,6 +4,7 @@ set -o errexit
 
 bundle install
 npm install
+export NODE_OPTIONS=--openssl-legacy-provider
 bundle exec rake assets:precompile
 bundle exec rake assets:clean
 bundle exec rake db:migrate
