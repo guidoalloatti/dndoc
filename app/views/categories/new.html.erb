@@ -1,4 +1,11 @@
-<h1><%= action_name.capitalize %> Category</h1>
-<%= render 'form', category: @category %>
-
-<%= link_to 'Back', categories_path %>
+<div class="container mt-4" style="max-width: 560px;">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0 fw-bold">
+      <i class="bi bi-plus-circle text-primary me-1"></i> <%= t('categories.new') %>
+    </h4>
+    <%= link_to categories_path, class: "btn btn-sm btn-outline-secondary" do %>
+      <i class="bi bi-arrow-left me-1"></i><%= t('shared.back') %>
+    <% end %>
+  </div>
+  <%= render 'form', category: @category %>
+</div>

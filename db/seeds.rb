@@ -113,16 +113,13 @@ Effect.create!([
 	{ name: "Attack +4", effect_type: "Attack Bonus", power_level: 4, description: "Your attack and damage rolls add +4", categories: [weapon_category] },
 	{ name: "Attack +5", effect_type: "Attack Bonus", power_level: 5, description: "Your attack and damage rolls add +5", categories: [weapon_category] },
   { name: "Minor Luck", effect_type: "Attack Bonus", power_level: 2, description: "Allows to get 10 instead of rolling the d20 for an attack roll (3/day)", categories: [weapon_category, gloves_category] },
-
   { name: "Divine Mattock", effect_type: "Attack Bonus", power_level: 2, description: "As an action, you can call upon the might of the All-Father and use it to cast Move Earth or Fabricate. Once this property is used, it can’t be used again until the next dawn", categories: [weapon_category, gloves_category] },
   { name: "Reforged", effect_type: "Attack Bonus", power_level: 2, description: "While holding this weapon, you have resistance to fire damage and are immune to exhaustion. Additionally, you have proficiency with smith's tools and have advantage on all ability checks made using them", categories: [weapon_category, gloves_category] },
   { name: "Smith's Spells", effect_type: "Attack Bonus", power_level: 3, description: "While this item is on your person, you can use an action to cast one of the following spells (save DC 18): Animate Objects, Heat Metal, Fabricate, Magic Weapon, Mending, Shatter. Once you use the hammer to cast a spell, the spell can't be cast again from it until the next dusk", categories: [weapon_category, gloves_category] },
-
   { name: "Conjure Earth Elemental", effect_type: "Conjuration", power_level: 2, description: "If you are holding it, you can use your action to cast the Conjure Elemental spell from it, summoning an earth elemental. You can't use this property again until the next dawn", categories: [weapon_category, gloves_category, boots_category, bracelet_category] },
   { name: "Helpful Hand", effect_type: "Handling", power_level: 3, description: "As an action, you can use the bracelet to cast Bigby's Hand as a 9th-level spell (spell attack bonus +13). When you cast the spell this way, the spell doesn’t require concentration. Once this property is used, it can’t be used again until the next dawn.", categories: [weapon_category, gloves_category, bracelet_category] },
   { name: "Dexterous Fingers", effect_type: "Handling", power_level: 1, description: "While wearing the bracelet, you can cast Mage Hand", categories: [weapon_category, gloves_category, ring_category, amulet_category, shield_category, boots_category, wands_category, staff_category, armor_category, bracelet_category] },
   { name: "Sentient", effect_type: "Sentient", power_level: 4, description: "The object is a sentient chaotic evil weapon with an Intelligence of 21, a Wisdom of 24, and a Charisma of 24. It has hearing and darkvision out to a range of 120 feet. The object communicates telepathically with its wielder and can speak, read, and understand Oestron and 2 more languages", categories: [weapon_category, gloves_category, bracelet_category] },
-
   { name: "Mithril Alloy", effect_type: "Material", power_level: 3, description: "Damage magical criatures, +1 to Attack, +1 to Damage, +1 to AC, +1 to Initiative Rolls, cannot be destroyed", categories: [weapon_category, armor_category, shield_category] },
   { name: "Mithril", effect_type: "Material", power_level: 5, description: "Damage magical criatures, +3 to Attack, +3 to Damage, +3 to AC, +3 to Initiative Rolls, cannot be destroyed", categories: [weapon_category, armor_category, shield_category] },
   { name: "Lightweight", effect_type: "Material", power_level: 1, description: "The object is extraordinarily light, reducing the weight by half", categories: [weapon_category, shield_category, armor_category] },
@@ -145,9 +142,7 @@ Effect.create!([
   { name: "Elemental Infusion", effect_type: "Material", power_level: 3, description: "The weapon can be infused with elemental energy (fire, cold, lightning), dealing an extra 1d6 damage of that type", categories: [weapon_category] },
   { name: "Temporal Edge", effect_type: "Material", power_level: 3, description: "Once per day, the weapon allows its wielder to slow time briefly, gaining an extra action on their turn", categories: [weapon_category] },
   { name: "Celestial Binding", effect_type: "Material", power_level: 2, description: "The object is bound to its wielder by an unbreakable magical bond. If separated, it can be summoned back as a bonus action", categories: [weapon_category, shield_category] },
-
 	{ name: "Ammunition Return", effect_type: "Ammunition Magic", power_level: 2, description: "The ammunition returns magically and can be used again in the next attack", categories: [ammunition_category] },
-
 	{ name: "Damage I - Fire", effect_type: "Attack Damage", power_level: 1, description: "Adds 1d4 Fire damage", categories: [weapon_category, ammunition_category, gloves_category] },
 	{ name: "Damage I - Cold", effect_type: "Attack Damage", power_level: 1,   description: "Adds 1d4 Cold damage", categories: [weapon_category, ammunition_category, gloves_category] },	
 	{ name: "Damage I - Acid", effect_type: "Attack Damage", power_level: 1, description: "Adds 1d4 Acid damage", categories: [weapon_category, ammunition_category, gloves_category] },	
@@ -161,7 +156,6 @@ Effect.create!([
 	{ name: "Damage I - Thunder", effect_type: "Attack Damage", power_level: 1, description: "Adds 1d4 Thunder damage", categories: [weapon_category, ammunition_category, gloves_category] },
 	{ name: "Damage I - Psychic", effect_type: "Attack Damage", power_level: 1, description: "Adds 1d4 Psychic damage", categories: [weapon_category, ammunition_category, gloves_category] },
 	{ name: "Damage I - Lightning", effect_type: "Attack Damage", power_level: 1, description: "Adds 1d4 Lightning damage", categories: [weapon_category, ammunition_category, gloves_category] },	
-
 	{ name: "Damage II - Fire", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d6 Fire damage", categories: [weapon_category, ammunition_category] },	
 	{ name: "Damage II - Cold", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d6 Cold damage", categories: [weapon_category, ammunition_category] },	
 	{ name: "Damage II - Acid", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d6 Acid damage", categories: [weapon_category, ammunition_category] },	
@@ -175,7 +169,6 @@ Effect.create!([
 	{ name: "Damage II - Thunder", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d6 Thunder damage", categories: [weapon_category, ammunition_category] },
 	{ name: "Damage II - Psychic", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d6 Psychic damage", categories: [weapon_category, ammunition_category] },
 	{ name: "Damage II - Lightning", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d6 Lightning damage", categories: [weapon_category, ammunition_category] },
-
 	{ name: "Damage III - Fire", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d8 Fire damage", categories: [weapon_category, ammunition_category] },	
 	{ name: "Damage III - Cold", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d8 Cold damage", categories: [weapon_category, ammunition_category] },	
 	{ name: "Damage III - Acid", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d8 Acid damage", categories: [weapon_category, ammunition_category] },	
@@ -188,8 +181,7 @@ Effect.create!([
 	{ name: "Damage III - Slashing", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d8 Slashing damage", categories: [weapon_category, ammunition_category] },
 	{ name: "Damage III - Thunder", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d8 Thunder damage", categories: [weapon_category, ammunition_category] },
 	{ name: "Damage III - Psychic", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d8 Psychic damage", categories: [weapon_category, ammunition_category] },
-	{ name: "Damage III - Lightning", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d8 Lightning damage", categories: [weapon_category, ammunition_category] },	
-  
+	{ name: "Damage III - Lightning", effect_type: "Attack Damage", power_level: 2, description: "Adds 1d8 Lightning damage", categories: [weapon_category, ammunition_category] },	 
   { name: "Damage IV - Fire", effect_type: "Attack Damage", power_level: 3, description: "Adds 2d6 Fire damage", categories: [weapon_category] },	
 	{ name: "Damage IV - Cold", effect_type: "Attack Damage", power_level: 3, description: "Adds 2d6 Cold damage", categories: [weapon_category] },	
 	{ name: "Damage IV - Acid", effect_type: "Attack Damage", power_level: 3, description: "Adds 2d6 Acid damage", categories: [weapon_category] },	
@@ -203,7 +195,6 @@ Effect.create!([
 	{ name: "Damage IV - Thunder", effect_type: "Attack Damage", power_level: 3, description: "Adds 2d6 Thunder damage", categories: [weapon_category] },
 	{ name: "Damage IV - Psychic", effect_type: "Attack Damage", power_level: 3, description: "Adds 2d6 Psychic damage", categories: [weapon_category] },
 	{ name: "Damage IV - Lightning", effect_type: "Attack Damage", power_level: 3, description: "Adds 2d6 Lightning damage", categories: [weapon_category] },
-
 	{ name: "Damage V - Fire", effect_type: "Attack Damage", power_level: 3, description: "Adds 3d6 Fire damage", categories: [weapon_category] },	
 	{ name: "Damage V - Cold", effect_type: "Attack Damage", power_level: 3, description: "Adds 3d6 Cold damage", categories: [weapon_category] },	
 	{ name: "Damage V - Acid", effect_type: "Attack Damage", power_level: 3, description: "Adds 3d6 Acid damage", categories: [weapon_category] },	
@@ -217,7 +208,6 @@ Effect.create!([
 	{ name: "Damage V - Thunder", effect_type: "Attack Damage", power_level: 3, description: "Adds 3d6 Thunder damage", categories: [weapon_category] },
 	{ name: "Damage V - Psychic", effect_type: "Attack Damage", power_level: 3, description: "Adds 3d6 Psychic damage", categories: [weapon_category] },
 	{ name: "Damage V - Lightning", effect_type: "Attack Damage", power_level: 3, description: "Adds 3d6 Lightning damage", categories: [weapon_category] },
-
   { name: "Damage VI - Fire", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d8 Fire damage", categories: [weapon_category] },  
   { name: "Damage VI - Cold", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d8 Cold damage", categories: [weapon_category] },  
   { name: "Damage VI - Acid", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d8 Acid damage", categories: [weapon_category] },  
@@ -231,7 +221,6 @@ Effect.create!([
   { name: "Damage VI - Thunder", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d8 Thunder damage", categories: [weapon_category] },
   { name: "Damage VI - Psychic", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d8 Psychic damage", categories: [weapon_category] },
   { name: "Damage VI - Lightning", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d8 Lightning damage", categories: [weapon_category] },
-
   { name: "Damage VII - Fire", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d10 Fire damage", categories: [weapon_category] },  
   { name: "Damage VII - Cold", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d10 Cold damage", categories: [weapon_category] },  
   { name: "Damage VII - Acid", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d10 Acid damage", categories: [weapon_category] },  
@@ -245,7 +234,6 @@ Effect.create!([
   { name: "Damage VII - Thunder", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d10 Thunder damage", categories: [weapon_category] },
   { name: "Damage VII - Psychic", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d10 Psychic damage", categories: [weapon_category] },
   { name: "Damage VII - Lightning", effect_type: "Attack Damage", power_level: 4, description: "Adds 3d10 Lightning damage", categories: [weapon_category] },
-
   { name: "Damage VIII - Fire", effect_type: "Attack Damage", power_level: 5, description: "Adds 3d12 Fire damage", categories: [weapon_category] },  
   { name: "Damage VIII - Cold", effect_type: "Attack Damage", power_level: 5, description: "Adds 3d12 Cold damage", categories: [weapon_category] },  
   { name: "Damage VIII - Acid", effect_type: "Attack Damage", power_level: 5, description: "Adds 3d12 Acid damage", categories: [weapon_category] },  
@@ -259,56 +247,47 @@ Effect.create!([
   { name: "Damage VIII - Thunder", effect_type: "Attack Damage", power_level: 5, description: "Adds 3d12 Thunder damage", categories: [weapon_category] },
   { name: "Damage VIII - Psychic", effect_type: "Attack Damage", power_level: 5, description: "Adds 3d12 Psychic damage", categories: [weapon_category] },
   { name: "Damage VIII - Lightning", effect_type: "Attack Damage", power_level: 5, description: "Adds 3d12 Lightning damage", categories: [weapon_category] },
-
 	{ name: "Flexibility", effect_type: "Flexibility", power_level: 1, description: "If an item have an attack bonus of +1 up to +5, this bonus can be used as CA for 1 turn", categories: [weapon_category, gloves_category] },
 	{ name: "Frostbite", effect_type: "Frosting", power_level: 1, description: "Reduces enemy movement speed by 10 feet on a successful hit", categories: [weapon_category, ammunition_category] },
 	{ name: "Electric Surge", effect_type: "Lightning", power_level: 2, description: "On command and using your bonus action, emits a jolt of electricity that deals 1d8 lightning damage to the nearest enemy", categories: [weapon_category, gloves_category] },
   { name: "Forceful Impact", effect_type: "Knocking", power_level: 2, description: "Adds a chance to knock back enemies 10 feet on a successful hit", categories: [weapon_category, gloves_category] },
-
   { name: "Ammunition I", effect_type: "Attack Bonus", power_level: 1, description: "This ammunition increase your attack and damage rolls add +1", categories: [ammunition_category] },
 	{ name: "Ammunition II", effect_type: "Attack Bonus", power_level: 1, description: "This ammunition increase your attack and damage rolls add +2", categories: [ammunition_category] },
 	{ name: "Ammunition III", effect_type: "Attack Bonus", power_level: 2, description: "This ammunition increase your attack and damage rolls add +3", categories: [ammunition_category] },
 	{ name: "Ammunition IV", effect_type: "Attack Bonus", power_level: 3, description: "This ammunition increase your attack and damage rolls add +4", categories: [ammunition_category] },
 	{ name: "Ammunition V", effect_type: "Attack Bonus", power_level: 4, description: "This ammunition increase your attack and damage rolls add +5", categories: [ammunition_category] },
-
 	{ name: "Defense +1", effect_type: "Defense", power_level: 1, description: "Your armor class add +1", categories: [armor_category, amulet_category, ring_category, gem_category, gloves_category, bracelet_category] },
 	{ name: "Defense +2", effect_type: "Defense", power_level: 2, description: "Your armor class add +2", categories: [armor_category, amulet_category, ring_category, gem_category, bracelet_category] },
 	{ name: "Defense +3", effect_type: "Defense", power_level: 3, description: "Your armor class add +3", categories: [armor_category, amulet_category, ring_category, gem_category] },
-
 	{ name: "Saving Throws I - Strength" , effect_type: "Saving Throws", power_level: 1, description: "You have a +1 to Strength Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, gloves_category, bracelet_category] },
 	{ name: "Saving Throws I - Dexterity" , effect_type: "Saving Throws", power_level: 1, description: "You have a +1 to Dexterity Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, gloves_category, bracelet_category] },
 	{ name: "Saving Throws I - Constitution" , effect_type: "Saving Throws", power_level: 1, description: "You have a +1 to Constitution Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, gloves_category, bracelet_category] },
 	{ name: "Saving Throws I - Wisdom" , effect_type: "Saving Throws", power_level: 1, description: "You have a +1 to Wisdom Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, gloves_category, bracelet_category] },
 	{ name: "Saving Throws I - Charisma" , effect_type: "Saving Throws", power_level: 1, description: "You have a +1 to Charisma Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, gloves_category] },
 	{ name: "Saving Throws I - Intelligence" , effect_type: "Saving Throws", power_level: 1, description: "You have a +1 to Intelligence Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, gloves_category] },
-
 	{ name: "Saving Throws II - Strength" , effect_type: "Saving Throws", power_level: 2, description: "You have a +3 to Strength Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category, gloves_category] },
 	{ name: "Saving Throws II - Dexterity" , effect_type: "Saving Throws", power_level: 2, description: "You have a +3 to Dexterity Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category] },
 	{ name: "Saving Throws II - Constitution" , effect_type: "Saving Throws", power_level: 2, description: "You have a +3 to Constitution Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category] },
 	{ name: "Saving Throws II - Wisdom" , effect_type: "Saving Throws", power_level: 2, description: "You have a +3 to Wisdom Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws II - Charisma" , effect_type: "Saving Throws", power_level: 2, description: "You have a +3 to Charisma Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws II - Intelligence" , effect_type: "Saving Throws", power_level: 2, description: "You have a +3 to Intelligence Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
-
 	{ name: "Saving Throws III - Strength" , effect_type: "Saving Throws", power_level: 3, description: "You have a +5 to Strength Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category, gloves_category] },
 	{ name: "Saving Throws III - Dexterity" , effect_type: "Saving Throws", power_level: 3, description: "You have a +5 to Dexterity Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category] },
 	{ name: "Saving Throws III - Constitution" , effect_type: "Saving Throws", power_level: 3, description: "You have a +5 to Constitution Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category] },
 	{ name: "Saving Throws III - Wisdom" , effect_type: "Saving Throws", power_level: 3, description: "You have a +5 to Wisdom Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws III - Charisma" , effect_type: "Saving Throws", power_level: 3, description: "You have a +5 to Charisma Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws III - Intelligence" , effect_type: "Saving Throws", power_level: 3, description: "You have a +5 to Intelligence Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
-
 	{ name: "Saving Throws IV - Strength" , effect_type: "Saving Throws", power_level: 3, description: "You have advantage on Strength Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category, gloves_category] },
 	{ name: "Saving Throws IV - Dexterity" , effect_type: "Saving Throws", power_level: 3, description: "You have advantage on Dexterity Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category] },
 	{ name: "Saving Throws IV - Constitution" , effect_type: "Saving Throws", power_level: 3, description: "You advantage on to Constitution Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category] },
 	{ name: "Saving Throws IV - Wisdom" , effect_type: "Saving Throws", power_level: 3, description: "You advantage on to Wisdom Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws IV - Charisma" , effect_type: "Saving Throws", power_level: 3, description: "You have advantage on Charisma Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws IV - Intelligence" , effect_type: "Saving Throws", power_level: 3, description: "You have advantage on Intelligence Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
-
 	{ name: "Saving Throws V - All" , effect_type: "Saving Throws", power_level: 2, description: "You have a +1 to all Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category, gloves_category] },
 	{ name: "Saving Throws VI - All" , effect_type: "Saving Throws", power_level: 3, description: "You have a +2 to all Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category, bracelet_category] },
 	{ name: "Saving Throws VII - All" , effect_type: "Saving Throws", power_level: 4, description: "You have a +3 to all Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws VIII - All" , effect_type: "Saving Throws", power_level: 5, description: "You have a +5 to all Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws IX - All" , effect_type: "Saving Throws", power_level: 5, description: "You advantage to all Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
-
 	{ name: "Saving Throws V - Fisical" , effect_type: "Saving Throws", power_level: 2, description: "You have a +1 to Strength, Dexterity and Constitution Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws VI - Fisical" , effect_type: "Saving Throws", power_level: 2, description: "You have a +2 to Strength, Dexterity and Constitution Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
 	{ name: "Saving Throws VII - Fisical" , effect_type: "Saving Throws", power_level: 3, description: "You have a +3 to Strength, Dexterity and Constitution Saving Throws", categories: [armor_category, amulet_category, ring_category, gem_category, shield_category] },
@@ -487,4 +466,101 @@ Effect.create!([
 	{ name: "Horn of Hearing", effect_type: "Loudness", power_level: 2, description: "This horn suppresses the effects of the deafened condition on you", categories: [trinkets_category] },
 	{ name: "Traveler's Clothes Repair", effect_type: "Durability", power_level: 1, description: "This outfit of traveler's clothes magically mends itself to counteract daily wear and tear", categories: [cloak_category, boots_category, trinkets_category] },
 	{ name: "Glowing Eyes Helm", effect_type: "Glow", power_level: 2, description: "This fearsome steel helm makes your eyes glow red", categories: [helm_category, armor_category, trinkets_category] },
+
+  # ═══════════════════════════════════════════
+  # CREATIVE & FUN EFFECTS
+  # ═══════════════════════════════════════════
+
+  # Luck
+  { name: "Gambler's Grace", effect_type: "Luck", power_level: 1, description: "Once per day, you may reroll any d20 and keep the second result. The item whispers 'double or nothing' each time.", categories: [ring_category, amulet_category, trinkets_category, gem_category] },
+  { name: "Fool's Fortune", effect_type: "Luck", power_level: 2, description: "When you roll a natural 1, you may treat it as a natural 20 once per long rest. The item giggles maniacally when triggered.", categories: [ring_category, amulet_category, trinkets_category] },
+  { name: "Lucky Coin Flip", effect_type: "Luck", power_level: 1, description: "Summon a spectral coin. Heads grants advantage on your next roll; tails gives disadvantage. Fate loves a gambler.", categories: [trinkets_category, ring_category, gem_category] },
+  { name: "Jinxbreaker", effect_type: "Luck", power_level: 3, description: "Negate one critical hit against you per day. The attack still hits but deals normal damage instead.", categories: [amulet_category, ring_category, shield_category, armor_category] },
+
+  # Summoning
+  { name: "Pocket Familiar", effect_type: "Summoning", power_level: 1, description: "Summon a tiny spectral animal companion (cat, owl, or toad). It can scout 60 ft and relay what it sees telepathically.", categories: [ring_category, amulet_category, trinkets_category, wands_category] },
+  { name: "Swarm Caller", effect_type: "Summoning", power_level: 3, description: "Once per day, summon a swarm of spectral insects that harass enemies in a 15-ft area, imposing disadvantage on concentration checks.", categories: [staff_category, wands_category, ring_category] },
+  { name: "Shadow Servant", effect_type: "Summoning", power_level: 2, description: "Summon an obedient shadow that can carry up to 30 lbs, open doors, and perform simple tasks. Lasts 1 hour.", categories: [ring_category, amulet_category, cloak_category] },
+  { name: "Phantasmal Steed", effect_type: "Summoning", power_level: 3, description: "Summon a ghostly horse with 60 ft speed and the ability to gallop across water. Lasts 1 hour, once per long rest.", categories: [boots_category, ring_category, amulet_category] },
+
+  # Control
+  { name: "Gravity Well", effect_type: "Control", power_level: 3, description: "Once per day, create a 20-ft zone of intense gravity. Creatures entering must succeed on a STR save or be restrained for 1 round.", categories: [staff_category, wands_category, ring_category, gem_category] },
+  { name: "Puppet Strings", effect_type: "Control", power_level: 4, description: "As an action, force one humanoid within 30 ft to make a WIS save or be compelled to move 15 ft in a direction you choose.", categories: [gloves_category, ring_category, wands_category] },
+  { name: "Terrain Sculptor", effect_type: "Control", power_level: 2, description: "Shape a 10-ft square of earth, stone, or ice into difficult terrain or smooth ground. The reshaping lasts 10 minutes.", categories: [staff_category, wands_category, gloves_category] },
+
+  # Minding
+  { name: "Thought Echo", effect_type: "Minding", power_level: 2, description: "Read the surface thoughts of one creature within 30 ft for 1 minute, once per day. They feel a faint tickle but don't know the source.", categories: [helm_category, amulet_category, ring_category] },
+  { name: "Dream Weaver", effect_type: "Minding", power_level: 3, description: "Send a message to a sleeping creature you know by name, anywhere on the same plane. They experience it as a vivid dream.", categories: [amulet_category, ring_category, gem_category, trinkets_category] },
+  { name: "Psychic Scream", effect_type: "Minding", power_level: 4, description: "Release a mental blast in a 15-ft cone. Each creature must succeed on an INT save or take 3d6 psychic damage and be stunned until end of their next turn. Once per long rest.", categories: [helm_category, staff_category, wands_category] },
+
+  # Vision
+  { name: "Eagle Eye", effect_type: "Vision", power_level: 1, description: "You can see clearly up to 1 mile as if it were only 30 feet away. Works like a built-in spyglass.", categories: [helm_category, ring_category, amulet_category, trinkets_category] },
+  { name: "Spectral Sight", effect_type: "Vision", power_level: 3, description: "See into the Ethereal Plane within 60 ft. Invisible creatures and objects appear as faint translucent silhouettes.", categories: [helm_category, ring_category, gem_category] },
+  { name: "Memory Lens", effect_type: "Vision", power_level: 2, description: "Touch an object to see a 30-second vision of the last significant event that occurred near it. Once per short rest.", categories: [ring_category, gem_category, trinkets_category] },
+
+  # Flight
+  { name: "Windrunner", effect_type: "Flight", power_level: 2, description: "Gain a flying speed of 30 ft for 1 minute, once per day. A trail of glowing feathers marks your path.", categories: [boots_category, cloak_category, ring_category] },
+  { name: "Levitation Field", effect_type: "Flight", power_level: 1, description: "Hover up to 5 ft above the ground at will. You ignore ground-based traps and difficult terrain but can't ascend higher.", categories: [boots_category, ring_category, amulet_category] },
+  { name: "Storm Rider", effect_type: "Flight", power_level: 4, description: "Gain a flying speed of 60 ft for 10 minutes, once per long rest. Lightning crackles around you, dealing 1d4 to creatures you fly past.", categories: [cloak_category, boots_category, staff_category] },
+
+  # Speed
+  { name: "Blink Step", effect_type: "Speed", power_level: 2, description: "As a bonus action, teleport up to 15 ft to an unoccupied space you can see. You leave a puff of smoke behind. 3 uses per long rest.", categories: [boots_category, ring_category, amulet_category] },
+  { name: "Afterimage", effect_type: "Speed", power_level: 3, description: "When you take the Dash action, leave a translucent copy of yourself behind. The copy lasts 1 round and enemies have disadvantage on attacks against you while it exists.", categories: [boots_category, cloak_category, ring_category] },
+  { name: "Quicksilver Reflexes", effect_type: "Speed", power_level: 2, description: "You can take reactions twice per round instead of once. Your movements shimmer with a mercurial glow.", categories: [gloves_category, boots_category, bracelet_category] },
+
+  # Healing
+  { name: "Life Leech", effect_type: "Healing", power_level: 2, description: "On a successful melee hit, regain HP equal to half the damage dealt. Works once per short rest. The weapon pulses with a crimson glow.", categories: [weapon_category, gloves_category] },
+  { name: "Phoenix Tear", effect_type: "Healing", power_level: 4, description: "When you drop to 0 HP, immediately regain 3d8+5 HP and stand up. This destroys the tear. A burst of golden fire erupts around you.", categories: [amulet_category, gem_category, ring_category] },
+  { name: "Sanguine Bond", effect_type: "Healing", power_level: 3, description: "As an action, sacrifice up to 20 of your HP to heal an ally within touch range for the same amount plus 1d8. Once per long rest.", categories: [ring_category, amulet_category, gloves_category] },
+
+  # Protection
+  { name: "Mirror Ward", effect_type: "Protection", power_level: 3, description: "Once per day, reflect the next spell of 3rd level or lower cast at you back at the caster, using their own spell attack or save DC.", categories: [shield_category, armor_category, amulet_category] },
+  { name: "Death's Denial", effect_type: "Protection", power_level: 5, description: "Once per week, when you would be killed, time freezes for 6 seconds. You are stabilized at 1 HP and teleported 30 ft in a random direction.", categories: [amulet_category, ring_category, armor_category] },
+  { name: "Absorb Elements", effect_type: "Protection", power_level: 2, description: "As a reaction when hit by elemental damage, gain resistance to that damage type until start of your next turn. 3 uses per long rest.", categories: [shield_category, armor_category, ring_category, bracelet_category] },
+
+  # Frosting
+  { name: "Glacial Prison", effect_type: "Frosting", power_level: 3, description: "On a critical hit, the target is encased in ice and restrained until they succeed on a STR save at the start of their turn.", categories: [weapon_category, ammunition_category, staff_category] },
+  { name: "Winter's Breath", effect_type: "Frosting", power_level: 2, description: "As an action, exhale a 15-ft cone of frost. Creatures take 2d6 cold damage and their speed is halved for 1 round. 2 uses per day.", categories: [helm_category, amulet_category, ring_category] },
+
+  # Lightning
+  { name: "Chain Lightning Strike", effect_type: "Lightning", power_level: 3, description: "On a hit, lightning arcs to up to 2 additional creatures within 15 ft, dealing 1d6 lightning damage to each. Once per short rest.", categories: [weapon_category, staff_category, wands_category] },
+  { name: "Thunderclap", effect_type: "Lightning", power_level: 2, description: "As an action, slam the item to create a thunderclap in a 10-ft radius. Creatures must make a CON save or be deafened and pushed 5 ft. 3 uses per day.", categories: [weapon_category, shield_category, staff_category] },
+
+  # Utility
+  { name: "Mood Ring", effect_type: "Utility", power_level: 1, description: "Changes color based on the emotional state of the nearest creature. Red = angry, blue = sad, green = calm, gold = happy.", categories: [ring_category, trinkets_category] },
+  { name: "Portable Campfire", effect_type: "Utility", power_level: 1, description: "Summon a small magical campfire that provides warmth, light (20 ft), and cooks food without fuel. Lasts 8 hours.", categories: [trinkets_category, gem_category] },
+  { name: "Bag of Holding (Mini)", effect_type: "Utility", power_level: 2, description: "This tiny pouch can hold up to 50 lbs of items in an extradimensional space no larger than 2 cubic feet.", categories: [trinkets_category] },
+  { name: "Bardic Echo", effect_type: "Utility", power_level: 1, description: "This item can record up to 1 minute of sound and play it back at will. Perfect for dramatic entrances.", categories: [trinkets_category, gem_category] },
+  { name: "Unseen Butler", effect_type: "Utility", power_level: 2, description: "Summon an invisible servant that sets up camp, cleans equipment, and serves meals. It cannot fight or carry more than 10 lbs.", categories: [ring_category, trinkets_category] },
+  { name: "Translator's Tongue", effect_type: "Understanding", power_level: 2, description: "Understand and speak any language for 10 minutes, 3 times per day. Your words have a faint magical echo.", categories: [amulet_category, ring_category, helm_category] },
+  { name: "Diplomat's Charm", effect_type: "Utility", power_level: 2, description: "Gain advantage on Persuasion checks for 10 minutes, once per day. A faint golden aura surrounds you when active.", categories: [amulet_category, ring_category, gem_category, bracelet_category] },
+  { name: "Chrono Pocket Watch", effect_type: "Utility", power_level: 3, description: "Once per day, rewind time by 6 seconds. You return to where you were and can take your last turn differently.", categories: [trinkets_category, ring_category, gem_category] },
+
+  # Stealth
+  { name: "Smoke Bomb", effect_type: "Stealth", power_level: 1, description: "As a bonus action, throw a smoke bomb creating a 10-ft radius of heavy obscurement that lasts 1 round. 3 uses per day.", categories: [trinkets_category, gloves_category, cloak_category] },
+  { name: "Chameleon Skin", effect_type: "Stealth", power_level: 2, description: "While motionless, you become nearly invisible, gaining advantage on Stealth checks and +5 to your passive Stealth.", categories: [cloak_category, armor_category, ring_category] },
+  { name: "Silence Aura", effect_type: "Stealth", power_level: 2, description: "Create a 5-ft sphere of silence around you for 1 minute, 2 times per day. No sound enters or leaves the sphere.", categories: [boots_category, cloak_category, amulet_category] },
+
+  # Scrolls & Elixirs
+  { name: "Scroll of Doppelganger", effect_type: "Control", power_level: 3, description: "Create an illusory double of yourself that mimics your actions 30 ft away. Lasts 1 minute. Enemies must guess which is real.", categories: [wands_category] },
+  { name: "Elixir of Iron Will", effect_type: "Resistance", power_level: 2, description: "Gain advantage on all Wisdom saving throws for 1 hour. Your eyes glow with a faint silver light.", categories: [potions_category] },
+  { name: "Elixir of Giant's Grasp", effect_type: "Enhance", power_level: 2, description: "Your hands grow to twice their size for 10 minutes. Grapple checks gain advantage and unarmed strikes deal 1d8.", categories: [potions_category] },
+  { name: "Scroll of Gravity Inversion", effect_type: "Control", power_level: 2, description: "Reverse gravity in a 20-ft area for 1 round. Creatures must succeed on a DEX save or fall upward 20 ft, then crash back down.", categories: [wands_category, staff_category] },
+
+  # Food & Candle
+  { name: "Bottomless Ration", effect_type: "Utility", power_level: 1, description: "This piece of bread regenerates overnight. It always tastes fresh and provides a full day's nourishment.", categories: [trinkets_category] },
+  { name: "Morale Feast", effect_type: "Healing", power_level: 1, description: "When shared among up to 6 creatures, this food grants 1d6 temporary HP and removes the frightened condition.", categories: [trinkets_category] },
+  { name: "Candle of Truth", effect_type: "Control", power_level: 2, description: "While this candle burns (1 hour), creatures within 10 ft must succeed on a CHA save to deliberately speak a lie.", categories: [trinkets_category] },
+  { name: "Candle of Restful Sleep", effect_type: "Healing", power_level: 1, description: "Creatures who complete a long rest within 30 ft of this burning candle regain an additional Hit Die.", categories: [trinkets_category] },
+
+  # Books & Artifacts
+  { name: "Tome of Forgotten Lore", effect_type: "Enhance", power_level: 3, description: "Once per day, ask the book one question about history, arcana, or religion and receive a truthful (but cryptic) answer.", categories: [trinkets_category] },
+  { name: "Grimoire of Spell Theft", effect_type: "Absortion", power_level: 4, description: "When you succeed on a saving throw against a spell, capture it. Cast it once within 24 hours using the original caster's save DC.", categories: [trinkets_category] },
+  { name: "Atlas of Hidden Paths", effect_type: "Detection", power_level: 2, description: "This map reveals secret doors, hidden passages, and traps within 100 ft. Updates in real-time as you explore.", categories: [trinkets_category] },
+
+  # Gems & Artifacts
+  { name: "Soul Anchor", effect_type: "Protection", power_level: 4, description: "You cannot be banished, teleported against your will, or sent to another plane. The gem glows with a deep violet light.", categories: [gem_category, amulet_category] },
+  { name: "Chaos Shard", effect_type: "Luck", power_level: 3, description: "On each attack, roll 1d6: 1-2 = extra 2d6 damage, 3-4 = normal, 5 = miss, 6 = both take 1d6 force damage. Chaos reigns.", categories: [gem_category, weapon_category, ring_category] },
+  { name: "Time Crystal", effect_type: "Speed", power_level: 4, description: "Once per long rest, take an additional full turn immediately after your current turn. The crystal cracks slightly each time.", categories: [gem_category, ring_category] },
+  { name: "Dimensional Pocket", effect_type: "Utility", power_level: 3, description: "Open a 5-ft portal to a personal pocket dimension (10x10x10 ft). Items stored inside persist indefinitely. 2 uses per day.", categories: [gem_category, ring_category] },
 ])

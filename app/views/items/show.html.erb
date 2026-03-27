@@ -1,60 +1,140 @@
-<div class="container mt-5">
-  <div class="card shadow-lg border-0">
+<% rarity = @item.rarity.name %>
+<% rarity_class = rarity_css_class(rarity) %>
+<% effect_colors_map = { 'Buff' => 'success', 'Debuff' => 'danger', 'Utility' => 'info', 'Healing' => 'primary', 'Damage' => 'warning', 'Defense' => 'secondary', 'Attack Bonus' => 'warning', 'Attack Damage' => 'danger' } %>
+
+<div class="container mt-4" style="max-width: 680px;">
+
+  <%# ── Top actions ── %>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <%= link_to items_path, class: "btn btn-sm btn-outline-secondary" do %>
+      <i class="bi bi-arrow-left me-1"></i><%= t('shared.back') %>
+    <% end %>
+    <div class="d-flex gap-1">
+      <%= link_to edit_item_path(@item), class: "btn btn-sm btn-outline-primary" do %>
+        <i class="bi bi-pencil me-1"></i><%= t('shared.edit') %>
+      <% end %>
+      <%= button_to item_path(@item), method: :delete, data: { turbo_confirm: t('shared.confirm_delete') }, class: "btn btn-sm btn-outline-danger" do %>
+        <i class="bi bi-trash3"></i>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ══════════════════════════════════════ %>
+  <%# ── HERO CARD ── %>
+  <%# ══════════════════════════════════════ %>
+  <div class="card border-0 shadow-sm mb-3 item-show-hero rarity-<%= rarity_class %>">
     <div class="card-body">
-      <div class="text-center">
-        <h1 class="display-5 font-weight-bold text-primary"><%= @item.name %></h1>
-        <p class="lead text-muted"><%= @item.description %></p>
-        <p class="display-6 text-secondary"><strong>Item ID: </strong><%= @item.id %></p>
+      <%# Title row %>
+      <div class="d-flex align-items-start gap-3">
+        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+          <i class="bi bi-<%= category_icon(@item.category.name) %> text-primary" style="font-size: 1.2rem;"></i>
+        </div>
+        <div class="flex-grow-1 min-width-0">
+          <h4 class="fw-bold mb-1 text-truncate"><%= @item.name %></h4>
+          <div class="d-flex align-items-center gap-1 flex-wrap">
+            <span class="badge <%= rarity_badge_class(rarity) %>" style="font-size: 0.68rem;"><i class="bi bi-star-fill me-1"></i><%= rarity %></span>
+            <span class="badge bg-body-secondary text-body" style="font-size: 0.68rem;"><i class="bi bi-<%= category_icon(@item.category.name) %> me-1"></i><%= @item.category.name %></span>
+            <% if @item.requires_attunement %>
+              <span class="badge bg-warning text-dark" style="font-size: 0.68rem;"><i class="bi bi-link-45deg me-1"></i><%= t('items.attunement_required') %></span>
+            <% end %>
+          </div>
+        </div>
+        <%# Power pill %>
+        <div class="text-center flex-shrink-0">
+          <span class="badge rounded-pill <%= power_badge_class(@item.power) %>" style="font-size: 1.1rem; padding: 0.5em 0.75em;"><%= @item.power %></span>
+          <div class="text-muted mt-1" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.05em;"><%= t('items.power') %></div>
+        </div>
+      </div>
+
+      <%# Description %>
+      <% if @item.description.present? %>
+        <div class="mt-3 pt-3 border-top">
+          <p class="mb-0 small" style="line-height: 1.6; color: var(--bs-secondary-color);"><%= @item.description %></p>
+        </div>
+      <% end %>
+
+      <%# Inline stats row %>
+      <div class="d-flex gap-3 mt-3 pt-3 border-top">
+        <div class="d-flex align-items-center gap-1">
+          <i class="bi bi-coin text-warning" style="font-size: 0.75rem;"></i>
+          <span class="fw-bold small"><%= number_with_delimiter(@item.price) %></span>
+          <span class="text-muted" style="font-size: 0.65rem;"><%= t('items.gold_pieces') %></span>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <i class="bi bi-feather text-muted" style="font-size: 0.75rem;"></i>
+          <span class="fw-bold small"><%= @item.weight %></span>
+          <span class="text-muted" style="font-size: 0.65rem;">lbs</span>
+        </div>
+        <% if @item.item_type.present? && @item.item_type != @item.category.name %>
+          <div class="d-flex align-items-center gap-1">
+            <i class="bi bi-tag text-muted" style="font-size: 0.75rem;"></i>
+            <span class="fw-bold small"><%= @item.item_type %></span>
+          </div>
+        <% end %>
+        <div class="ms-auto d-flex align-items-center gap-1 text-muted" style="font-size: 0.6rem;">
+          <i class="bi bi-calendar3"></i>
+          <%= @item.created_at.strftime("%b %d, %Y") %>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="row mt-4">
-    <div class="col-lg-6">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <h4 class="text-secondary">Item Details</h4>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Type:</strong> <%= @item.item_type %></li>
-            <li class="list-group-item"><strong>Rarity:</strong> <%= @item.rarity.name %></li>
-            <li class="list-group-item"><strong>Category:</strong> <%= @item.category.name %></li>
-            <li class="list-group-item"><strong>Power:</strong> <%= @item.power %></li>
-            <li class="list-group-item"><strong>Weight:</strong> <%= @item.weight %></li>
-            <li class="list-group-item"><strong>Price:</strong> <%= @item.price %></li>
-            <li class="list-group-item"><strong>Requires Attunement:</strong> <%= @item.requires_attunement ? "Yes" : "No" %></li>
-          </ul>
-        </div>
-      </div>
+  <%# ══════════════════════════════════════ %>
+  <%# ── EFFECTS ── %>
+  <%# ══════════════════════════════════════ %>
+  <% if @item.effects.any? %>
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h6 class="text-muted text-uppercase small fw-semibold mb-0">
+        <i class="bi bi-magic me-1"></i> <%= t('items.item_effects') %>
+        <span class="badge bg-primary rounded-pill ms-1" style="font-size: 0.55rem;"><%= @item.effects.size %></span>
+      </h6>
+      <% used = @item.effects.sum(&:power_level) %>
+      <span class="text-muted" style="font-size: 0.65rem;">
+        <i class="bi bi-lightning-charge me-1"></i><%= used %> / <%= @item.power %> <%= t('items.power_used').downcase %>
+      </span>
     </div>
 
-    <div class="col-lg-6">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <h4 class="text-secondary">Effects</h4>
-          <% if @item.effects.any? %>
-            <ul class="list-group list-group-flush">
-              <% @item.effects.each do |effect| %>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <h5 class="font-weight-bold mb-1"><%= effect.name %></h5>
-                    <p class="mb-0"><%= effect.description %></p>
-                  </div>
-                  <span class="badge badge-pill badge-primary">Power: <%= effect.power_level %></span>
-                </li>
+    <%# Power usage bar %>
+    <div class="progress mb-3" style="height: 3px; border-radius: 2px;">
+      <% pct = @item.power > 0 ? [(used.to_f / @item.power * 100), 100].min : 0 %>
+      <div class="progress-bar bg-<%= pct >= 100 ? 'success' : 'primary' %>" style="width: <%= pct %>%;"></div>
+    </div>
+
+    <%# Effect cards %>
+    <div class="d-flex flex-column gap-2 mb-3">
+      <% @item.effects.each do |effect| %>
+        <% color = effect_type_color(effect.effect_type) %>
+        <div class="item-effect-row p-2" style="border-left: 3px solid var(--bs-<%= color %>) !important;">
+          <div class="d-flex align-items-start gap-2">
+            <%# Type icon circle %>
+            <div class="effect-type-icon bg-<%= color %> bg-opacity-10 text-<%= color %>">
+              <i class="bi bi-<%= effect_type_icon(effect.effect_type) %>"></i>
+            </div>
+
+            <%# Main content %>
+            <div class="flex-grow-1 min-width-0">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-1">
+                  <span class="fw-semibold small"><%= effect.name %></span>
+                  <span class="badge bg-<%= color %> bg-opacity-10 text-<%= color %>" style="font-size: 0.55rem;"><%= effect.effect_type %></span>
+                </div>
+                <span class="badge bg-<%= color %> rounded-pill" style="font-size: 0.7rem; min-width: 22px;"><%= effect.power_level %></span>
+              </div>
+
+              <% if effect.description.present? %>
+                <p class="mb-0 mt-1 text-muted" style="font-size: 0.72rem; line-height: 1.4;"><%= effect.description %></p>
               <% end %>
-            </ul>
-          <% else %>
-            <p class="text-muted">No effects added.</p>
-          <% end %>
+            </div>
+          </div>
         </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body py-3 text-center">
+        <i class="bi bi-magic text-muted" style="font-size: 1.5rem;"></i>
+        <p class="text-muted small mb-0 mt-1"><%= t('items.no_effects') %></p>
       </div>
     </div>
-  </div>
-
-  <hr class="hr-cool">
-
-  <div class="mt-4 text-center">
-    <%= link_to 'Edit', edit_item_path(@item), class: "btn btn-secondary btn-lg mx-2" %> 
-    <%= link_to 'Back', items_path, class: "btn btn-danger btn-lg mx-2" %>
-  </div>
+  <% end %>
 </div>

@@ -1,0 +1,78 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-shield-lock me-2"></i><%= t('devise_views.edit_account') %></h5>
+        </div>
+        <div class="card-body p-4">
+          <% if resource.provider.present? %>
+            <div class="d-flex align-items-center gap-3 p-3 mb-4 rounded-3 border" style="background: var(--bs-tertiary-bg);">
+              <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #fff; border: 1px solid var(--bs-border-color);">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.01 24.01 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+              </div>
+              <div>
+                <div class="fw-semibold small"><%= t('devise_views.google_linked') %></div>
+                <div class="text-muted" style="font-size: 0.75rem;"><%= t('devise_views.google_linked_desc') %></div>
+              </div>
+            </div>
+          <% end %>
+
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+            <%= render "devise/shared/error_messages", resource: resource %>
+
+            <div class="mb-3">
+              <%= f.label :email, t('profiles.email'), class: 'form-label' %>
+              <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-control' %>
+            </div>
+
+            <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+              <div class="alert alert-info">
+                <%= t('devise_views.waiting_confirmation', email: resource.unconfirmed_email) %>
+              </div>
+            <% end %>
+
+            <% unless resource.google_linked? %>
+              <div class="mb-3">
+                <%= f.label :password, t('devise_views.new_password'), class: 'form-label' %>
+                <small class="text-muted">(<%= t('devise_views.leave_blank') %>)</small>
+                <%= f.password_field :password, autocomplete: "new-password", class: 'form-control' %>
+                <% if @minimum_password_length %>
+                  <div class="form-text"><%= t('devise_views.min_chars', count: @minimum_password_length) %></div>
+                <% end %>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :password_confirmation, t('devise_views.password_confirmation'), class: 'form-label' %>
+                <%= f.password_field :password_confirmation, autocomplete: "new-password", class: 'form-control' %>
+              </div>
+
+              <hr>
+
+              <div class="mb-3">
+                <%= f.label :current_password, t('devise_views.current_password'), class: 'form-label' %>
+                <small class="text-muted">(<%= t('devise_views.need_current_password') %>)</small>
+                <%= f.password_field :current_password, autocomplete: "current-password", class: 'form-control' %>
+              </div>
+            <% end %>
+
+            <div class="d-flex gap-2">
+              <%= f.submit t('shared.update'), class: 'btn btn-primary' %>
+              <%= link_to t('shared.cancel'), profile_path, class: 'btn btn-outline-secondary' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mt-4 border-danger">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0"><%= t('devise_views.cancel_account') %></h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted"><%= t('devise_views.cancel_account_desc') %></p>
+          <%= button_to t('devise_views.cancel_account'), registration_path(resource_name), method: :delete, class: 'btn btn-outline-danger', data: { turbo_confirm: t('shared.confirm_delete') } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

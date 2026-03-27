@@ -1,43 +1,157 @@
-<%= render "layouts/subheader", :locals => {:count => @effects.count, :name => "Effects"} %>
+<div class="container mt-4">
+  <%# ── Header ── %>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0 fw-bold">
+      <i class="bi bi-magic text-primary me-1"></i> <%= t('effects.title') %>
+      <span class="badge bg-primary rounded-pill ms-2 fs-6"><%= @pagy.count %></span>
+    </h4>
+    <%= link_to new_effect_path, class: "btn btn-sm btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i><%= t('effects.new') %>
+    <% end %>
+  </div>
 
-<div class="container mt-3">  
-  <table class="table table-bordered table-striped table-hover">
-    <thead class="table-primary">
-      <tr>
-      	<th>Id</th>
-        <th>Name</th>
-        <th>Effect Type</th>
-        <th>Power Level</th>
-        <th>Categories</th>
-        <th>Description</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @effects.each do |effect| %>
-        <tr>
-        	<td><%= effect.id %></td>
-          <td><%= effect.name %></td>
-          <td><strong><%= effect.effect_type %></strong></td>
-          <td><strong><%= effect.power_level %></strong></td>
-          <td>
-            <ul>
-            	<li>
-            	  <% effect.categories.each do |category| %>
-            			<%= "➜ #{category.name}" %>
-                  <br>
-            	  <% end %>
-            	</li>
-            </ul>
-          </td>
-          <td><%= truncate(effect.description, length: 100) %></td>
-          <td style="min-width: 185px;">
-            <%= link_to 'Show', effect_path(effect), class: 'btn btn-sm btn-outline-primary' %>
-            <%= link_to 'Edit', edit_effect_path(effect), class: 'btn btn-sm btn-outline-success' %>
-            <%= link_to 'Delete', effect_path(effect), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-sm btn-outline-danger' %>
-          </td>
-        </tr>
+  <%# ── Filters bar ── %>
+  <% has_filters = params[:q].present? || params[:effect_type].present? || params[:power_level].present? %>
+  <%= form_with url: effects_path, method: :get, local: true, id: "effects-filter-form" do %>
+    <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
+    <%= hidden_field_tag :dir, params[:dir] if params[:dir].present? %>
+    <%= hidden_field_tag :per_page, params[:per_page] if params[:per_page].present? %>
+
+    <div class="items-toolbar d-flex align-items-center border rounded mb-3">
+      <i class="bi bi-search text-muted px-2"></i>
+      <%= text_field_tag :q, params[:q],
+        class: "items-toolbar-input flex-grow-1",
+        placeholder: t('effects.search_placeholder'),
+        id: "effects-search",
+        autocomplete: "off",
+        data: { min_chars: 3 } %>
+
+      <span class="items-toolbar-sep"></span>
+
+      <%= select_tag :effect_type,
+        options_for_select(@effect_types, params[:effect_type]),
+        include_blank: t('effects.all_types'),
+        class: "items-toolbar-select",
+        onchange: "this.form.requestSubmit()" %>
+
+      <span class="items-toolbar-sep"></span>
+
+      <%= select_tag :power_level,
+        options_for_select(@power_levels, params[:power_level]),
+        include_blank: t('effects.all_powers'),
+        class: "items-toolbar-select",
+        onchange: "this.form.requestSubmit()" %>
+
+      <% if has_filters %>
+        <span class="items-toolbar-sep"></span>
+        <%= link_to effects_path(sort: params[:sort], dir: params[:dir], per_page: params[:per_page]), class: "items-toolbar-clear text-muted px-2", title: t('items.clear') do %>
+          <i class="bi bi-x-lg"></i>
+        <% end %>
       <% end %>
-    </tbody>
-  </table>
+    </div>
+  <% end %>
+
+  <%# ── Sort bar ── %>
+  <div class="d-flex align-items-center gap-3 mb-2">
+    <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.65rem;">Sort:</span>
+    <span style="font-size: 0.72rem;"><%= effects_sort_link(:name, t('shared.name')) %></span>
+    <span style="font-size: 0.72rem;"><%= effects_sort_link(:effect_type, t('effects.effect_type')) %></span>
+    <span style="font-size: 0.72rem;"><%= effects_sort_link(:power_level, t('effects.power_level')) %></span>
+  </div>
+
+  <%# ── Card Grid ── %>
+  <% if @effects.any? %>
+    <div class="row g-2">
+      <% @effects.each do |effect| %>
+        <% color = { 'Buff' => 'success', 'Debuff' => 'danger', 'Utility' => 'info', 'Healing' => 'primary', 'Damage' => 'warning', 'Defense' => 'secondary', 'Attack Bonus' => 'warning', 'Attack Damage' => 'danger' }.fetch(effect.effect_type, 'primary') %>
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="index-card" style="border-left: 3px solid var(--bs-<%= color %>);">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="badge bg-<%= color %>" style="font-size: 0.65rem;"><%= effect.effect_type %></span>
+                  <span class="card-title"><%= effect.name %></span>
+                </div>
+                <% if effect.description.present? %>
+                  <p class="card-meta mb-1" style="line-height: 1.3;"><%= truncate(effect.description, length: 80) %></p>
+                <% end %>
+              </div>
+              <div class="d-flex flex-column align-items-center">
+                <span class="badge rounded-pill <%= power_level_badge_class(effect.power_level) %> mb-1" style="font-size: 0.75rem; min-width: 24px;"><%= effect.power_level %></span>
+                <div class="card-actions">
+                  <%= link_to effect_path(effect), class: "action-icon text-primary", title: t('shared.show') do %><i class="bi bi-eye"></i><% end %>
+                  <%= link_to edit_effect_path(effect), class: "action-icon text-secondary", title: t('shared.edit') do %><i class="bi bi-pencil"></i><% end %>
+                  <%= button_to effect_path(effect), method: :delete, data: { turbo_confirm: t('shared.confirm_delete') }, class: "action-icon text-danger", title: t('shared.delete') do %><i class="bi bi-trash3"></i><% end %>
+                </div>
+              </div>
+            </div>
+            <% if effect.categories.any? %>
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                <% effect.categories.limit(5).each do |category| %>
+                  <span class="badge bg-body-secondary text-body" style="font-size: 0.58rem;"><i class="bi bi-<%= category_icon(category.name) %>" style="font-size: 0.55rem;"></i> <%= category.name %></span>
+                <% end %>
+                <% if effect.categories.size > 5 %>
+                  <span class="badge bg-body-secondary text-body" style="font-size: 0.58rem;">+<%= effect.categories.size - 5 %></span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ── Pagination ── %>
+    <nav class="d-flex align-items-center justify-content-between mt-3 mb-4">
+      <div class="d-flex align-items-center gap-2">
+        <small class="text-muted">
+          <%= t('effects.showing', from: @pagy.from, to: @pagy.to, count: @pagy.count) %>
+        </small>
+        <span class="text-muted small">·</span>
+        <div class="d-flex align-items-center gap-1">
+          <% [20, 50, 100].each do |n| %>
+            <% active = (@pagy.limit == n) %>
+            <%= link_to n,
+              effects_path(request.params.except("controller", "action").merge(per_page: n, page: nil)),
+              class: "btn btn-outline-secondary py-0 px-1 #{'active' if active}",
+              style: "font-size: 0.7rem;" %>
+          <% end %>
+          <span class="text-muted" style="font-size: 0.7rem;"><%= t('effects.per_page') %></span>
+        </div>
+      </div>
+      <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+    </nav>
+  <% else %>
+    <div class="text-center py-5">
+      <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+      <p class="text-muted mt-2"><%= t('shared.no_records') %></p>
+      <%= link_to new_effect_path, class: "btn btn-primary" do %>
+        <i class="bi bi-plus-lg me-1"></i><%= t('effects.new') %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
+
+<script>
+  function initEffectsSearch() {
+    var searchInput = document.getElementById("effects-search");
+    var form = document.getElementById("effects-filter-form");
+    if (!searchInput || !form || searchInput.dataset.bound) return;
+
+    searchInput.dataset.bound = "true";
+    var debounceTimer;
+
+    searchInput.addEventListener("keyup", function() {
+      clearTimeout(debounceTimer);
+      var value = searchInput.value.trim();
+
+      debounceTimer = setTimeout(function() {
+        if (value.length >= 3 || value.length === 0) {
+          form.requestSubmit();
+        }
+      }, 300);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", initEffectsSearch);
+  document.addEventListener("turbo:load", initEffectsSearch);
+</script>

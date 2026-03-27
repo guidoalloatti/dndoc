@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /Users/guidoalloatti/projects/dndoc/README*)",
+      "Bash(bin/rails routes:*)",
+      "Bash(bin/rails runner:*)",
+      "Bash(bundle install:*)",
+      "Bash(rails generate:*)",
+      "Bash(rails db:migrate)",
+      "Bash(rails routes:*)",
+      "Bash(rails runner:*)",
+      "Bash(rails active_storage:install)",
+      "Bash(find /Users/guidoalloatti/projects/dndoc/app/views -name \"*.erb\" -exec wc -l {} +)",
+      "Bash(bundle update:*)"
+    ]
+  }
+}

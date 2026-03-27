@@ -1,36 +1,55 @@
 Rails.application.routes.draw do
-  resources :items do
-    collection do
-      post :random_create
-      get :create_random
-      post :create_random
-      post :get_item_name
-      post :create_item
-    end
-    member do
-      post :destroy
-      post :get_item_name
-      post :create_item
-    end
-    resources :effects, only: [:new, :create, :edit, :update]
-  end
-  resources :categories
+  devise_for :users, controllers: {
+    omniauth_callbacks: "users/omniauth_callbacks",
+    registrations: "users/registrations"
+  }
 
-  resources :effects do
-    collection do
-      post :get_effects_by_category
+  scope "(:locale)", locale: /en|es/ do
+    resource :profile, only: [:show, :edit, :update]
+
+    resources :items do
+      collection do
+        post :random_create
+        get :create_random
+        post :create_random
+        post :get_item_name
+        post :create_item
+        post :get_item
+        post :update_item
+        post :recommend_effects
+        get :wizard
+        post :wizard
+      end
+      member do
+        post :destroy
+        post :get_item_name
+        post :create_item
+        post :get_item
+        post :update_item
+      end
+      resources :effects, only: [:new, :create, :edit, :update]
     end
-    member do
-      post :get_effects_by_category
+    resources :categories
+
+    resources :effects do
+      collection do
+        post :get_effects_by_category
+      end
+      member do
+        post :get_effects_by_category
+      end
     end
+
+    resources :rarities do
+      collection do
+        post :get_rarities
+      end
+    end
+    resources :weapons
+
+    root 'main#index'
   end
 
-  resources :rarities do
-    collection do
-      post :get_rarities
-    end
-  end
-  resources :weapons
-
-  root 'main#index'
+  # Silently ignore socket.io requests from browser extensions/dev tools
+  match "/socket.io", to: proc { [404, {}, [""]] }, via: :all
 end

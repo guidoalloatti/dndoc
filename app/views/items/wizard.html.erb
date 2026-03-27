@@ -1,0 +1,754 @@
+<div class="container mt-4" style="max-width: 760px;">
+
+  <%# ── Header ── %>
+  <div class="text-center mb-4">
+    <h4 class="fw-bold mb-1">
+      <i class="bi bi-magic text-primary me-2"></i><%= t('items.wizard_title') %>
+    </h4>
+    <p class="text-muted small mb-0"><%= t('items.wizard_subtitle') %></p>
+  </div>
+
+  <%# ── Step Indicators ── %>
+  <div class="d-flex justify-content-center gap-2 mb-4" id="stepIndicators">
+    <% [
+      { num: 1, icon: "bi-grid-3x3-gap", label: t('items.step_category') },
+      { num: 2, icon: "bi-stars", label: t('items.step_rarity') },
+      { num: 3, icon: "bi-magic", label: t('items.step_effects') },
+      { num: 4, icon: "bi-tag", label: t('items.step_name') },
+    ].each do |step| %>
+      <div class="wizard-step-indicator text-center" data-step="<%= step[:num] %>">
+        <div class="wizard-step-circle mx-auto mb-1 <%= step[:num] == 1 ? 'active' : '' %>">
+          <i class="bi <%= step[:icon] %>"></i>
+        </div>
+        <span class="small d-none d-sm-block" style="font-size: 0.65rem;"><%= step[:label] %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <%# ══════════════════════════════════════ %>
+  <%# STEP 1: Category %>
+  <%# ══════════════════════════════════════ %>
+  <div class="wizard-panel" id="step1">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-1">
+          <i class="bi bi-grid-3x3-gap me-1"></i> <%= t('items.step_category') %>
+        </h6>
+        <p class="text-muted small mb-3"><%= t('items.step_category_desc') %></p>
+
+        <div class="d-flex flex-wrap gap-1" id="wizCategoryPicker">
+          <% @categories.each do |cat| %>
+            <button type="button"
+                    class="btn btn-outline-secondary btn-sm wiz-category-btn px-2 py-1"
+                    data-id="<%= cat.id %>"
+                    data-name="<%= cat.name %>">
+              <i class="bi bi-<%= category_icon(cat.name) %> me-1"></i>
+              <span class="small"><%= cat.name %></span>
+            </button>
+          <% end %>
+        </div>
+
+        <div id="wizWeaponSelect" class="mt-3" style="display:none;">
+          <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+            <i class="bi bi-hammer me-1"></i> <%= t('items.select_weapon') %>
+          </h6>
+          <div class="d-flex flex-wrap gap-1" id="wizWeaponPicker">
+            <% @weapons.each_with_index do |w, idx| %>
+              <button type="button"
+                      class="btn btn-sm wiz-weapon-btn px-2 py-1 <%= idx == 0 ? 'active btn-primary' : 'btn-outline-secondary' %>"
+                      data-id="<%= w.id %>"
+                      data-name="<%= w.name %>"
+                      data-damage="<%= w.damage %>"
+                      data-cost="<%= w.cost %>"
+                      title="<%= w.damage %> · <%= w.cost %>">
+                <i class="bi bi-<%= weapon_icon(w.name) %> me-1"></i>
+                <span class="small"><%= w.name %></span>
+              </button>
+            <% end %>
+          </div>
+          <div id="wizWeaponDetails" class="mt-2 p-2 rounded bg-body-tertiary small" style="display:none;">
+            <span class="text-muted"><i class="bi bi-bullseye me-1"></i><span id="wizWeaponDamage"></span></span>
+            <span class="text-muted ms-3"><i class="bi bi-coin me-1"></i><span id="wizWeaponCost"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ══════════════════════════════════════ %>
+  <%# STEP 2: Rarity & Power %>
+  <%# ══════════════════════════════════════ %>
+  <div class="wizard-panel" id="step2" style="display:none;">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-1">
+          <i class="bi bi-stars me-1"></i> <%= t('items.step_rarity') %>
+        </h6>
+        <p class="text-muted small mb-3"><%= t('items.step_rarity_desc') %></p>
+
+        <div class="d-flex flex-wrap gap-1 mb-3" id="wizRarityPicker"></div>
+
+        <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+          <i class="bi bi-lightning-charge me-1"></i> <%= t('items.power') %>
+        </h6>
+        <div class="d-flex gap-1 flex-wrap" id="wizPowerPicker">
+          <% (1..10).each do |p| %>
+            <button type="button"
+                    class="btn btn-sm wiz-power-btn btn-outline-secondary"
+                    data-power="<%= p %>"
+                    style="width: 36px; height: 36px; font-weight: 700; border-radius: 50%;">
+              <%= p %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ══════════════════════════════════════ %>
+  <%# STEP 3: Effects %>
+  <%# ══════════════════════════════════════ %>
+  <div class="wizard-panel" id="step3" style="display:none;">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-1">
+          <h6 class="text-muted text-uppercase small fw-semibold mb-0">
+            <i class="bi bi-magic me-1"></i> <%= t('items.step_effects') %>
+          </h6>
+          <div>
+            <span id="wizPowerUsage" class="small fw-semibold text-muted">0 / 10</span>
+          </div>
+        </div>
+        <p class="text-muted small mb-2"><%= t('items.step_effects_desc') %></p>
+
+        <%# Progress bar %>
+        <div class="progress mb-3" style="height: 6px;">
+          <div id="wizPowerBar" class="progress-bar bg-primary" style="width: 0%;" role="progressbar"></div>
+        </div>
+
+        <%# Recommended effects %>
+        <div id="wizRecommended" class="mb-3">
+          <span class="badge bg-success-subtle text-success mb-1"><i class="bi bi-star me-1"></i><%= t('items.recommended') %></span>
+          <div id="wizRecommendedEffects" class="d-flex flex-wrap gap-1"></div>
+        </div>
+
+        <%# All available effects %>
+        <div id="wizAllEffects" class="d-flex flex-wrap gap-1 mb-3" style="max-height: 200px; overflow-y: auto;"></div>
+
+        <%# Selected effects %>
+        <div class="border-top pt-2">
+          <div class="d-flex align-items-center justify-content-between mb-1">
+            <span class="small fw-semibold text-muted"><i class="bi bi-check2-circle me-1"></i>Selected</span>
+            <button id="wizResetEffects" class="btn btn-sm btn-link text-danger p-0 small" type="button">
+              <i class="bi bi-arrow-counterclockwise me-1"></i><%= t('items.reset') %>
+            </button>
+          </div>
+          <div id="wizSelectedEffects" style="min-height: 40px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ══════════════════════════════════════ %>
+  <%# STEP 4: Name & Finalize %>
+  <%# ══════════════════════════════════════ %>
+  <div class="wizard-panel" id="step4" style="display:none;">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-1">
+          <i class="bi bi-tag me-1"></i> <%= t('items.step_name') %>
+        </h6>
+        <p class="text-muted small mb-3"><%= t('items.step_name_desc') %></p>
+
+        <%# Preview card %>
+        <div class="bg-body-tertiary rounded p-3 mb-3">
+          <div class="text-center mb-2">
+            <span id="wizPreviewRarity" class="badge"></span>
+            <span id="wizPreviewCategory" class="badge bg-secondary ms-1"></span>
+            <span id="wizPreviewPower" class="badge bg-primary ms-1"></span>
+          </div>
+          <div id="wizPreviewEffects" class="text-center mb-2"></div>
+        </div>
+
+        <%# Name input %>
+        <div class="input-group input-group-sm mb-3">
+          <input type="text" id="wizItemName" class="form-control" placeholder="<%= t('items.name_placeholder') %>">
+          <button id="wizGenerateName" class="btn btn-outline-primary" type="button">
+            <i class="bi bi-magic me-1"></i><%= t('items.auto_generate') %>
+          </button>
+        </div>
+
+        <div class="text-muted small mb-2">
+          <i class="bi bi-info-circle me-1"></i> <%= t('items.effects_hint') %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Navigation Buttons ── %>
+  <div class="d-flex justify-content-between mt-3 mb-4">
+    <button id="wizPrevBtn" class="btn btn-sm btn-outline-secondary" style="display:none;">
+      <i class="bi bi-arrow-left me-1"></i><%= t('items.prev_step') %>
+    </button>
+    <div class="ms-auto d-flex gap-2">
+      <%= link_to items_path, class: "btn btn-sm btn-outline-secondary" do %>
+        <i class="bi bi-x-lg me-1"></i><%= t('shared.cancel') %>
+      <% end %>
+      <button id="wizNextBtn" class="btn btn-sm btn-primary" disabled>
+        <%= t('items.next_step') %> <i class="bi bi-arrow-right ms-1"></i>
+      </button>
+      <button id="wizCreateBtn" class="btn btn-sm btn-primary" style="display:none;" disabled>
+        <i class="bi bi-hammer me-1"></i><%= t('items.finalize') %>
+      </button>
+    </div>
+  </div>
+</div>
+
+<%# ── Forge Overlay (reuse from create_random) ── %>
+<div id="forgeOverlay" class="forge-overlay" style="display:none;">
+  <div class="forge-content text-center">
+    <div class="forge-anvil mb-3">
+      <i class="bi bi-hammer forge-hammer"></i>
+      <div class="forge-sparks">
+        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+      </div>
+      <div class="forge-fire">
+        <span class="flame flame-1"></span>
+        <span class="flame flame-2"></span>
+        <span class="flame flame-3"></span>
+      </div>
+    </div>
+    <h5 class="text-white fw-bold"><%= t('items.forging') %></h5>
+    <p class="text-white-50 small"><%= t('items.forging_desc') %></p>
+  </div>
+</div>
+
+<%# ── Result Modal ── %>
+<div class="modal fade" id="wizResultModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-stars text-warning me-1"></i> <%= t('items.item_forged') %>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-3">
+          <h4 id="wizModalName" class="fw-bold text-primary mb-1"></h4>
+          <span id="wizModalRarity" class="badge"></span>
+          <span id="wizModalCategory" class="badge bg-secondary ms-1"></span>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-4">
+            <div class="text-center p-2 rounded bg-body-tertiary">
+              <div class="small text-muted"><%= t('items.power') %></div>
+              <div id="wizModalPower" class="fw-bold fs-5 text-primary"></div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="text-center p-2 rounded bg-body-tertiary">
+              <div class="small text-muted"><%= t('items.price') %></div>
+              <div class="fw-bold fs-5"><span id="wizModalPrice"></span> <span class="small text-muted"><%= t('items.gold_pieces') %></span></div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="text-center p-2 rounded bg-body-tertiary">
+              <div class="small text-muted"><%= t('items.weight') %></div>
+              <div id="wizModalWeight" class="fw-bold fs-5"></div>
+            </div>
+          </div>
+        </div>
+        <div id="wizModalAttunement" class="text-center mb-3" style="display:none;">
+          <span class="badge bg-warning text-dark"><i class="bi bi-link-45deg me-1"></i><%= t('items.attunement_required') %></span>
+        </div>
+        <h6 class="fw-semibold small text-muted text-uppercase mb-2">
+          <i class="bi bi-magic me-1"></i> <%= t('items.item_effects') %>
+        </h6>
+        <div id="wizModalEffects"></div>
+      </div>
+      <div class="modal-footer border-0 pt-0 justify-content-center">
+        <a id="wizModalViewLink" href="#" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-eye me-1"></i><%= t('items.view_item') %>
+        </a>
+        <a id="wizModalEditLink" href="#" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-pencil me-1"></i><%= t('items.edit_item_link') %>
+        </a>
+        <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal" onclick="resetWizard()">
+          <i class="bi bi-magic me-1"></i><%= t('items.forge_another') %>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function() {
+  const path = window.location.pathname;
+  const localeMatch = path.match(/^\/(en|es)/);
+  const localePrefix = localeMatch ? "/" + localeMatch[1] : "";
+
+  $.ajaxSetup({ headers: { 'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content') } });
+
+  // ── State ──
+  let currentStep = 1;
+  let wizCategory = null;
+  let wizCategoryName = null;
+  let wizWeapon = null;
+  let wizRarityId = null;
+  let wizRarityName = null;
+  let wizPower = 0;
+  let wizMaxPower = 0;
+  let wizTotalPower = 0;
+  let wizSelectedEffects = []; // {id, name, type, power}
+
+  const rarityColors = {
+    'Common': { bg: 'btn-outline-secondary', active: 'btn-secondary', badge: 'bg-secondary' },
+    'Uncommon': { bg: 'btn-outline-success', active: 'btn-success', badge: 'bg-success' },
+    'Rare': { bg: 'btn-outline-info', active: 'btn-info', badge: 'bg-info' },
+    'Very Rare': { bg: 'btn-outline-primary', active: 'btn-primary', badge: 'bg-primary' },
+    'Legendary': { bg: 'btn-outline-warning', active: 'btn-warning', badge: 'bg-warning text-dark' },
+    'Ancestral': { bg: 'btn-outline-danger', active: 'btn-danger', badge: 'bg-danger' }
+  };
+
+  const effectColors = {
+    'Attack Bonus': 'warning', 'Attack Damage': 'danger', 'Defense': 'secondary',
+    'Healing': 'primary', 'Material': 'dark', 'Stealth': 'secondary',
+    'Speed': 'info', 'Protection': 'success', 'Resistance': 'success',
+    'Conjuration': 'primary', 'Flight': 'info', 'Frosting': 'info',
+    'Lightning': 'warning', 'Vision': 'primary', 'Luck': 'success',
+    'Summoning': 'primary', 'Control': 'dark', 'Minding': 'primary',
+    'Enhance': 'warning', 'Utility': 'secondary', 'Understanding': 'info',
+    'Absortion': 'dark', 'Detection': 'info', 'Initiative': 'warning',
+    'Saving Throws': 'success', 'Inmunity': 'danger', 'Movement': 'info',
+    'Restoration': 'primary', 'Climbing': 'secondary', 'Durability': 'dark',
+    'Paralyzing': 'danger', 'Knocking': 'warning', 'Precision': 'warning',
+    'Flexibility': 'info', 'Ammunition Magic': 'danger', 'Sentient': 'dark',
+    'Handling': 'secondary', 'Sense': 'info', 'Morality': 'success',
+    'Traces': 'secondary', 'Reach': 'warning', 'Cleaving': 'danger',
+    'Assassination': 'dark', 'Goliath': 'danger', 'Fishing': 'info',
+    'Weirdness': 'secondary', 'Sobriety': 'success', 'Stealing': 'dark',
+    'Jumping': 'info', 'Water': 'info', 'Locking': 'dark',
+    'Seeing': 'info', 'Glow': 'warning', 'Loudness': 'warning',
+    'Eternity': 'danger', 'Equilibrium': 'secondary', 'Defensive': 'success',
+    'Breathing': 'info', 'Proning': 'danger', 'Stength': 'warning',
+    'Sight': 'info', 'Change': 'secondary', 'Enlarge': 'warning',
+    'Attack': 'danger'
+  };
+
+  function getEffectColor(type) { return effectColors[type] || 'primary'; }
+
+  function powerBtnClass(p) {
+    if (p <= 1) return 'btn-secondary';
+    if (p <= 3) return 'btn-success';
+    if (p <= 5) return 'btn-info';
+    if (p <= 7) return 'btn-warning';
+    if (p <= 9) return 'btn-danger';
+    return 'btn-dark';
+  }
+
+  // ── Step Navigation ──
+  function goToStep(step) {
+    $(".wizard-panel").hide();
+    $("#step" + step).show();
+
+    $(".wizard-step-circle").removeClass("active");
+    for (let i = 1; i <= step; i++) {
+      $(`.wizard-step-indicator[data-step='${i}'] .wizard-step-circle`).addClass("active");
+    }
+
+    currentStep = step;
+    $("#wizPrevBtn").toggle(step > 1);
+    $("#wizNextBtn").toggle(step < 4);
+    $("#wizCreateBtn").toggle(step === 4);
+
+    if (step === 3) loadRecommendations();
+    if (step === 4) updatePreview();
+
+    validateStep();
+  }
+
+  function validateStep() {
+    let valid = false;
+    if (currentStep === 1) valid = wizCategory !== null;
+    if (currentStep === 2) valid = wizPower > 0;
+    if (currentStep === 3) valid = wizTotalPower >= wizMaxPower;
+    if (currentStep === 4) valid = $("#wizItemName").val().trim().length > 0 && wizTotalPower >= wizMaxPower;
+
+    if (currentStep < 4) {
+      $("#wizNextBtn").prop("disabled", !valid);
+    } else {
+      $("#wizCreateBtn").prop("disabled", !valid);
+    }
+  }
+
+  $("#wizNextBtn").on("click", function() { if (currentStep < 4) goToStep(currentStep + 1); });
+  $("#wizPrevBtn").on("click", function() { if (currentStep > 1) goToStep(currentStep - 1); });
+
+  // ── Step 1: Category ──
+  $(document).on("click", ".wiz-category-btn", function(e) {
+    e.preventDefault();
+    $(".wiz-category-btn").removeClass("active btn-primary").addClass("btn-outline-secondary");
+    $(this).removeClass("btn-outline-secondary").addClass("active btn-primary");
+    wizCategory = $(this).data("id");
+    wizCategoryName = $(this).data("name");
+    if (wizCategoryName === "Weapons") {
+      $("#wizWeaponSelect").show();
+      // Auto-select first weapon and show its details
+      const firstBtn = $(".wiz-weapon-btn").first();
+      if (firstBtn.length) {
+        wizWeapon = firstBtn.data("name");
+        $("#wizWeaponDamage").text(firstBtn.data("damage"));
+        $("#wizWeaponCost").text(firstBtn.data("cost"));
+        $("#wizWeaponDetails").show();
+      }
+    } else {
+      $("#wizWeaponSelect").hide();
+      $("#wizWeaponDetails").hide();
+    }
+    // Reset effects when category changes
+    wizSelectedEffects = [];
+    wizTotalPower = 0;
+    validateStep();
+  });
+
+  // ── Weapon Picker ──
+  $(document).on("click", ".wiz-weapon-btn", function(e) {
+    e.preventDefault();
+    $(".wiz-weapon-btn").removeClass("active btn-primary").addClass("btn-outline-secondary");
+    $(this).removeClass("btn-outline-secondary").addClass("active btn-primary");
+    wizWeapon = $(this).data("name");
+    $("#wizWeaponDamage").text($(this).data("damage"));
+    $("#wizWeaponCost").text($(this).data("cost"));
+    $("#wizWeaponDetails").show();
+  });
+
+  // ── Step 2: Rarity & Power ──
+  // Load rarities
+  $.ajax({
+    url: localePrefix + '/rarities/get_rarities',
+    type: 'POST', dataType: 'json', data: {},
+    success: function(response) {
+      const container = $('#wizRarityPicker');
+      container.empty();
+      response.data.forEach(function(r) {
+        const colors = rarityColors[r.name] || rarityColors['Common'];
+        container.append(`
+          <button type="button" class="btn btn-sm wiz-rarity-pill ${colors.bg}"
+                  data-id="${r.id}" data-name="${r.name}">
+            <i class="bi bi-star-fill me-1"></i>${r.name}
+          </button>
+        `);
+      });
+    }
+  });
+
+  function getMaxPowerByRarity(name) {
+    const map = { 'Common': 1, 'Uncommon': 3, 'Rare': 5, 'Very Rare': 7, 'Legendary': 9, 'Ancestral': 10 };
+    return map[name] || 0;
+  }
+  function getRarityByPower(p) {
+    if (p >= 10) return 'Ancestral';
+    if (p >= 8) return 'Legendary';
+    if (p >= 6) return 'Very Rare';
+    if (p >= 4) return 'Rare';
+    if (p >= 2) return 'Uncommon';
+    return 'Common';
+  }
+
+  $(document).on("click", ".wiz-rarity-pill", function(e) {
+    e.preventDefault();
+    $(".wiz-rarity-pill").each(function() {
+      const n = $(this).data("name");
+      const c = rarityColors[n] || rarityColors['Common'];
+      $(this).removeClass(c.active + " text-white").addClass(c.bg);
+    });
+    const name = $(this).data("name");
+    const colors = rarityColors[name] || rarityColors['Common'];
+    $(this).removeClass(colors.bg).addClass(colors.active + " text-white");
+    wizRarityId = $(this).data("id");
+    wizRarityName = name;
+    wizMaxPower = getMaxPowerByRarity(name);
+    selectWizPower(wizMaxPower);
+  });
+
+  function selectWizPower(value) {
+    wizPower = value;
+    wizMaxPower = value;
+    $(".wiz-power-btn").each(function() {
+      const p = parseInt($(this).data("power"));
+      $(this).removeClass("active text-white btn-secondary btn-success btn-info btn-warning btn-danger btn-dark").addClass("btn-outline-secondary");
+      if (p === value) {
+        $(this).removeClass("btn-outline-secondary").addClass("active " + powerBtnClass(p) + " text-white");
+      }
+    });
+    // Sync rarity visual
+    const rName = getRarityByPower(value);
+    $(".wiz-rarity-pill").each(function() {
+      const n = $(this).data("name");
+      const c = rarityColors[n] || rarityColors['Common'];
+      $(this).removeClass(c.active + " text-white").addClass(c.bg);
+      if (n === rName) {
+        $(this).removeClass(c.bg).addClass(c.active + " text-white");
+        wizRarityId = $(this).data("id");
+        wizRarityName = n;
+      }
+    });
+    // Reset effects when power changes
+    wizSelectedEffects = [];
+    wizTotalPower = 0;
+    updatePowerBar();
+    validateStep();
+  }
+
+  $(document).on("click", ".wiz-power-btn", function(e) {
+    e.preventDefault();
+    selectWizPower(parseInt($(this).data("power")));
+  });
+
+  // ── Step 3: Effects ──
+  function updatePowerBar() {
+    const pct = wizMaxPower > 0 ? Math.min((wizTotalPower / wizMaxPower) * 100, 100) : 0;
+    const bar = document.getElementById('wizPowerBar');
+    if (bar) {
+      bar.style.width = pct + '%';
+      bar.className = 'progress-bar ' + (pct >= 100 ? 'bg-success' : pct >= 60 ? 'bg-info' : 'bg-primary');
+    }
+    $("#wizPowerUsage").text(wizTotalPower + ' / ' + wizMaxPower);
+    validateStep();
+  }
+
+  function renderSelectedEffects() {
+    const container = $("#wizSelectedEffects");
+    container.empty();
+    wizSelectedEffects.forEach(function(eff) {
+      const color = getEffectColor(eff.type);
+      container.append(`
+        <div class="effect-item d-flex align-items-center justify-content-between px-2 py-1 rounded mb-1 border" data-eid="${eff.id}">
+          <span class="small">
+            <span class="badge bg-${color} me-1">${eff.power}</span>
+            <strong>${eff.type}</strong>
+            <span class="text-muted mx-1">&middot;</span>
+            ${eff.name}
+          </span>
+          <button class="btn btn-sm p-0 text-danger wiz-remove-effect" data-eid="${eff.id}" title="Remove"><i class="bi bi-x-lg wiz-remove-effect" data-eid="${eff.id}"></i></button>
+        </div>
+      `);
+    });
+  }
+
+  function loadRecommendations() {
+    const selectedTypes = wizSelectedEffects.map(e => e.type);
+    const availablePower = wizMaxPower - wizTotalPower;
+
+    $.ajax({
+      url: localePrefix + '/items/recommend_effects',
+      type: 'POST', dataType: 'json',
+      data: { category_id: wizCategory, selected_types: selectedTypes, available_power: availablePower },
+      success: function(response) {
+        const recs = response.recommendations;
+        const synTypes = response.synergy_types || [];
+        const conflictTypes = response.conflict_types || [];
+
+        // Recommended (synergy)
+        const recContainer = $("#wizRecommendedEffects");
+        recContainer.empty();
+        const synRecs = recs.filter(r => r.synergy);
+        if (synRecs.length > 0) {
+          synRecs.slice(0, 6).forEach(r => recContainer.append(effectBtn(r, true)));
+          $("#wizRecommended").show();
+        } else {
+          $("#wizRecommended").hide();
+        }
+
+        // All available
+        const allContainer = $("#wizAllEffects");
+        allContainer.empty();
+        recs.forEach(function(r) {
+          const isSelected = wizSelectedEffects.some(e => e.id == r.id);
+          if (!isSelected) allContainer.append(effectBtn(r, false));
+        });
+      }
+    });
+  }
+
+  function effectBtn(r, isSynergy) {
+    const color = getEffectColor(r.effect_type);
+    const isSelected = wizSelectedEffects.some(e => e.id == r.id);
+    const cls = isSelected ? 'btn-' + color + ' text-white' : 'btn-outline-' + color;
+    const disabled = isSelected ? 'disabled' : '';
+    const synergyBadge = isSynergy ? '<i class="bi bi-lightning-charge-fill text-warning ms-1" title="Synergy"></i>' : '';
+    return `
+      <button type="button" class="btn btn-sm wiz-effect-btn ${cls}" ${disabled}
+              data-id="${r.id}" data-power="${r.power_level}" data-type="${r.effect_type}" data-name="${r.name}">
+        <span class="badge bg-white text-${color} me-1">${r.power_level}</span>
+        <span class="small">${r.name}</span>${synergyBadge}
+      </button>
+    `;
+  }
+
+  $(document).on("click", ".wiz-effect-btn:not([disabled])", function(e) {
+    e.preventDefault();
+    const id = $(this).data("id");
+    const power = parseInt($(this).data("power"));
+    const type = $(this).data("type");
+    const name = $(this).data("name");
+
+    if (wizSelectedEffects.some(e => e.id == id)) return;
+    if (wizSelectedEffects.some(e => e.type === type)) { alert('This effect type is already selected!'); return; }
+    if (wizTotalPower + power > wizMaxPower) { alert('Not enough power budget!'); return; }
+
+    wizSelectedEffects.push({ id, name, type, power });
+    wizTotalPower += power;
+    renderSelectedEffects();
+    updatePowerBar();
+    loadRecommendations();
+  });
+
+  $(document).on("click", ".wiz-remove-effect", function(e) {
+    e.preventDefault();
+    const eid = $(this).data("eid");
+    const idx = wizSelectedEffects.findIndex(e => e.id == eid);
+    if (idx >= 0) {
+      wizTotalPower -= wizSelectedEffects[idx].power;
+      wizSelectedEffects.splice(idx, 1);
+      renderSelectedEffects();
+      updatePowerBar();
+      loadRecommendations();
+    }
+  });
+
+  $("#wizResetEffects").on("click", function(e) {
+    e.preventDefault();
+    wizSelectedEffects = [];
+    wizTotalPower = 0;
+    renderSelectedEffects();
+    updatePowerBar();
+    loadRecommendations();
+  });
+
+  // ── Step 4: Name & Create ──
+  function updatePreview() {
+    const rc = rarityColors[wizRarityName] || rarityColors['Common'];
+    $("#wizPreviewRarity").attr("class", "badge " + rc.badge).text(wizRarityName);
+    $("#wizPreviewCategory").text(wizCategoryName);
+    $("#wizPreviewPower").text("Power: " + wizMaxPower);
+
+    const ep = $("#wizPreviewEffects");
+    ep.empty();
+    wizSelectedEffects.forEach(function(eff) {
+      const color = getEffectColor(eff.type);
+      ep.append(`<span class="badge bg-${color} me-1 mb-1">${eff.type} (${eff.power})</span>`);
+    });
+  }
+
+  $("#wizItemName").on("input", function() { validateStep(); });
+
+  $("#wizGenerateName").on("click", function(e) {
+    e.preventDefault();
+    $(this).prop("disabled", true).html('<i class="bi bi-hourglass-split me-1"></i>...');
+
+    $.ajax({
+      url: localePrefix + '/items/get_item_name',
+      type: 'POST', dataType: 'json',
+      data: {
+        category: wizCategory,
+        weapon: wizCategoryName === "Weapons" ? (($(".wiz-weapon-btn.active").data("name") || "") || "") : "",
+        power: wizMaxPower,
+        effects: wizSelectedEffects.map(e => e.id)
+      },
+      success: function(response) {
+        $("#wizItemName").val(response.data);
+        $("#wizGenerateName").prop("disabled", false).html('<i class="bi bi-magic me-1"></i><%= t("items.auto_generate") %>');
+        validateStep();
+      },
+      error: function() {
+        $("#wizGenerateName").prop("disabled", false).html('<i class="bi bi-magic me-1"></i><%= t("items.auto_generate") %>');
+      }
+    });
+  });
+
+  // ── Create Item ──
+  $("#wizCreateBtn").on("click", function(e) {
+    e.preventDefault();
+    $("#forgeOverlay").fadeIn(200);
+
+    const data = {
+      name: $("#wizItemName").val(),
+      category: wizCategory,
+      weapon: wizCategoryName === "Weapons" ? (($(".wiz-weapon-btn.active").data("name") || "") || "") : "",
+      rarity: wizRarityName,
+      power: wizMaxPower,
+      effects: wizSelectedEffects.map(e => e.id)
+    };
+
+    const ajaxPromise = $.ajax({
+      url: localePrefix + '/items/create_item',
+      type: 'POST', dataType: 'json', data: data
+    });
+
+    const animDelay = new Promise(resolve => setTimeout(resolve, 2000));
+
+    Promise.all([ajaxPromise, animDelay]).then(function(results) {
+      $("#forgeOverlay").fadeOut(300, function() {
+        // Fetch the created item to get full details
+        showWizResult(data);
+      });
+    }).catch(function(err) {
+      console.error(err);
+      $("#forgeOverlay").fadeOut(300);
+    });
+  });
+
+  function showWizResult(data) {
+    const rc = rarityColors[data.rarity] || rarityColors['Common'];
+    $("#wizModalName").text(data.name);
+    $("#wizModalRarity").attr("class", "badge " + rc.badge).text(data.rarity);
+    $("#wizModalCategory").text(wizCategoryName);
+    $("#wizModalPower").text(data.power);
+    $("#wizModalPrice").text("—");
+    $("#wizModalWeight").text("—");
+    data.power > 2 ? $("#wizModalAttunement").show() : $("#wizModalAttunement").hide();
+
+    const ec = $("#wizModalEffects");
+    ec.empty();
+    wizSelectedEffects.forEach(function(eff) {
+      const color = getEffectColor(eff.type);
+      ec.append(`
+        <div class="d-flex align-items-center px-2 py-1 rounded mb-1 border">
+          <span class="badge bg-${color} me-2">${eff.power}</span>
+          <div>
+            <span class="small fw-semibold">${eff.type}</span>
+            <span class="text-muted mx-1">&middot;</span>
+            <span class="small">${eff.name}</span>
+          </div>
+        </div>
+      `);
+    });
+
+    $("#wizModalViewLink").attr("href", localePrefix + "/items");
+    $("#wizModalEditLink").attr("href", localePrefix + "/items");
+
+    new bootstrap.Modal(document.getElementById('wizResultModal')).show();
+  }
+
+  window.resetWizard = function() {
+    wizCategory = null; wizCategoryName = null; wizWeapon = null;
+    wizRarityId = null; wizRarityName = null; wizPower = 0; wizMaxPower = 0;
+    wizTotalPower = 0; wizSelectedEffects = [];
+    $(".wiz-category-btn").removeClass("active btn-primary").addClass("btn-outline-secondary");
+    $(".wiz-rarity-pill").each(function() {
+      const n = $(this).data("name");
+      const c = rarityColors[n] || rarityColors['Common'];
+      $(this).removeClass(c.active + " text-white").addClass(c.bg);
+    });
+    $(".wiz-power-btn").removeClass("active text-white btn-secondary btn-success btn-info btn-warning btn-danger btn-dark").addClass("btn-outline-secondary");
+    $("#wizItemName").val("");
+    $("#wizSelectedEffects").empty();
+    goToStep(1);
+  };
+
+  goToStep(1);
+});
+</script>

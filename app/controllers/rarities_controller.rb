@@ -2,7 +2,13 @@ class RaritiesController < ApplicationController
   before_action :set_rarity, only: [:show, :edit, :update, :destroy]
 
   def index
-    @rarities = Rarity.all
+    rarities = Rarity.includes(:items)
+                     .search_by_name(params[:q])
+                     .sorted(params[:sort], params[:dir])
+
+    per_page = [params[:per_page].to_i, 10].max rescue 20
+    per_page = [per_page, 100].min
+    @pagy, @rarities = pagy(rarities, limit: per_page)
   end
 
   def new
@@ -49,6 +55,6 @@ class RaritiesController < ApplicationController
   end
 
   def rarity_params
-    params.require(:rarity).permit(:name, :min_price, :max_price)
+    params.require(:rarity).permit(:name, :min_price, :max_price, :min_power, :max_power)
   end
 end

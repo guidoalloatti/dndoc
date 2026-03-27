@@ -1,96 +1,174 @@
-<div class="container mt-5">
-  <h2>Create a New Item</h2>
+<input type="hidden" id="item_id" value="0">
 
-  <%= form_with(model: @item, local: true) do |form| %>
-    <!-- Select Name -->
-    <div class="form-group mb-3">
-      <%= form.label :name, 'Item Name', class: "form-label" %>
-      <div class="input-group">
-        <%= form.text_field :name, class: 'form-control', placeholder: 'Enter item name' %>
-        <button id="generateNameBtn" class="btn btn-outline-primary">Generate</button>
+<%= form_with(model: @item, local: true) do |form| %>
+
+  <%# ── Category Picker (icon grid) ── %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body pb-2">
+      <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+        <i class="bi bi-grid-3x3-gap me-1"></i> <%= t('items.category') %>
+      </h6>
+      <div class="d-flex flex-wrap gap-1" id="categoryPicker">
+        <% categories.each do |cat| %>
+          <button type="button"
+                  class="btn btn-outline-secondary btn-sm category-btn px-2 py-1"
+                  data-id="<%= cat.id %>"
+                  data-name="<%= cat.name %>"
+                  title="<%= cat.name %>">
+            <i class="bi bi-<%= category_icon(cat.name) %> me-1"></i>
+            <span class="small"><%= cat.name %></span>
+          </button>
+        <% end %>
       </div>
-    </div>
-
-    <!-- Select Category -->
-    <div class="form-group mb-3">
-      <%= form.label :category_id, 'Select Category', class: "form-label" %>
-      <br>
-
-      <select class="form-select" id="addCategory">
-        <% categories.each do |category| %>
-          <option value='<%= category.id %>'><%= category.name %></option>
-        <% end %>
-      </select>
-    </div>
-
-    <!-- Select Weapon Type -->
-    <div class="mb-3" id="addWeapons" style="display:none;">
-      <%= form.label :rarity_id, 'Weapon' %>
-      <br>
-      <select class="form-select" id="addWeaponDropdown">
-        <% weapons.each do |weapon| %>
-          <option value='<%= weapon.id %>'><%= weapon.name %></option>
-        <% end %>
-      </select>
-      <small>Note: Weapons Selection is only available when selecting the Weapons category.</small>
-    </div>
-
-    <!-- Select Rarity -->  
-    <div class="mb-3">
-      <%= form.label :rarity_id, 'Rarity' %>
-      <select class="form-select mt-3" id="addRarity"></select>
-      <small>Note: Rarity level affects the maximum allowed power.</small>
-    </div>
-
-    <!-- Item Power -->
-    <div class="mb-3">
-      <%= form.label :power, 'Item Power (Max 10)' %>
-      <%= form.number_field :power, max: 10, min: 0, class: 'form-control', placeholder: 'Enter item power' %>
-    </div>
-    
-    <!-- Add Effects -->
-    <div class="form-group mt-4 mb-4">
-      <div class="row">
-        <div class="col">
-          <%= form.label :effect_ids, 'Effects', id: "effectsLabel", class: "form-label" %>
+      <%# Weapon type picker (shown when Weapons selected) %>
+      <div id="addWeapons" class="mt-3" style="display:none;">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+          <i class="bi bi-hammer me-1"></i> <%= t('items.weapon_type') %>
+        </h6>
+        <div class="d-flex flex-wrap gap-1" id="weaponPicker">
+          <% weapons.each_with_index do |weapon, idx| %>
+            <button type="button"
+                    class="btn btn-sm weapon-btn px-2 py-1 <%= idx == 0 ? 'active btn-primary' : 'btn-outline-secondary' %>"
+                    data-id="<%= weapon.id %>"
+                    data-name="<%= weapon.name %>"
+                    data-damage="<%= weapon.damage %>"
+                    data-cost="<%= weapon.cost %>"
+                    title="<%= weapon.damage %> · <%= weapon.cost %>">
+              <i class="bi bi-<%= weapon_icon(weapon.name) %> me-1"></i>
+              <span class="small"><%= weapon.name %></span>
+            </button>
+          <% end %>
         </div>
-
-        <div class="col text-end">
-          <button id="addEffectBtn" class="btn btn-sm btn-outline-primary">Add Effect</button>
-          <button id="resetEffects" class="btn btn-sm btn-outline-danger">Reset All Effects</button>
+        <div id="weaponDetails" class="mt-2 p-2 rounded bg-body-tertiary small" style="display:none;">
+          <span class="text-muted"><i class="bi bi-bullseye me-1"></i><span id="weaponDamage"></span></span>
+          <span class="text-muted ms-3"><i class="bi bi-coin me-1"></i><span id="weaponCost"></span></span>
         </div>
       </div>
-
-      <select class="form-select mt-3" id="addEffect"></select>
-      <small>Each effect will consume power, total power should not exceed 10</small>
     </div>
+  </div>
 
-    <!-- Selected Effects -->
-    <div class="mb-3">
-      <h5>Selected Effects</h5>
-      <ul id="selectedEffects" class="list-group"></ul>
-    </div>
+  <div class="row g-3">
+    <%# ── Left column ── %>
+    <div class="col-lg-7">
 
-    <!-- Power Usage -->
-    <div class="mb-3">
-      <label for="powerProgress" class="form-label">Total Power Used</label>
-      <div class="progress">
-        <div id="powerProgress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
+      <%# Rarity Pills %>
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body pb-2">
+          <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+            <i class="bi bi-stars me-1"></i> <%= t('items.rarity') %>
+          </h6>
+          <div class="d-flex flex-wrap gap-1" id="rarityPicker">
+            <%# Populated via JS after loading rarities %>
+          </div>
+        </div>
       </div>
-      <small id="powerUsageText" class="form-text text-muted">Power used: 0/10</small>
+
+      <%# Power Selector %>
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body pb-2">
+          <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+            <i class="bi bi-lightning-charge me-1"></i> <%= t('items.power') %>
+          </h6>
+          <%= form.hidden_field :power, id: 'item_power', value: 10 %>
+          <div class="d-flex gap-1 flex-wrap" id="powerPicker">
+            <% (0..10).each do |p| %>
+              <button type="button"
+                      class="btn btn-sm power-btn <%= p == 10 ? 'active' : '' %>"
+                      data-power="<%= p %>"
+                      style="width: 36px; height: 36px;">
+                <%= p %>
+              </button>
+            <% end %>
+          </div>
+          <div class="mt-2">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="small fw-semibold text-muted"><%= t('items.power_used') %></span>
+              <span id="powerUsageText" class="small fw-semibold text-muted">0 / 10</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+              <div id="powerProgress" class="progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# Name with generate button %>
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+            <i class="bi bi-tag me-1"></i> <%= t('shared.name') %>
+          </h6>
+          <div class="input-group input-group-sm">
+            <%= form.text_field :name, class: 'form-control', placeholder: t('items.name_placeholder'), id: 'item_name' %>
+            <button id="generateNameBtn" class="btn btn-outline-primary" type="button">
+              <i class="bi bi-magic me-1"></i><%= t('items.generate') %>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <hr class="cool-hr">
+    <%# ── Right column: Effects ── %>
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h6 class="text-muted text-uppercase small fw-semibold mb-0">
+              <i class="bi bi-magic me-1"></i> <span id="effectsLabel"><%= t('items.effects') %></span>
+            </h6>
+            <button id="resetEffects" class="btn btn-sm btn-link text-danger p-0 small" type="button">
+              <i class="bi bi-arrow-counterclockwise me-1"></i><%= t('items.reset') %>
+            </button>
+          </div>
 
-    <div class="form-group">
-      <button id="createItem" class="btn btn-outline-primary disabled">Create Object</button>
+          <%# Effect cards grid %>
+          <div id="availableEffects" class="d-flex flex-wrap gap-1 mb-3" style="max-height: 260px; overflow-y: auto;">
+            <%# Populated via JS %>
+          </div>
+
+          <%# Selected effects list %>
+          <div class="border-top pt-2">
+            <span class="small fw-semibold text-muted d-block mb-1"><i class="bi bi-check2-circle me-1"></i>Selected</span>
+            <div id="selectedEffects" style="min-height: 40px;"></div>
+          </div>
+
+          <% if action == "Create" || action == "Update" %>
+            <div class="text-muted small mt-2">
+              <i class="bi bi-info-circle me-1"></i> <%= t('items.effects_hint') %>
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
-  <% end %>
+  </div>
+
+  <%# ── Action button (sticky bottom) ── %>
+  <div class="create-action-bar">
+    <div class="d-flex justify-content-center">
+      <button id="<%= action == "Create" ? "createItem" : "updateItem" %>" class="btn btn-lg btn-outline-primary disabled px-5 shadow" type="button">
+        <i class="bi bi-<%= action == "Create" ? "hammer" : "check-lg" %> me-2"></i>
+        <%= action == "Create" ? t('items.create_item') : t('items.update_item') %>
+      </button>
+    </div>
+  </div>
+<% end %>
+
+<%# ── Forge Animation Overlay ── %>
+<div id="forgeOverlay" class="forge-overlay" style="display:none;">
+  <div class="forge-content text-center">
+    <div class="forge-anvil mb-3">
+      <i class="bi bi-hammer forge-hammer"></i>
+      <div class="forge-sparks">
+        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+      </div>
+      <div class="forge-fire">
+        <span class="flame flame-1"></span>
+        <span class="flame flame-2"></span>
+        <span class="flame flame-3"></span>
+      </div>
+    </div>
+    <h5 class="text-white fw-bold" id="forgeTitle"><%= action == "Create" ? t('items.creating') : t('items.updating') %></h5>
+    <p class="text-white-50 small" id="forgeDesc"><%= action == "Create" ? t('items.creating_desc') : t('items.updating_desc') %></p>
+  </div>
 </div>
-
-
-
-
-
-
-

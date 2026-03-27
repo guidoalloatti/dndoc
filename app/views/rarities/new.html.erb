@@ -1,2 +1,11 @@
-<h1>Rarities#new</h1>
-<p>Find me in app/views/rarities/new.html.erb</p>
+<div class="container mt-4" style="max-width: 560px;">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0 fw-bold">
+      <i class="bi bi-plus-circle text-primary me-1"></i> <%= t('rarities.new') %>
+    </h4>
+    <%= link_to rarities_path, class: "btn btn-sm btn-outline-secondary" do %>
+      <i class="bi bi-arrow-left me-1"></i><%= t('shared.back') %>
+    <% end %>
+  </div>
+  <%= render 'form', rarity: @rarity %>
+</div>

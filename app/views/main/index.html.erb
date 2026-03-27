@@ -1,65 +1,496 @@
-<%= render "layouts/subheader", :locals => {:count => 0, :name => "Home"} %>
+<% if user_signed_in? %>
+  <%# ══════════════════════════════════════════════════════ %>
+  <%# DASHBOARD — signed-in user view                       %>
+  <%# ══════════════════════════════════════════════════════ %>
+  <div class="container py-4">
+    <%# Welcome row %>
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h3 class="fw-bold mb-1"><%= t('home.welcome_back', name: current_user.first_name || current_user.email.split('@').first) %></h3>
+        <p class="text-body-secondary mb-0"><%= t('home.dashboard_subtitle') %></p>
+      </div>
+      <%= link_to create_random_items_path, class: 'btn btn-primary px-4 shadow-sm' do %>
+        <i class="bi bi-lightning-fill me-1"></i> <%= t('home.generate_item') %>
+      <% end %>
+    </div>
 
-<div class="container text-center mt-3">
-	<div class="row card-group">
-		<div class="card" style="max-width: 800px; margin: 25px; border: 1px solid gray; border-radius: 0 0 15px 15px; padding: 0">
-			<%= image_tag "hero.png", alt: "Hero Image", class: "img-fluid" %>
-		  <div class="card-body">
-		    <h5 class="card-title">Create Random Object</h5>
-		    <p class="card-text">We can create a new object.</p>
-		    <%= link_to 'Create Random Item', create_random_items_path, class: 'btn btn-outline-success' %>	    
-		  </div>
-		</div>
+    <%# User stats %>
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body py-3 text-center">
+            <div class="text-primary fs-3 fw-bold"><%= @user_items_count %></div>
+            <small class="text-body-secondary fw-medium"><%= t('home.my_items') %></small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body py-3 text-center">
+            <div class="text-success fs-3 fw-bold"><%= @stats[:effects] %></div>
+            <small class="text-body-secondary fw-medium"><%= t('home.stats_effects') %></small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body py-3 text-center">
+            <div class="text-info fs-3 fw-bold"><%= @stats[:categories] %></div>
+            <small class="text-body-secondary fw-medium"><%= t('home.stats_categories') %></small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body py-3 text-center">
+            <div class="text-danger fs-3 fw-bold"><%= @stats[:weapons] %></div>
+            <small class="text-body-secondary fw-medium"><%= t('home.stats_weapons') %></small>
+          </div>
+        </div>
+      </div>
+    </div>
 
-		<div class="card" style="margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
-			<%= image_tag "hero3.png", alt: "Hero Image", class: "img-fluid" %>
-			<hr class="cool-hr">
-		  <div class="card-body">
-		    <h5 class="card-title">Handle Effects</h5>
-		    <p class="card-text">We can handle effects</p>
-		    <%= link_to 'Effects', effects_path, class: 'btn btn-outline-primary' %>
-		  </div>
-		</div>
+    <%# Recent items %>
+    <% if @recent_items.any? %>
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i><%= t('home.recent_items') %></h5>
+        <%= link_to items_path, class: 'btn btn-sm btn-outline-primary' do %>
+          <%= t('home.view_all') %> <i class="bi bi-arrow-right ms-1"></i>
+        <% end %>
+      </div>
+      <div class="row g-3 mb-4">
+        <% @recent_items.each do |item| %>
+          <div class="col-md-6 col-lg-4">
+            <%= link_to item_path(item), class: 'text-decoration-none' do %>
+              <div class="index-card rarity-<%= rarity_css_class(item.rarity.name) %> h-100">
+                <div class="d-flex align-items-start gap-2">
+                  <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                    <i class="bi bi-<%= category_icon(item.category.name) %> text-primary" style="font-size: 0.9rem;"></i>
+                  </div>
+                  <div class="flex-grow-1 min-width-0">
+                    <div class="card-title text-body text-truncate"><%= item.name %></div>
+                    <div class="d-flex align-items-center gap-1 flex-wrap">
+                      <span class="badge <%= rarity_badge_class(item.rarity.name) %>" style="font-size: 0.6rem;"><%= item.rarity.name %></span>
+                      <span class="badge bg-body-secondary text-body" style="font-size: 0.6rem;"><%= item.category.name %></span>
+                    </div>
+                    <div class="card-stats mt-1">
+                      <span class="stat-item"><i class="bi bi-lightning-charge text-warning"></i> <%= item.power %></span>
+                      <span class="stat-item"><i class="bi bi-coin text-warning"></i> <%= number_with_delimiter(item.price) %></span>
+                      <span class="stat-item"><i class="bi bi-magic text-info"></i> <%= item.effects.size %></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <%# New user — empty state %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body py-5 text-center">
+          <div class="landing-icon-circle bg-primary bg-opacity-10 mx-auto mb-3">
+            <i class="bi bi-box-seam text-primary" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="fw-bold mb-2"><%= t('home.no_items_title') %></h5>
+          <p class="text-body-secondary mb-3"><%= t('home.no_items_desc') %></p>
+          <div class="d-flex justify-content-center gap-2">
+            <%= link_to create_random_items_path, class: 'btn btn-primary' do %>
+              <i class="bi bi-lightning-fill me-1"></i> <%= t('home.generate_item') %>
+            <% end %>
+            <%= link_to new_item_path, class: 'btn btn-outline-primary' do %>
+              <i class="bi bi-plus-lg me-1"></i> <%= t('home.create_manual') %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
 
-	</div>
+    <%# Quick access cards %>
+    <h5 class="fw-bold text-body-secondary mb-3">
+      <i class="bi bi-grid-3x2-gap me-1"></i> <%= t('home.quick_access') %>
+    </h5>
+    <div class="row g-3">
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= link_to new_item_path, class: 'text-decoration-none' do %>
+          <div class="card border-0 shadow-sm card-hover text-center h-100">
+            <div class="card-body py-3">
+              <i class="bi bi-plus-circle text-primary fs-4"></i>
+              <div class="small fw-semibold mt-1"><%= t('nav.new_item') %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= link_to create_random_items_path, class: 'text-decoration-none' do %>
+          <div class="card border-0 shadow-sm card-hover text-center h-100">
+            <div class="card-body py-3">
+              <i class="bi bi-dice-5 text-success fs-4"></i>
+              <div class="small fw-semibold mt-1"><%= t('items.random') %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= link_to items_path, class: 'text-decoration-none' do %>
+          <div class="card border-0 shadow-sm card-hover text-center h-100">
+            <div class="card-body py-3">
+              <i class="bi bi-box-seam text-info fs-4"></i>
+              <div class="small fw-semibold mt-1"><%= t('nav.items') %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= link_to effects_path, class: 'text-decoration-none' do %>
+          <div class="card border-0 shadow-sm card-hover text-center h-100">
+            <div class="card-body py-3">
+              <i class="bi bi-magic text-warning fs-4"></i>
+              <div class="small fw-semibold mt-1"><%= t('nav.effects') %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= link_to categories_path, class: 'text-decoration-none' do %>
+          <div class="card border-0 shadow-sm card-hover text-center h-100">
+            <div class="card-body py-3">
+              <i class="bi bi-grid text-danger fs-4"></i>
+              <div class="small fw-semibold mt-1"><%= t('nav.categories') %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <%= link_to weapons_path, class: 'text-decoration-none' do %>
+          <div class="card border-0 shadow-sm card-hover text-center h-100">
+            <div class="card-body py-3">
+              <i class="bi bi-shield-shaded text-secondary fs-4"></i>
+              <div class="small fw-semibold mt-1"><%= t('nav.weapons') %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
 
-	<hr class="cool-hr">
+<% else %>
+  <%# ══════════════════════════════════════════════════════ %>
+  <%# LANDING PAGE — not signed in                          %>
+  <%# ══════════════════════════════════════════════════════ %>
 
-	<div class="row card-group">
-		<div class="card" style="margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
-			<%= image_tag "hero6.png", alt: "Hero Image", class: "img-fluid" %>
-		  <div class="card-body">
-		    <h5 class="card-title">Rarities</h5>
-		    <p class="card-text">We can edit rarities for objects</p>
-		    <%= link_to 'Items', rarities_path, class: 'btn btn-outline-primary' %>
-		  </div>
-		</div>
+  <%# ── HERO with parallax ── %>
+  <div class="landing-hero" data-parallax-hero>
+    <div class="landing-hero-particles" data-parallax-layer="0.3">
+      <span class="particle"></span><span class="particle"></span><span class="particle"></span>
+      <span class="particle"></span><span class="particle"></span><span class="particle"></span>
+      <span class="particle"></span><span class="particle"></span>
+    </div>
+    <%# Floating rune orbits %>
+    <div class="landing-hero-orbits" data-parallax-layer="0.15">
+      <div class="orbit orbit-1"><span class="rune"><i class="bi bi-lightning-charge"></i></span></div>
+      <div class="orbit orbit-2"><span class="rune"><i class="bi bi-shield-shaded"></i></span></div>
+      <div class="orbit orbit-3"><span class="rune"><i class="bi bi-gem"></i></span></div>
+    </div>
+    <div class="container position-relative text-center py-5" style="z-index: 2;">
+      <div class="landing-hero-icon mb-3 scroll-reveal" data-sr-delay="0">
+        <i class="bi bi-dice-5-fill"></i>
+      </div>
+      <h1 class="display-4 fw-bold mb-3 landing-hero-title scroll-reveal" data-sr-delay="100">
+        <%= t('landing.hero_title') %>
+      </h1>
+      <p class="lead mb-4 mx-auto landing-hero-subtitle scroll-reveal" data-sr-delay="200" style="max-width: 600px;">
+        <%= t('landing.hero_subtitle') %>
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap scroll-reveal" data-sr-delay="300">
+        <%= link_to new_user_registration_path, class: 'btn btn-lg btn-light px-5 shadow landing-cta-btn' do %>
+          <i class="bi bi-rocket-takeoff me-2"></i><%= t('landing.get_started') %>
+        <% end %>
+        <a href="#features" class="btn btn-lg btn-outline-light px-4 landing-cta-outline">
+          <i class="bi bi-eye me-2"></i><%= t('landing.explore') %>
+        </a>
+      </div>
 
-		<div class="card" style="max-width: 320px;margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
-			<%= image_tag "hero2.png", alt: "Hero Image", class: "img-fluid" %>
-		  <div class="card-body">
-		    <h5 class="card-title">Items</h5>
-		    <p class="card-text">We can handle items</p>
-		    <%= link_to 'Effects', items_path, class: 'btn btn-outline-secondary' %>
-		  </div>
-		</div>
+      <%# Floating stats %>
+      <div class="row g-3 mt-5 justify-content-center">
+        <% [@stats[:items], @stats[:effects], @stats[:categories], @stats[:weapons]].zip(
+             [t('landing.stat_items'), t('landing.stat_effects'), t('landing.stat_categories'), t('landing.stat_weapons')],
+             %w[+ + {} +]
+           ).each_with_index do |(val, label, suffix), i| %>
+          <div class="col-auto scroll-reveal" data-sr-delay="<%= 400 + i * 100 %>">
+            <div class="landing-stat-pill">
+              <span class="fw-bold counter" data-count="<%= val %>">0</span><%= suffix == '+' ? '+' : '' %> <%= label %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <%# Scroll indicator %>
+    <div class="landing-scroll-indicator scroll-reveal" data-sr-delay="800">
+      <i class="bi bi-chevron-double-down"></i>
+    </div>
+  </div>
 
-		<div class="card" style="max-width: 320px;margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
-			<%= image_tag "hero4.png", alt: "Hero Image", class: "img-fluid" %>
-		  <div class="card-body">
-		    <h5 class="card-title">Categories</h5>
-		    <p class="card-text">We can handle categories</p>
-		    <%= link_to 'Categories', categories_path, class: 'btn btn-outline-info' %>
-		  </div>
-		</div>
+  <%# ── FEATURES ── %>
+  <div id="features" class="container py-5">
+    <div class="text-center mb-5 scroll-reveal" data-sr="fade-up">
+      <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 mb-3 rounded-pill">
+        <i class="bi bi-stars me-1"></i> <%= t('landing.features_badge') %>
+      </span>
+      <h2 class="display-6 fw-bold mb-2"><%= t('landing.features_title') %></h2>
+      <p class="text-body-secondary mx-auto" style="max-width: 550px;"><%= t('landing.features_subtitle') %></p>
+    </div>
 
-		<div class="card" style="max-width: 320px;margin: 25px; border: 1px solid gray; border-radius: 5px; padding: 0">
-			<%= image_tag "hero5.png", alt: "Hero Image", class: "img-fluid" %>
-		  <div class="card-body">
-		    <h5 class="card-title">Weapons</h5>
-		    <p class="card-text">We can handle weapons</p>
-		    <%= link_to 'Weapons', weapons_path, class: 'btn btn-outline-danger' %>
-		  </div>
-		</div>
-	</div>
-</div>
+    <div class="row g-4">
+      <% [
+           { icon: 'lightning-charge-fill', color: 'primary', title: t('landing.feature_random_title'), desc: t('landing.feature_random_desc') },
+           { icon: 'magic', color: 'success', title: t('landing.feature_wizard_title'), desc: t('landing.feature_wizard_desc') },
+           { icon: 'diagram-3-fill', color: 'warning', title: t('landing.feature_synergy_title'), desc: t('landing.feature_synergy_desc') },
+           { icon: 'book-fill', color: 'danger', title: t('landing.feature_lore_title'), desc: t('landing.feature_lore_desc') },
+         ].each_with_index do |f, i| %>
+        <div class="col-md-6 col-lg-3 scroll-reveal" data-sr="fade-up" data-sr-delay="<%= i * 120 %>">
+          <div class="landing-feature-card text-center h-100">
+            <div class="landing-feature-icon bg-<%= f[:color] %> bg-opacity-10 text-<%= f[:color] %>">
+              <i class="bi bi-<%= f[:icon] %>"></i>
+            </div>
+            <h5 class="fw-bold mt-3 mb-2"><%= f[:title] %></h5>
+            <p class="text-body-secondary small mb-0"><%= f[:desc] %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ── RARITY TIERS ── %>
+  <div class="landing-rarity-section py-5">
+    <div class="container">
+      <div class="text-center mb-5 scroll-reveal" data-sr="fade-up">
+        <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 mb-3 rounded-pill">
+          <i class="bi bi-gem me-1"></i> <%= t('landing.rarity_badge') %>
+        </span>
+        <h2 class="display-6 fw-bold mb-2"><%= t('landing.rarity_title') %></h2>
+        <p class="text-body-secondary mx-auto" style="max-width: 550px;"><%= t('landing.rarity_subtitle') %></p>
+      </div>
+
+      <div class="row g-3 justify-content-center">
+        <% rarity_order = ["Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Ancestral"] %>
+        <% @rarities.sort_by { |r| rarity_order.index(r.name) || 99 }.each_with_index do |rarity, i| %>
+          <div class="col-6 col-md-4 col-lg-2 scroll-reveal" data-sr="scale-up" data-sr-delay="<%= i * 100 %>">
+            <div class="landing-rarity-card rarity-card-<%= rarity_css_class(rarity.name) %> text-center" data-tilt>
+              <div class="landing-rarity-gem">
+                <i class="bi bi-gem"></i>
+              </div>
+              <h6 class="fw-bold mb-1" style="font-size: 0.8rem;"><%= rarity.name %></h6>
+              <div class="text-body-secondary" style="font-size: 0.65rem;">
+                <i class="bi bi-lightning-charge me-1"></i><%= rarity.min_power %>–<%= rarity.max_power %>
+              </div>
+              <div class="text-body-secondary" style="font-size: 0.65rem;">
+                <i class="bi bi-coin me-1"></i><%= number_with_delimiter(rarity.min_price) %>–<%= number_with_delimiter(rarity.max_price) %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# ── SAMPLE ITEM SHOWCASE ── %>
+  <% if @sample_item %>
+    <div class="container py-5">
+      <div class="text-center mb-4 scroll-reveal" data-sr="fade-up">
+        <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 mb-3 rounded-pill">
+          <i class="bi bi-eye me-1"></i> <%= t('landing.showcase_badge') %>
+        </span>
+        <h2 class="display-6 fw-bold mb-2"><%= t('landing.showcase_title') %></h2>
+        <p class="text-body-secondary"><%= t('landing.showcase_subtitle') %></p>
+      </div>
+
+      <div class="mx-auto scroll-reveal" data-sr="fade-up" data-sr-delay="150" style="max-width: 680px;">
+        <% si = @sample_item %>
+        <% si_rarity = si.rarity.name %>
+        <div class="card border-0 shadow item-show-hero rarity-<%= rarity_css_class(si_rarity) %>" data-tilt data-tilt-max="4">
+          <div class="card-body">
+            <div class="d-flex align-items-start gap-3">
+              <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+                <i class="bi bi-<%= category_icon(si.category.name) %> text-primary" style="font-size: 1.2rem;"></i>
+              </div>
+              <div class="flex-grow-1 min-width-0">
+                <h4 class="fw-bold mb-1 text-truncate"><%= si.name %></h4>
+                <div class="d-flex align-items-center gap-1 flex-wrap">
+                  <span class="badge <%= rarity_badge_class(si_rarity) %>" style="font-size: 0.68rem;"><i class="bi bi-star-fill me-1"></i><%= si_rarity %></span>
+                  <span class="badge bg-body-secondary text-body" style="font-size: 0.68rem;"><i class="bi bi-<%= category_icon(si.category.name) %> me-1"></i><%= si.category.name %></span>
+                </div>
+              </div>
+              <div class="text-center flex-shrink-0">
+                <span class="badge rounded-pill <%= power_badge_class(si.power) %>" style="font-size: 1.1rem; padding: 0.5em 0.75em;"><%= si.power %></span>
+                <div class="text-muted mt-1" style="font-size: 0.55rem; text-transform: uppercase;"><%= t('items.power') %></div>
+              </div>
+            </div>
+            <% if si.description.present? %>
+              <div class="mt-3 pt-3 border-top">
+                <p class="mb-0 small" style="line-height: 1.6; color: var(--bs-secondary-color);"><%= si.description %></p>
+              </div>
+            <% end %>
+            <% if si.effects.any? %>
+              <div class="mt-3 pt-3 border-top">
+                <div class="d-flex flex-wrap gap-1">
+                  <% si.effects.each do |effect| %>
+                    <% color = effect_type_color(effect.effect_type) %>
+                    <span class="badge bg-<%= color %> bg-opacity-10 text-<%= color %>" style="font-size: 0.6rem;">
+                      <i class="bi bi-<%= effect_type_icon(effect.effect_type) %> me-1"></i><%= effect.name %>
+                      <span class="ms-1 badge bg-<%= color %> rounded-pill" style="font-size: 0.5rem;"><%= effect.power_level %></span>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%# ── HOW IT WORKS ── %>
+  <div class="landing-steps-section py-5">
+    <div class="container">
+      <div class="text-center mb-5 scroll-reveal" data-sr="fade-up">
+        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 mb-3 rounded-pill">
+          <i class="bi bi-signpost me-1"></i> <%= t('landing.steps_badge') %>
+        </span>
+        <h2 class="display-6 fw-bold mb-2"><%= t('landing.steps_title') %></h2>
+      </div>
+
+      <div class="row g-4">
+        <% [
+             { num: 1, title: t('landing.step1_title'), desc: t('landing.step1_desc') },
+             { num: 2, title: t('landing.step2_title'), desc: t('landing.step2_desc') },
+             { num: 3, title: t('landing.step3_title'), desc: t('landing.step3_desc') },
+           ].each_with_index do |step, i| %>
+          <div class="col-md-4 scroll-reveal" data-sr="fade-up" data-sr-delay="<%= i * 150 %>">
+            <div class="text-center">
+              <div class="landing-step-number"><%= step[:num] %></div>
+              <h5 class="fw-bold mt-3 mb-2"><%= step[:title] %></h5>
+              <p class="text-body-secondary small"><%= step[:desc] %></p>
+            </div>
+            <% if i < 2 %>
+              <div class="landing-step-connector d-none d-md-block">
+                <i class="bi bi-arrow-right"></i>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# ── CTA ── %>
+  <div class="container py-5 scroll-reveal" data-sr="fade-up">
+    <div class="landing-cta-card text-center py-5 px-4" data-tilt data-tilt-max="3">
+      <div class="landing-cta-particles">
+        <span class="cta-spark"></span><span class="cta-spark"></span><span class="cta-spark"></span>
+        <span class="cta-spark"></span><span class="cta-spark"></span>
+      </div>
+      <h2 class="display-6 fw-bold mb-3 text-white position-relative" style="z-index:1;"><%= t('landing.cta_title') %></h2>
+      <p class="text-white-50 mb-4 mx-auto position-relative" style="max-width: 500px; z-index:1;"><%= t('landing.cta_subtitle') %></p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap position-relative" style="z-index:1;">
+        <%= link_to new_user_registration_path, class: 'btn btn-lg btn-light px-5 shadow' do %>
+          <i class="bi bi-person-plus me-2"></i><%= t('landing.cta_signup') %>
+        <% end %>
+        <%= link_to new_user_session_path, class: 'btn btn-lg btn-outline-light px-4' do %>
+          <i class="bi bi-box-arrow-in-right me-2"></i><%= t('landing.cta_signin') %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# ── LANDING SCROLL ANIMATIONS JS ── %>
+  <script>
+  (function() {
+    function initLanding() {
+      // ── Intersection Observer for scroll-reveal ──
+      var els = document.querySelectorAll('.scroll-reveal');
+      if (!els.length) return;
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var delay = parseInt(entry.target.getAttribute('data-sr-delay') || '0', 10);
+            setTimeout(function() { entry.target.classList.add('sr-visible'); }, delay);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+      els.forEach(function(el) { observer.observe(el); });
+
+      // ── Parallax on hero ──
+      var hero = document.querySelector('[data-parallax-hero]');
+      if (hero) {
+        var layers = hero.querySelectorAll('[data-parallax-layer]');
+        window.addEventListener('scroll', function() {
+          var scrollY = window.pageYOffset;
+          var heroH = hero.offsetHeight;
+          if (scrollY > heroH * 1.5) return; // skip when past hero
+          layers.forEach(function(layer) {
+            var speed = parseFloat(layer.getAttribute('data-parallax-layer'));
+            layer.style.transform = 'translateY(' + (scrollY * speed) + 'px)';
+          });
+          // Fade hero content as user scrolls
+          var heroContent = hero.querySelector('.container');
+          if (heroContent) {
+            var opacity = Math.max(0, 1 - scrollY / (heroH * 0.7));
+            heroContent.style.opacity = opacity;
+          }
+        }, { passive: true });
+      }
+
+      // ── Counter animation ──
+      var counters = document.querySelectorAll('.counter');
+      var counterObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var el = entry.target;
+            var target = parseInt(el.getAttribute('data-count'), 10);
+            var duration = 1500;
+            var start = 0;
+            var startTime = null;
+            function step(ts) {
+              if (!startTime) startTime = ts;
+              var progress = Math.min((ts - startTime) / duration, 1);
+              var eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+              el.textContent = Math.floor(eased * target);
+              if (progress < 1) requestAnimationFrame(step);
+              else el.textContent = target;
+            }
+            requestAnimationFrame(step);
+            counterObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.5 });
+      counters.forEach(function(c) { counterObserver.observe(c); });
+
+      // ── Tilt effect on hover ──
+      document.querySelectorAll('[data-tilt]').forEach(function(card) {
+        var maxTilt = parseFloat(card.getAttribute('data-tilt-max') || '6');
+        card.addEventListener('mousemove', function(e) {
+          var rect = card.getBoundingClientRect();
+          var x = (e.clientX - rect.left) / rect.width - 0.5;
+          var y = (e.clientY - rect.top) / rect.height - 0.5;
+          card.style.transform = 'perspective(800px) rotateY(' + (x * maxTilt) + 'deg) rotateX(' + (-y * maxTilt) + 'deg) scale(1.02)';
+        });
+        card.addEventListener('mouseleave', function() {
+          card.style.transform = 'perspective(800px) rotateY(0) rotateX(0) scale(1)';
+        });
+      });
+    }
+
+    // Run on initial load and Turbo navigation
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLanding);
+    } else {
+      initLanding();
+    }
+    document.addEventListener('turbo:load', initLanding);
+  })();
+  </script>
+<% end %>

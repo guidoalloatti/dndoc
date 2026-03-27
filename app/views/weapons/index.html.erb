@@ -1,33 +1,144 @@
-<%= render "layouts/subheader", :locals => {:count => @weapons.count, :name => "Weapons"} %>
+<div class="container mt-4">
+  <%# ── Header ── %>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0 fw-bold">
+      <i class="bi bi-hammer text-primary me-1"></i> <%= t('weapons.title') %>
+      <span class="badge bg-primary rounded-pill ms-2 fs-6"><%= @pagy.count %></span>
+    </h4>
+    <%= link_to new_weapon_path, class: "btn btn-sm btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i><%= t('weapons.new') %>
+    <% end %>
+  </div>
 
-<div class="container mt-3">
-  <table class="table table-hover table-bordered table-striped">
-    <thead class="table-primary">
-      <tr>
-      <th>Name</th>
-      <th>Cost</th>
-      <th>Damage</th>
-      <th>Weight</th>
-      <th>Properties</th>
-      <th colspan="3"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @weapons.each do |weapon| %>
-        <tr>
-          <td><%= weapon.name %></td>
-          <td><%= weapon.cost %></td>
-          <td><%= weapon.damage %></td>
-          <td><%= weapon.weight %></td>
-          <td><%= weapon.properties %></td>
-          </td>
-          <td style="min-width: 185px;">
-            <%= link_to 'Show', weapon_path(weapon), class: "btn btn-outline-primary btn-sm" %>
-            <%= link_to 'Edit', edit_weapon_path(weapon), class: "btn btn-outline-success btn-sm" %>
-            <%= link_to 'Delete', weapon_path(weapon), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-outline-danger btn-sm" %>
-          </td>
-        </tr>
+  <%# ── Filters bar ── %>
+  <% has_filters = params[:q].present? || params[:damage].present? %>
+  <%= form_with url: weapons_path, method: :get, local: true, id: "weapons-filter-form" do %>
+    <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
+    <%= hidden_field_tag :dir, params[:dir] if params[:dir].present? %>
+    <%= hidden_field_tag :per_page, params[:per_page] if params[:per_page].present? %>
+
+    <div class="items-toolbar d-flex align-items-center border rounded mb-3">
+      <i class="bi bi-search text-muted px-2"></i>
+      <%= text_field_tag :q, params[:q],
+        class: "items-toolbar-input flex-grow-1",
+        placeholder: t('weapons.search_placeholder'),
+        id: "weapons-search",
+        autocomplete: "off" %>
+
+      <span class="items-toolbar-sep"></span>
+
+      <%= select_tag :damage,
+        options_for_select(@damage_types, params[:damage]),
+        include_blank: t('weapons.all_damage'),
+        class: "items-toolbar-select",
+        onchange: "this.form.requestSubmit()" %>
+
+      <% if has_filters %>
+        <span class="items-toolbar-sep"></span>
+        <%= link_to weapons_path(sort: params[:sort], dir: params[:dir], per_page: params[:per_page]), class: "items-toolbar-clear text-muted px-2", title: t('items.clear') do %>
+          <i class="bi bi-x-lg"></i>
+        <% end %>
       <% end %>
-    </tbody>
-  </table>
+    </div>
+  <% end %>
+
+  <%# ── Sort bar ── %>
+  <div class="d-flex align-items-center gap-3 mb-2">
+    <span class="text-muted small fw-semibold text-uppercase" style="font-size: 0.65rem;">Sort:</span>
+    <span style="font-size: 0.72rem;"><%= weapons_sort_link(:name, t('shared.name')) %></span>
+    <span style="font-size: 0.72rem;"><%= weapons_sort_link(:cost, t('weapons.cost')) %></span>
+    <span style="font-size: 0.72rem;"><%= weapons_sort_link(:damage, t('weapons.damage')) %></span>
+    <span style="font-size: 0.72rem;"><%= weapons_sort_link(:weight, t('weapons.weight')) %></span>
+  </div>
+
+  <%# ── Card Grid ── %>
+  <% if @weapons.any? %>
+    <div class="row g-2">
+      <% @weapons.each do |weapon| %>
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="index-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <i class="bi bi-<%= weapon_icon(weapon.name) %> text-primary" style="font-size: 0.8rem;"></i>
+                  <span class="card-title"><%= weapon.name %></span>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <span class="badge bg-danger bg-opacity-10 text-danger" style="font-size: 0.65rem;"><i class="bi bi-bullseye me-1"></i><%= weapon.damage %></span>
+                  <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size: 0.65rem;"><i class="bi bi-coin me-1"></i><%= weapon.cost %></span>
+                  <span class="badge bg-body-secondary text-body" style="font-size: 0.65rem;"><i class="bi bi-feather me-1"></i><%= weapon.weight %> lbs</span>
+                </div>
+              </div>
+              <div class="card-actions">
+                <%= link_to weapon_path(weapon), class: "action-icon text-primary", title: t('shared.show') do %><i class="bi bi-eye"></i><% end %>
+                <%= link_to edit_weapon_path(weapon), class: "action-icon text-secondary", title: t('shared.edit') do %><i class="bi bi-pencil"></i><% end %>
+                <%= button_to weapon_path(weapon), method: :delete, data: { turbo_confirm: t('shared.confirm_delete') }, class: "action-icon text-danger", title: t('shared.delete') do %><i class="bi bi-trash3"></i><% end %>
+              </div>
+            </div>
+            <% if weapon.properties.present? && weapon.properties != "-" %>
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                <% weapon.properties.split(",").each do |prop| %>
+                  <span class="badge bg-body-secondary text-body" style="font-size: 0.58rem;"><%= prop.strip %></span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ── Pagination ── %>
+    <nav class="d-flex align-items-center justify-content-between mt-3 mb-4">
+      <div class="d-flex align-items-center gap-2">
+        <small class="text-muted">
+          <%= t('weapons.showing', from: @pagy.from, to: @pagy.to, count: @pagy.count) %>
+        </small>
+        <span class="text-muted small">·</span>
+        <div class="d-flex align-items-center gap-1">
+          <% [20, 50, 100].each do |n| %>
+            <% active = (@pagy.limit == n) %>
+            <%= link_to n,
+              weapons_path(request.params.except("controller", "action").merge(per_page: n, page: nil)),
+              class: "btn btn-outline-secondary py-0 px-1 #{'active' if active}",
+              style: "font-size: 0.7rem;" %>
+          <% end %>
+          <span class="text-muted" style="font-size: 0.7rem;"><%= t('weapons.per_page') %></span>
+        </div>
+      </div>
+      <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+    </nav>
+  <% else %>
+    <div class="text-center py-5">
+      <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+      <p class="text-muted mt-2"><%= t('shared.no_records') %></p>
+      <%= link_to new_weapon_path, class: "btn btn-primary" do %>
+        <i class="bi bi-plus-lg me-1"></i><%= t('weapons.new') %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
+
+<script>
+  function initWeaponsSearch() {
+    var searchInput = document.getElementById("weapons-search");
+    var form = document.getElementById("weapons-filter-form");
+    if (!searchInput || !form || searchInput.dataset.bound) return;
+
+    searchInput.dataset.bound = "true";
+    var debounceTimer;
+
+    searchInput.addEventListener("keyup", function() {
+      clearTimeout(debounceTimer);
+      var value = searchInput.value.trim();
+
+      debounceTimer = setTimeout(function() {
+        if (value.length >= 3 || value.length === 0) {
+          form.requestSubmit();
+        }
+      }, 300);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", initWeaponsSearch);
+  document.addEventListener("turbo:load", initWeaponsSearch);
+</script>

@@ -5,6 +5,16 @@ class Rarity < ApplicationRecord
   validates :min_price, :max_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validate :min_price_less_than_max_price
 
+  scope :search_by_name, ->(query) { where("rarities.name ILIKE ?", "%#{query}%") if query.present? }
+
+  scope :sorted, ->(col, dir) {
+    dir = "asc" unless %w[asc desc].include?(dir)
+    case col
+    when "name", "min_price", "max_price", "min_power", "max_power" then order(col => dir)
+    else order(name: :asc)
+    end
+  }
+
   private
 
   def min_price_less_than_max_price

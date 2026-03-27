@@ -2,7 +2,17 @@ class EffectsController < ApplicationController
   before_action :set_effect, only: [:show, :edit, :update, :destroy]
 
   def index
-    @effects = Effect.all.sort_by { |e| e.name }
+    effects = Effect.includes(:categories)
+                    .search_by_name(params[:q])
+                    .by_effect_type(params[:effect_type])
+                    .by_power_level(params[:power_level])
+                    .sorted(params[:sort], params[:dir])
+
+    per_page = [params[:per_page].to_i, 10].max rescue 20
+    per_page = [per_page, 100].min
+    @pagy, @effects = pagy(effects, limit: per_page)
+    @effect_types = Effect.distinct.order(:effect_type).pluck(:effect_type)
+    @power_levels = Effect.distinct.order(:power_level).pluck(:power_level)
   end
 
   def show

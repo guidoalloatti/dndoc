@@ -1,53 +1,337 @@
-<%= render "layouts/subheader", :locals => {:count => 0, :name => "Generate Items"} %>
-<div class="text-center">
-  <%= link_to 'Back to Items Index', items_path, class: "btn btn-sm btn-outline-primary mt-3" %>
-</div>
+<div class="container mt-4" style="max-width: 720px;">
 
-<%= form_with url: create_random_items_path, method: :post, data: { turbo: false }, local: true do |form| %>
-<div class="container overflow-hidden mt-5">
-  <div class="row" style="height: 400px">
+  <%# ── Header ── %>
+  <div class="text-center mb-4">
+    <h4 class="fw-bold mb-1">
+      <i class="bi bi-hammer text-primary me-2"></i><%= t('items.random_title') %>
+    </h4>
+    <p class="text-muted small mb-0"><%= t('items.random_subtitle') %></p>
+  </div>
 
-      <div class="col-5 text-center">
-        <div class="form-group">
-          <%= form.label :category_id, "Category", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
-          <%= form.collection_select :category_id, @categories, :id, :name, prompt: "Choose a category", class: "dropdown-menu" %>
-        </div>
+  <%# ── Configuration Card ── %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
 
-        <div class="form-group">
-          <%= form.label :power_level, "Power", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
-          <%= form.select :power_level, options_for_select(@power_levels), class: "form-control" %>
-        </div>
-
-        <div class="form-group">
-          <%= form.label :rarity, "Rarity", style: "font-weight: 600; margin: 0 10px; border-radius: 5px 0 0 5px; width: 180px;", class: "btn btn-primary" %>
-          <%= form.collection_select :rarity, @rarities, :id, :name, class: "form-control" %>
-        </div>
-
-        <div class="form-group">
-          
-        </div>
+      <%# Category picker (visual icons, reuse helper) %>
+      <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+        <i class="bi bi-grid-3x3-gap me-1"></i> <%= t('items.select_category') %>
+      </h6>
+      <div class="d-flex flex-wrap gap-1 mb-3" id="randomCategoryPicker">
+        <button type="button" class="btn btn-primary btn-sm category-rand-btn active px-2 py-1" data-id="" data-name="">
+          <i class="bi bi-shuffle me-1"></i><span class="small"><%= t('items.any_category') %></span>
+        </button>
+        <% @categories.each do |cat| %>
+          <button type="button"
+                  class="btn btn-outline-secondary btn-sm category-rand-btn px-2 py-1"
+                  data-id="<%= cat.id %>"
+                  data-name="<%= cat.name %>"
+                  title="<%= cat.name %>">
+            <i class="bi bi-<%= category_icon(cat.name) %> me-1"></i>
+            <span class="small"><%= cat.name %></span>
+          </button>
+        <% end %>
       </div>
 
-      <div class="col-1 vertical-span"></div>
-
-      <div class="col-5" style="padding-left: 2%">
-        <div class="card-group">
-          <div class="card" style="width: 18rem; max-width: 400px; margin: 25px; border: 1px solid gray; border-radius: 5px;">
-            <%= image_tag "hero.png", alt: "Hero Image", class: "img-fluid", style: "max-height: 275px" %>
-            <div class="card-body">
-              <h5 class="card-title">Creating something amazing... </h5>
-              <p class="card-text">In here we can create a new object.</p>
+      <%# Power & Rarity side by side %>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+            <i class="bi bi-lightning-charge me-1"></i> <%= t('items.select_power') %>
+          </h6>
+          <div class="d-flex gap-1 flex-wrap" id="randomPowerPicker">
+            <button type="button" class="btn btn-sm power-rand-btn btn-primary text-white active" data-power="" style="width: 36px; height: 36px;">
+              <i class="bi bi-shuffle"></i>
+            </button>
+            <% (1..10).each do |p| %>
+              <button type="button"
+                      class="btn btn-sm power-rand-btn btn-outline-secondary"
+                      data-power="<%= p %>"
+                      style="width: 36px; height: 36px; font-weight: 700;">
+                <%= p %>
+              </button>
+            <% end %>
           </div>
+        </div>
+
+        <div class="col-md-6">
+          <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+            <i class="bi bi-stars me-1"></i> <%= t('items.select_rarity') %>
+          </h6>
+          <div class="d-flex flex-wrap gap-1" id="randomRarityPicker">
+            <%# Populated after power/rarity sync - but we show static pills %>
+            <button type="button" class="btn btn-sm rarity-rand-pill btn-primary text-white active" data-name="" data-id="">
+              <i class="bi bi-shuffle me-1"></i>Auto
+            </button>
+          </div>
+          <p class="text-muted small mt-1 mb-0"><i class="bi bi-info-circle me-1"></i>Auto-synced with power level</p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="text-center mt-5">
-    <%= form.submit "Generate Item", class: "btn btn-lg btn-outline-primary " %>
-    <hr class="cool-hr">
-    <%= form.submit "Generate Fully Random Item", class: "btn btn-sm btn-success mt-2" %>
+  <%# ── Action Buttons ── %>
+  <div class="d-flex gap-2 justify-content-center mb-3">
+    <button id="forgeItemBtn" class="btn btn-primary">
+      <i class="bi bi-hammer me-1"></i> <%= t('items.forge_item') %>
+    </button>
+    <button id="forgeRandomBtn" class="btn btn-outline-success">
+      <i class="bi bi-shuffle me-1"></i> <%= t('items.forge_random') %>
+    </button>
   </div>
-  <% end %>
+
+  <%# ── Navigation ── %>
+  <div class="text-center">
+    <%= link_to items_path, class: "btn btn-sm btn-outline-secondary" do %>
+      <i class="bi bi-arrow-left me-1"></i><%= t('shared.back') %>
+    <% end %>
+    <%= link_to new_item_path, class: "btn btn-sm btn-outline-primary ms-1" do %>
+      <i class="bi bi-plus-lg me-1"></i><%= t('items.new') %>
+    <% end %>
+  </div>
 </div>
 
+<%# ══════════════════════════════════════════════════════ %>
+<%# ── Forge Animation Overlay ── %>
+<%# ══════════════════════════════════════════════════════ %>
+<div id="forgeOverlay" class="forge-overlay" style="display:none;">
+  <div class="forge-content text-center">
+    <div class="forge-anvil mb-3">
+      <i class="bi bi-hammer forge-hammer"></i>
+      <div class="forge-sparks">
+        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+      </div>
+      <div class="forge-fire">
+        <span class="flame flame-1"></span>
+        <span class="flame flame-2"></span>
+        <span class="flame flame-3"></span>
+      </div>
+    </div>
+    <h5 class="text-white fw-bold"><%= t('items.forging') %></h5>
+    <p class="text-white-50 small"><%= t('items.forging_desc') %></p>
+  </div>
+</div>
+
+<%# ══════════════════════════════════════════════════════ %>
+<%# ── Result Modal ── %>
+<%# ══════════════════════════════════════════════════════ %>
+<div class="modal fade" id="itemModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-stars text-warning me-1"></i> <%= t('items.item_forged') %>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <%# Item name %>
+        <div class="text-center mb-3">
+          <h4 id="modalItemName" class="fw-bold text-primary mb-1"></h4>
+          <span id="modalItemRarity" class="badge"></span>
+          <span id="modalItemCategory" class="badge bg-secondary ms-1"></span>
+        </div>
+
+        <%# Stats grid %>
+        <div class="row g-2 mb-3">
+          <div class="col-4">
+            <div class="text-center p-2 rounded bg-body-tertiary">
+              <div class="small text-muted"><%= t('items.power') %></div>
+              <div id="modalItemPower" class="fw-bold fs-5 text-primary"></div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="text-center p-2 rounded bg-body-tertiary">
+              <div class="small text-muted"><%= t('items.price') %></div>
+              <div class="fw-bold fs-5"><span id="modalItemPrice"></span> <span class="small text-muted"><%= t('items.gold_pieces') %></span></div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="text-center p-2 rounded bg-body-tertiary">
+              <div class="small text-muted"><%= t('items.weight') %></div>
+              <div id="modalItemWeight" class="fw-bold fs-5"></div>
+            </div>
+          </div>
+        </div>
+
+        <%# Attunement %>
+        <div id="modalAttunement" class="text-center mb-3" style="display:none;">
+          <span class="badge bg-warning text-dark"><i class="bi bi-link-45deg me-1"></i><%= t('items.attunement_required') %></span>
+        </div>
+
+        <%# Effects %>
+        <h6 class="fw-semibold small text-muted text-uppercase mb-2">
+          <i class="bi bi-magic me-1"></i> <%= t('items.item_effects') %>
+        </h6>
+        <div id="modalEffects"></div>
+      </div>
+      <div class="modal-footer border-0 pt-0 justify-content-center">
+        <a id="modalViewLink" href="#" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-eye me-1"></i><%= t('items.view_item') %>
+        </a>
+        <a id="modalEditLink" href="#" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-pencil me-1"></i><%= t('items.edit_item_link') %>
+        </a>
+        <button type="button" class="btn btn-sm btn-primary" id="forgeAnotherBtn" data-bs-dismiss="modal">
+          <i class="bi bi-hammer me-1"></i><%= t('items.forge_another') %>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function() {
+
+  const path = window.location.pathname;
+  const localeMatch = path.match(/^\/(en|es)/);
+  const localePrefix = localeMatch ? "/" + localeMatch[1] : "";
+
+  $.ajaxSetup({
+    headers: { 'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content') }
+  });
+
+  // ── State ──
+  let selectedCategoryId = "";
+  let selectedPower = "";
+
+  // ── Category Picker ──
+  $(document).on("click", ".category-rand-btn", function(e) {
+    e.preventDefault();
+    $(".category-rand-btn").removeClass("active btn-primary text-white").addClass("btn-outline-secondary");
+    $(this).removeClass("btn-outline-secondary").addClass("active btn-primary text-white");
+    selectedCategoryId = $(this).data("id");
+  });
+
+  // ── Power Picker ──
+  const powerColors = {
+    1: 'btn-secondary', 2: 'btn-secondary',
+    3: 'btn-success', 4: 'btn-success',
+    5: 'btn-info', 6: 'btn-info',
+    7: 'btn-warning', 8: 'btn-warning',
+    9: 'btn-danger', 10: 'btn-dark'
+  };
+
+  $(document).on("click", ".power-rand-btn", function(e) {
+    e.preventDefault();
+    $(".power-rand-btn").each(function() {
+      $(this).removeClass("active text-white btn-secondary btn-success btn-info btn-warning btn-danger btn-dark btn-primary").addClass("btn-outline-secondary");
+    });
+    const p = $(this).data("power");
+    selectedPower = p;
+    if (p === "") {
+      $(this).removeClass("btn-outline-secondary").addClass("active btn-primary text-white");
+    } else {
+      const cls = powerColors[p] || 'btn-secondary';
+      $(this).removeClass("btn-outline-secondary").addClass("active " + cls + " text-white");
+    }
+  });
+
+  // ── Rarity colors ──
+  const rarityBadgeClass = {
+    'Common': 'bg-secondary',
+    'Uncommon': 'bg-success',
+    'Rare': 'bg-info',
+    'Very Rare': 'bg-primary',
+    'Legendary': 'bg-warning text-dark',
+    'Ancestral': 'bg-danger'
+  };
+
+  const effectColors = {
+    'Buff': 'success', 'Debuff': 'danger', 'Utility': 'info',
+    'Healing': 'primary', 'Damage': 'warning', 'Defense': 'secondary',
+    'Attack Bonus': 'warning', 'Attack Damage': 'danger'
+  };
+
+  // ── Forge (with params) ──
+  $("#forgeItemBtn").on("click", function(e) {
+    e.preventDefault();
+    forgeItem(false);
+  });
+
+  // ── Forge (fully random) ──
+  $("#forgeRandomBtn").on("click", function(e) {
+    e.preventDefault();
+    forgeItem(true);
+  });
+
+  function forgeItem(fullyRandom) {
+    // Show forge animation
+    $("#forgeOverlay").fadeIn(200);
+
+    const data = { fully_random: fullyRandom.toString() };
+    if (!fullyRandom) {
+      if (selectedCategoryId !== "") data.category_id = selectedCategoryId;
+      else data.fully_random = "true"; // no category = random
+
+      if (selectedPower !== "") data.power_level = selectedPower;
+    }
+
+    // Start AJAX but delay showing result for 2s (animation)
+    const ajaxPromise = $.ajax({
+      url: localePrefix + '/items/create_random',
+      type: 'POST',
+      dataType: 'json',
+      data: data
+    });
+
+    const animationDelay = new Promise(resolve => setTimeout(resolve, 2000));
+
+    Promise.all([ajaxPromise, animationDelay]).then(function(results) {
+      const response = results[0];
+      $("#forgeOverlay").fadeOut(300, function() {
+        showItemModal(response.item);
+      });
+    }).catch(function(error) {
+      console.error('Forge error:', error);
+      $("#forgeOverlay").fadeOut(300);
+    });
+  }
+
+  function showItemModal(item) {
+    $("#modalItemName").text(item.name);
+
+    const rarityClass = rarityBadgeClass[item.rarity] || 'bg-secondary';
+    $("#modalItemRarity").attr("class", "badge " + rarityClass).text(item.rarity);
+    $("#modalItemCategory").text(item.category);
+    $("#modalItemPower").text(item.power);
+    $("#modalItemPrice").text(item.price.toLocaleString());
+    $("#modalItemWeight").text(item.weight);
+
+    if (item.requires_attunement) {
+      $("#modalAttunement").show();
+    } else {
+      $("#modalAttunement").hide();
+    }
+
+    // Effects
+    const effectsContainer = $("#modalEffects");
+    effectsContainer.empty();
+    if (item.effects && item.effects.length > 0) {
+      item.effects.forEach(function(effect) {
+        const color = effectColors[effect.effect_type] || 'primary';
+        effectsContainer.append(`
+          <div class="d-flex align-items-center px-2 py-1 rounded mb-1 border">
+            <span class="badge bg-${color} me-2">${effect.power_level}</span>
+            <div>
+              <span class="small fw-semibold">${effect.effect_type}</span>
+              <span class="text-muted mx-1">&middot;</span>
+              <span class="small">${effect.name}</span>
+            </div>
+          </div>
+        `);
+      });
+    } else {
+      effectsContainer.html('<p class="text-muted small"><%= t("items.no_effects") %></p>');
+    }
+
+    // Links
+    $("#modalViewLink").attr("href", localePrefix + "/items/" + item.id);
+    $("#modalEditLink").attr("href", localePrefix + "/items/" + item.id + "/edit");
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('itemModal'));
+    modal.show();
+  }
+});
+</script>

@@ -2,7 +2,13 @@ class CategoriesController < ApplicationController
   before_action :set_category, only: [:show, :edit, :update, :destroy]
 
   def index
-    @categories = Category.all
+    categories = Category.includes(:items, :effects)
+                         .search_by_name(params[:q])
+                         .sorted(params[:sort], params[:dir])
+
+    per_page = [params[:per_page].to_i, 10].max rescue 20
+    per_page = [per_page, 100].min
+    @pagy, @categories = pagy(categories, limit: per_page)
   end
 
   def show
@@ -44,6 +50,6 @@ class CategoriesController < ApplicationController
   end
 
   def category_params
-    params.require(:category).permit(:name, :description)
+    params.require(:category).permit(:name, :description, :min_weight, :max_weight)
   end
 end

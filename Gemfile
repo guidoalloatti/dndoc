@@ -63,3 +63,14 @@ group :test do
 end
 
 gem "webpacker", "~> 5.4"
+
+# Pagination
+gem "pagy", "~> 9.0"
+
+# Authentication
+gem "devise"
+gem "omniauth-google-oauth2"
+gem "omniauth-rails_csrf_protection"
+
+# Environment variables
+gem "dotenv-rails", groups: [:development, :test]
