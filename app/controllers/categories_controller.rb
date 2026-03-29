@@ -1,14 +1,13 @@
 class CategoriesController < ApplicationController
   before_action :set_category, only: [:show, :edit, :update, :destroy]
+  before_action :require_admin!, only: [:new, :create, :edit, :update, :destroy]
 
   def index
     categories = Category.includes(:items, :effects)
                          .search_by_name(params[:q])
                          .sorted(params[:sort], params[:dir])
 
-    per_page = [params[:per_page].to_i, 10].max rescue 20
-    per_page = [per_page, 100].min
-    @pagy, @categories = pagy(categories, limit: per_page)
+    @pagy, @categories = pagy(categories, limit: parse_per_page)
   end
 
   def show
@@ -21,7 +20,7 @@ class CategoriesController < ApplicationController
   def create
     @category = Category.new(category_params)
     if @category.save
-      redirect_to categories_path, notice: 'Category was successfully created.'
+      redirect_to categories_path, notice: t("categories.created")
     else
       render :new
     end
@@ -32,7 +31,7 @@ class CategoriesController < ApplicationController
 
   def update
     if @category.update(category_params)
-      redirect_to category_path(@category), notice: 'Category was successfully updated.'
+      redirect_to category_path(@category), notice: t("categories.updated")
     else
       render :edit
     end
@@ -40,7 +39,7 @@ class CategoriesController < ApplicationController
 
   def destroy
     @category.destroy
-    redirect_to categories_path, notice: 'Category was successfully deleted.'
+    redirect_to categories_path, notice: t("categories.deleted")
   end
 
   private

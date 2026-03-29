@@ -1,4 +1,4 @@
-<input type="hidden" id="item_id" value="0">
+<input type="hidden" id="item_id" value="<%= item.persisted? ? item.id : 0 %>">
 
 <%= form_with(model: @item, local: true) do |form| %>
 
@@ -69,7 +69,7 @@
           <h6 class="text-muted text-uppercase small fw-semibold mb-2">
             <i class="bi bi-lightning-charge me-1"></i> <%= t('items.power') %>
           </h6>
-          <%= form.hidden_field :power, id: 'item_power', value: 10 %>
+          <%= form.hidden_field :power, id: 'item_power', value: item.persisted? ? item.power : 10 %>
           <div class="d-flex gap-1 flex-wrap" id="powerPicker">
             <% (0..10).each do |p| %>
               <button type="button"

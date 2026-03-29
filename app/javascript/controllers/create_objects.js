@@ -295,7 +295,16 @@ function initCreateObjects() {
   hanldeRarities();
 
   if (isEditPage) {
-    loadItemData();
+    // Use preloaded data from server if available, otherwise fallback to AJAX
+    if (window.editItemPreload) {
+      editItemData = window.editItemPreload;
+      window.editItemPreload = null; // Clear to avoid stale data on Turbo navigation
+      if (raritiesLoaded) {
+        applyItemData();
+      }
+    } else {
+      loadItemData();
+    }
   }
 
   // ── Functions ──

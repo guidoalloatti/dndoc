@@ -10,6 +10,19 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def require_admin!
+    unless current_user&.admin?
+      redirect_to root_path, alert: t("admin.access_denied")
+    end
+  end
+
+  def parse_per_page(default = 20, max = 100)
+    per_page = params[:per_page].to_i
+    per_page = default if per_page < 10
+    per_page = max if per_page > max
+    per_page
+  end
+
   def set_locale
     I18n.locale = params[:locale] || session[:locale] || I18n.default_locale
     session[:locale] = I18n.locale

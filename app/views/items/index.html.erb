@@ -110,7 +110,7 @@
             <% if item.effects.any? %>
               <div class="d-flex flex-wrap gap-1 mt-1">
                 <% item.effects.limit(4).each do |effect| %>
-                  <span class="badge bg-body-secondary text-body" style="font-size: 0.58rem;"><%= effect.name %></span>
+                  <span class="badge bg-body-secondary text-body" style="font-size: 0.58rem;"><%= effect.translated_name %></span>
                 <% end %>
                 <% if item.effects.size > 4 %>
                   <span class="badge bg-body-secondary text-body" style="font-size: 0.58rem;">+<%= item.effects.size - 4 %></span>

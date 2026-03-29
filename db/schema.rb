@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_27_050000) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_29_034927) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -54,8 +54,27 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_27_050000) do
   create_table "categories_effects", id: false, force: :cascade do |t|
     t.bigint "category_id", null: false
     t.bigint "effect_id", null: false
+    t.index ["category_id", "effect_id"], name: "index_categories_effects_on_category_and_effect", unique: true
     t.index ["category_id"], name: "index_categories_effects_on_category_id"
     t.index ["effect_id"], name: "index_categories_effects_on_effect_id"
+  end
+
+  create_table "character_classes", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description"
+    t.boolean "is_magic_user", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_character_classes_on_name", unique: true
+  end
+
+  create_table "class_category_affinities", force: :cascade do |t|
+    t.bigint "character_class_id", null: false
+    t.bigint "category_id", null: false
+    t.integer "weight", default: 1, null: false
+    t.index ["category_id"], name: "index_class_category_affinities_on_category_id"
+    t.index ["character_class_id", "category_id"], name: "idx_class_category_affinity_unique", unique: true
+    t.index ["character_class_id"], name: "index_class_category_affinities_on_character_class_id"
   end
 
   create_table "effects", force: :cascade do |t|
@@ -65,6 +84,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_27_050000) do
     t.integer "power_level"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name_es"
+    t.text "description_es"
   end
 
   create_table "item_effects", force: :cascade do |t|
@@ -136,6 +157,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_27_050000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "categories_effects", "categories"
   add_foreign_key "categories_effects", "effects"
+  add_foreign_key "class_category_affinities", "categories"
+  add_foreign_key "class_category_affinities", "character_classes"
   add_foreign_key "item_effects", "effects"
   add_foreign_key "item_effects", "items"
   add_foreign_key "items", "categories"

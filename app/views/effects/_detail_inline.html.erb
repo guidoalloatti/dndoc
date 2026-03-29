@@ -1,0 +1,77 @@
+<%# Hero %>
+<div class="d-flex align-items-start gap-3 mb-3">
+  <div class="rounded-circle bg-<%= color %> bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+    <i class="bi bi-<%= icon %> text-<%= color %>" style="font-size: 1.3rem;"></i>
+  </div>
+  <div class="flex-grow-1 min-width-0">
+    <h5 class="fw-bold mb-1"><%= effect.translated_name %></h5>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <span class="badge bg-<%= color %> bg-opacity-10 text-<%= color %>" style="font-size: 0.7rem;">
+        <i class="bi bi-<%= icon %> me-1"></i><%= effect.effect_type %>
+      </span>
+      <span class="badge rounded-pill <%= power_level_badge_class(effect.power_level) %>" style="font-size: 0.75rem;"><%= effect.power_level %></span>
+    </div>
+  </div>
+  <div class="d-flex gap-1 flex-shrink-0">
+    <a href="<%= effect_path(effect) %>" class="btn btn-sm btn-outline-primary" title="<%= t('shared.show') %>"><i class="bi bi-eye"></i></a>
+    <a href="<%= edit_effect_path(effect) %>" class="btn btn-sm btn-outline-secondary" title="<%= t('shared.edit') %>"><i class="bi bi-pencil"></i></a>
+    <%= button_to effect_path(effect), method: :delete, data: { turbo_confirm: t('shared.confirm_delete') }, class: "btn btn-sm btn-outline-danger", title: t('shared.delete') do %>
+      <i class="bi bi-trash3"></i>
+    <% end %>
+  </div>
+</div>
+
+<%# Description %>
+<div class="mb-3 pb-3 border-bottom">
+  <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size: 0.65rem;"><%= t('effects.description', default: 'Description') %></h6>
+  <% if effect.translated_description.present? %>
+    <p class="mb-0 small" style="line-height: 1.6; color: var(--bs-secondary-color);"><%= effect.translated_description %></p>
+  <% else %>
+    <p class="mb-0 small text-muted fst-italic"><%= t('effects.no_description') %></p>
+  <% end %>
+</div>
+
+<%# Categories %>
+<div class="mb-3 pb-3 border-bottom">
+  <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size: 0.65rem;">
+    <%= t('effects.categories') %>
+    <span class="badge bg-primary rounded-pill ms-1" style="font-size: 0.5rem;"><%= effect.categories.size %></span>
+  </h6>
+  <% if effect.categories.any? %>
+    <div class="d-flex flex-wrap gap-1">
+      <% effect.categories.each do |category| %>
+        <a href="<%= category_path(category) %>" class="badge bg-body-secondary text-body text-decoration-none" style="font-size: 0.72rem; padding: 0.4em 0.65em;">
+          <i class="bi bi-<%= category_icon(category.name) %> me-1"></i><%= category.name %>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="mb-0 small text-muted fst-italic"><%= t('effects.no_categories') %></p>
+  <% end %>
+</div>
+
+<%# Items using this effect %>
+<div>
+  <h6 class="text-muted text-uppercase fw-semibold mb-2" style="font-size: 0.65rem;">
+    <%= t('effects.items_using') %>
+    <span class="badge bg-primary rounded-pill ms-1" style="font-size: 0.5rem;"><%= effect.items.size %></span>
+  </h6>
+  <% if effect.items.any? %>
+    <div class="d-flex flex-column gap-1">
+      <% effect.items.each do |item| %>
+        <a href="<%= item_path(item) %>" class="d-flex align-items-center justify-content-between p-2 rounded-2 border text-decoration-none" style="transition: background .1s;">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-<%= category_icon(item.category.name) %> text-primary" style="font-size: 0.8rem;"></i>
+            <span class="fw-semibold small text-body"><%= item.name %></span>
+            <span class="badge bg-body-secondary text-body" style="font-size: 0.58rem;"><%= item.category.name %></span>
+          </div>
+          <span class="badge bg-body-secondary text-body" style="font-size: 0.62rem;">
+            <i class="bi bi-lightning-charge me-1"></i><%= item.power %>
+          </span>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="mb-0 small text-muted fst-italic"><%= t('effects.no_items') %></p>
+  <% end %>
+</div>

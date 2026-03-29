@@ -1,0 +1,446 @@
+<div class="container mt-4" style="max-width: 900px;">
+
+  <%# ── Header ── %>
+  <div class="text-center mb-4">
+    <h4 class="fw-bold mb-1">
+      <i class="bi bi-people-fill text-primary me-2"></i><%= t('party_rewards.title') %>
+    </h4>
+    <p class="text-muted small mb-0"><%= t('party_rewards.subtitle') %></p>
+  </div>
+
+  <%# ── Configuration ── %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-0">
+          <i class="bi bi-gear me-1"></i> <%= t('party_rewards.items_per_member') %>
+        </h6>
+        <div class="d-flex gap-1">
+          <% (1..5).each do |n| %>
+            <button type="button"
+                    class="btn btn-sm items-count-btn <%= n == 1 ? 'btn-primary text-white' : 'btn-outline-secondary' %>"
+                    data-count="<%= n %>"
+                    style="width: 36px; height: 36px;">
+              <%= n %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Party Members ── %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-0">
+          <i class="bi bi-people me-1"></i> <%= t('party_rewards.party_members') %>
+        </h6>
+        <button id="addMemberBtn" class="btn btn-sm btn-outline-primary" type="button">
+          <i class="bi bi-plus-lg me-1"></i><%= t('party_rewards.add_member') %>
+        </button>
+      </div>
+
+      <div id="partyMembersList">
+        <%# Members are added dynamically via JS %>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Generate Button ── %>
+  <div class="d-flex justify-content-center mb-4">
+    <button id="generateRewardsBtn" class="btn btn-lg btn-primary px-5 shadow disabled" type="button" disabled>
+      <i class="bi bi-hammer me-2"></i><%= t('party_rewards.generate') %>
+    </button>
+  </div>
+
+  <%# ── Results Area (hidden initially) ── %>
+  <div id="resultsArea" style="display: none;">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="fw-bold mb-0">
+        <i class="bi bi-trophy-fill text-warning me-2"></i><%= t('party_rewards.results_title') %>
+      </h5>
+      <button id="saveAllBtn" class="btn btn-sm btn-success" type="button">
+        <i class="bi bi-check2-all me-1"></i><%= t('party_rewards.save_all') %>
+      </button>
+    </div>
+    <div id="resultsContainer">
+      <%# Populated via JS %>
+    </div>
+  </div>
+</div>
+
+<%# ── Forge Animation Overlay ── %>
+<div id="forgeOverlay" class="forge-overlay" style="display:none;">
+  <div class="forge-content text-center">
+    <div class="forge-anvil mb-3">
+      <i class="bi bi-hammer forge-hammer"></i>
+      <div class="forge-sparks">
+        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
+      </div>
+      <div class="forge-fire">
+        <span class="flame flame-1"></span>
+        <span class="flame flame-2"></span>
+        <span class="flame flame-3"></span>
+      </div>
+    </div>
+    <h5 class="text-white fw-bold"><%= t('party_rewards.generating') %></h5>
+    <p class="text-white-50 small"><%= t('party_rewards.generating_desc') %></p>
+  </div>
+</div>
+
+<%# ── Member Row Template (hidden) ── %>
+<template id="memberRowTemplate">
+  <div class="party-member-row border rounded p-3 mb-2 position-relative bg-body-tertiary">
+    <button type="button" class="btn btn-sm btn-link text-danger position-absolute top-0 end-0 mt-1 me-1 remove-member-btn" title="<%= t('party_rewards.remove_member') %>">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small text-muted mb-1"><%= t('party_rewards.member_name') %></label>
+        <input type="text" class="form-control form-control-sm member-name" placeholder="<%= t('party_rewards.member_name_placeholder') %>">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small text-muted mb-1"><%= t('party_rewards.character_class') %></label>
+        <select class="form-select form-select-sm member-class">
+          <option value=""><%= t('party_rewards.select_class') %></option>
+          <% @character_classes.each do |cc| %>
+            <option value="<%= cc.id %>" data-magic="<%= cc.is_magic_user %>"><%= cc.name %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small text-muted mb-1"><%= t('party_rewards.level') %></label>
+        <select class="form-select form-select-sm member-level">
+          <% (1..20).each do |lvl| %>
+            <option value="<%= lvl %>" <%= lvl == 5 ? 'selected' : '' %>><%= lvl %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small text-muted mb-1"><%= t('party_rewards.reward_level') %></label>
+        <div class="d-flex gap-1">
+          <button type="button" class="btn btn-sm reward-btn btn-outline-secondary flex-fill" data-reward="low"><%= t('party_rewards.reward_low') %></button>
+          <button type="button" class="btn btn-sm reward-btn btn-success text-white flex-fill active" data-reward="medium"><%= t('party_rewards.reward_medium') %></button>
+          <button type="button" class="btn btn-sm reward-btn btn-outline-warning flex-fill" data-reward="high"><%= t('party_rewards.reward_high') %></button>
+          <button type="button" class="btn btn-sm reward-btn btn-outline-danger flex-fill" data-reward="very_high"><%= t('party_rewards.reward_very_high') %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+$(function() {
+  const path = window.location.pathname;
+  const localeMatch = path.match(/^\/(en|es)/);
+  const localePrefix = localeMatch ? "/" + localeMatch[1] : "";
+
+  $.ajaxSetup({
+    headers: { 'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content') }
+  });
+
+  let itemsPerMember = 1;
+  let generatedResults = null;
+
+  const rarityBadgeClass = {
+    'Common': 'bg-secondary', 'Uncommon': 'bg-success', 'Rare': 'bg-info',
+    'Very Rare': 'bg-primary', 'Legendary': 'bg-warning text-dark', 'Ancestral': 'bg-danger'
+  };
+
+  const effectColors = {
+    'Attack Bonus': 'warning', 'Attack Damage': 'danger', 'Defense': 'secondary',
+    'Healing': 'primary', 'Material': 'info', 'Stealth': 'dark', 'Speed': 'success',
+    'Protection': 'primary', 'Resistance': 'secondary', 'Conjuration': 'info',
+    'Flight': 'success', 'Frosting': 'info', 'Lightning': 'warning', 'Vision': 'primary',
+    'Luck': 'warning', 'Control': 'danger', 'Minding': 'info', 'Summoning': 'info',
+    'Enhance': 'success', 'Utility': 'secondary', 'Understanding': 'primary', 'Absortion': 'danger',
+  };
+
+  function getEffectColor(type) { return effectColors[type] || 'primary'; }
+
+  // ── Items per member picker ──
+  $(document).on("click", ".items-count-btn", function(e) {
+    e.preventDefault();
+    $(".items-count-btn").removeClass("btn-primary text-white").addClass("btn-outline-secondary");
+    $(this).removeClass("btn-outline-secondary").addClass("btn-primary text-white");
+    itemsPerMember = parseInt($(this).data("count"));
+  });
+
+  // ── Add member ──
+  function addMember() {
+    const template = document.getElementById("memberRowTemplate");
+    const clone = template.content.cloneNode(true);
+    document.getElementById("partyMembersList").appendChild(clone);
+    updateGenerateButton();
+  }
+
+  // Start with 4 members
+  for (let i = 0; i < 4; i++) addMember();
+
+  $("#addMemberBtn").on("click", function(e) {
+    e.preventDefault();
+    addMember();
+  });
+
+  // ── Remove member ──
+  $(document).on("click", ".remove-member-btn", function(e) {
+    e.preventDefault();
+    $(this).closest(".party-member-row").remove();
+    updateGenerateButton();
+  });
+
+  // ── Reward level picker ──
+  $(document).on("click", ".reward-btn", function(e) {
+    e.preventDefault();
+    const row = $(this).closest(".party-member-row");
+    row.find(".reward-btn").removeClass("active btn-success btn-warning btn-danger text-white").addClass("btn-outline-secondary");
+    $(this).removeClass("btn-outline-secondary");
+    const reward = $(this).data("reward");
+    if (reward === "low") $(this).addClass("active btn-secondary text-white");
+    else if (reward === "medium") $(this).addClass("active btn-success text-white");
+    else if (reward === "high") $(this).addClass("active btn-warning text-white");
+    else $(this).addClass("active btn-danger text-white");
+  });
+
+  // ── Validate & enable generate ──
+  $(document).on("change", ".member-class", updateGenerateButton);
+
+  function updateGenerateButton() {
+    const rows = $(".party-member-row");
+    const allValid = rows.length > 0 && rows.toArray().every(function(row) {
+      return $(row).find(".member-class").val() !== "";
+    });
+    if (allValid) {
+      $("#generateRewardsBtn").prop("disabled", false).removeClass("disabled");
+    } else {
+      $("#generateRewardsBtn").prop("disabled", true).addClass("disabled");
+    }
+  }
+
+  // ── Collect party data ──
+  function collectPartyData() {
+    const members = [];
+    $(".party-member-row").each(function() {
+      const row = $(this);
+      members.push({
+        name: row.find(".member-name").val(),
+        character_class_id: row.find(".member-class").val(),
+        level: row.find(".member-level").val(),
+        reward_level: row.find(".reward-btn.active").data("reward") || "medium",
+      });
+    });
+    return members;
+  }
+
+  // ── Generate Rewards ──
+  $("#generateRewardsBtn").on("click", function(e) {
+    e.preventDefault();
+    const members = collectPartyData();
+    if (members.length === 0) return;
+
+    $("#forgeOverlay").fadeIn(200);
+
+    const ajaxPromise = $.ajax({
+      url: localePrefix + "/party_rewards/generate",
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify({ party_members: members, items_per_member: itemsPerMember }),
+    });
+
+    const delay = new Promise(resolve => setTimeout(resolve, 2500));
+
+    Promise.all([ajaxPromise, delay]).then(function(results) {
+      generatedResults = results[0].results;
+      $("#forgeOverlay").fadeOut(300, function() {
+        renderResults(generatedResults);
+      });
+    }).catch(function(error) {
+      console.error("Error:", error);
+      $("#forgeOverlay").fadeOut(300);
+    });
+  });
+
+  // ── Render Results ──
+  function renderResults(results) {
+    const container = $("#resultsContainer");
+    container.empty();
+
+    results.forEach(function(member, memberIdx) {
+      const memberCard = $(`
+        <div class="card border-0 shadow-sm mb-3" data-member-idx="${memberIdx}">
+          <div class="card-header bg-body-tertiary border-0 py-2">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <span class="fw-bold"><i class="bi bi-person-fill me-1"></i>${member.name}</span>
+                <span class="badge bg-primary ms-2">${member.character_class}</span>
+                <span class="badge bg-secondary ms-1"><%= t('party_rewards.level') %> ${member.level}</span>
+              </div>
+              <span class="badge ${rewardBadgeClass(member.reward_level)} ms-2">${rewardLabel(member.reward_level)}</span>
+            </div>
+          </div>
+          <div class="card-body pt-2 pb-2">
+            <div class="member-items-container"></div>
+          </div>
+        </div>
+      `);
+
+      const itemsContainer = memberCard.find(".member-items-container");
+      member.items.forEach(function(item, itemIdx) {
+        itemsContainer.append(buildItemCard(item, memberIdx, itemIdx));
+      });
+
+      container.append(memberCard);
+    });
+
+    $("#resultsArea").slideDown(300);
+    $("html, body").animate({ scrollTop: $("#resultsArea").offset().top - 80 }, 500);
+  }
+
+  function buildItemCard(item, memberIdx, itemIdx) {
+    const rarityClass = rarityBadgeClass[item.rarity_name] || 'bg-secondary';
+    let effectsHtml = "";
+    item.effects.forEach(function(effect) {
+      const color = getEffectColor(effect.effect_type);
+      effectsHtml += `
+        <div class="d-inline-flex align-items-center me-2 mb-1">
+          <span class="badge bg-${color} me-1" style="font-size:0.65rem;">${effect.power_level}</span>
+          <span style="font-size:0.75rem;">${effect.name}</span>
+        </div>
+      `;
+    });
+
+    return $(`
+      <div class="item-reward-card border rounded p-2 mb-2" data-member-idx="${memberIdx}" data-item-idx="${itemIdx}">
+        <div class="d-flex align-items-start justify-content-between">
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center mb-1">
+              <span class="fw-bold me-2">${item.name}</span>
+              <span class="badge ${rarityClass} me-1" style="font-size:0.65rem;">${item.rarity_name}</span>
+              <span class="badge bg-secondary" style="font-size:0.65rem;">${item.category_name}</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 mb-1 text-muted" style="font-size:0.75rem;">
+              <span><i class="bi bi-lightning-charge"></i> ${item.power}</span>
+              <span><i class="bi bi-coin"></i> ${item.price.toLocaleString()} gp</span>
+              <span><i class="bi bi-feather"></i> ${item.weight}</span>
+              ${item.requires_attunement ? '<span class="text-warning"><i class="bi bi-link-45deg"></i> Attunement</span>' : ''}
+            </div>
+            <div>${effectsHtml}</div>
+          </div>
+          <button class="btn btn-sm btn-outline-primary ms-2 regenerate-item-btn"
+                  data-member-idx="${memberIdx}" data-item-idx="${itemIdx}"
+                  title="<%= t('party_rewards.regenerate') %>">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+        </div>
+      </div>
+    `);
+  }
+
+  function rewardBadgeClass(level) {
+    switch(level) {
+      case 'low': return 'bg-secondary';
+      case 'medium': return 'bg-success';
+      case 'high': return 'bg-warning text-dark';
+      case 'very_high': return 'bg-danger';
+      default: return 'bg-secondary';
+    }
+  }
+
+  function rewardLabel(level) {
+    const labels = {
+      'low': '<%= t("party_rewards.reward_low") %>',
+      'medium': '<%= t("party_rewards.reward_medium") %>',
+      'high': '<%= t("party_rewards.reward_high") %>',
+      'very_high': '<%= t("party_rewards.reward_very_high") %>',
+    };
+    return labels[level] || level;
+  }
+
+  // ── Regenerate single item ──
+  $(document).on("click", ".regenerate-item-btn", function(e) {
+    e.preventDefault();
+    const btn = $(this);
+    const memberIdx = parseInt(btn.data("member-idx"));
+    const itemIdx = parseInt(btn.data("item-idx"));
+    const member = generatedResults[memberIdx];
+
+    btn.prop("disabled", true).html('<i class="bi bi-hourglass-split"></i>');
+
+    // Find the member's party data from the form
+    const rows = $(".party-member-row");
+    const row = $(rows[memberIdx]);
+
+    $.ajax({
+      url: localePrefix + "/party_rewards/regenerate_item",
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify({
+        character_class_id: row.find(".member-class").val(),
+        level: row.find(".member-level").val(),
+        reward_level: row.find(".reward-btn.active").data("reward") || "medium",
+      }),
+      success: function(response) {
+        generatedResults[memberIdx].items[itemIdx] = response.item;
+        const card = $(`.item-reward-card[data-member-idx="${memberIdx}"][data-item-idx="${itemIdx}"]`);
+        card.replaceWith(buildItemCard(response.item, memberIdx, itemIdx));
+      },
+      error: function(err) {
+        console.error("Regenerate error:", err);
+      },
+      complete: function() {
+        btn.prop("disabled", false).html('<i class="bi bi-arrow-clockwise"></i>');
+      },
+    });
+  });
+
+  // ── Save All ──
+  $("#saveAllBtn").on("click", function(e) {
+    e.preventDefault();
+    if (!generatedResults) return;
+
+    const btn = $(this);
+    btn.prop("disabled", true).html('<i class="bi bi-hourglass-split me-1"></i><%= t("party_rewards.saving") %>');
+
+    const items = [];
+    generatedResults.forEach(function(member) {
+      member.items.forEach(function(item) {
+        items.push({
+          name: item.name,
+          description: item.description,
+          item_type: item.item_type,
+          power: item.power,
+          weight: item.weight,
+          price: item.price,
+          requires_attunement: item.requires_attunement,
+          category_id: item.category_id,
+          rarity_id: item.rarity_id,
+          effect_ids: item.effects.map(function(e) { return e.id; }),
+        });
+      });
+    });
+
+    $.ajax({
+      url: localePrefix + "/party_rewards/save_all",
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify({ items: items }),
+      success: function(response) {
+        btn.removeClass("btn-success").addClass("btn-outline-success")
+           .html('<i class="bi bi-check2-all me-1"></i><%= t("party_rewards.saved") %>');
+        setTimeout(function() {
+          window.location.href = localePrefix + "/items";
+        }, 1500);
+      },
+      error: function(err) {
+        console.error("Save error:", err);
+        btn.prop("disabled", false).html('<i class="bi bi-check2-all me-1"></i><%= t("party_rewards.save_all") %>');
+      },
+    });
+  });
+});
+</script>

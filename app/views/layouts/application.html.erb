@@ -21,10 +21,7 @@
   </head>
 
   <body>
-    <%# Header is outside Turbo's frame so Bootstrap dropdowns always work %>
-    <div data-turbo-permanent id="main-header">
-      <%= render "layouts/header" %>
-    </div>
+    <%= render "layouts/header" %>
 
     <% if notice.present? %>
       <div class="container mt-3">
@@ -53,49 +50,50 @@
         document.documentElement.setAttribute('data-bs-theme', saved);
       })();
 
-      // Re-initialize Bootstrap components after Turbo navigation
+      // Re-initialize ALL Bootstrap components after Turbo navigation
       function initBootstrapComponents() {
+        // Dropdowns
         document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el) {
-          // Dispose existing instance to avoid duplicates
-          var existing = bootstrap.Dropdown.getInstance(el);
-          if (existing) existing.dispose();
+          try { var inst = bootstrap.Dropdown.getInstance(el); if (inst) inst.dispose(); } catch(e) {}
           new bootstrap.Dropdown(el);
+        });
+        // Collapses
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(el) {
+          try { var inst = bootstrap.Collapse.getInstance(el); if (inst) inst.dispose(); } catch(e) {}
+          new bootstrap.Collapse(el, { toggle: false });
+        });
+        // Dark mode icons
+        var theme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        var cls = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+        document.querySelectorAll('#darkModeToggle i, #darkModeToggleMobile i').forEach(function(i) {
+          i.className = cls;
         });
       }
 
-      document.addEventListener('turbo:load', initBootstrapComponents);
-      document.addEventListener('turbo:render', initBootstrapComponents);
+      if (!window._navInitBound) {
+        window._navInitBound = true;
 
-      // Dark mode toggle — event delegation
-      (function() {
-        function updateIcon(btn, theme) {
-          var icon = btn.querySelector('i');
-          if (icon) {
-            icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-          }
-        }
-
-        function initToggle() {
-          var btn = document.getElementById('darkModeToggle');
-          if (!btn) return;
-          var current = document.documentElement.getAttribute('data-bs-theme') || 'light';
-          updateIcon(btn, current);
-        }
-
-        document.addEventListener('click', function(e) {
-          var btn = e.target.closest('#darkModeToggle');
-          if (!btn) return;
-          var current = document.documentElement.getAttribute('data-bs-theme');
-          var next = current === 'dark' ? 'light' : 'dark';
-          document.documentElement.setAttribute('data-bs-theme', next);
-          localStorage.setItem('theme', next);
-          updateIcon(btn, next);
+        // turbo:load = page settled; turbo:render = early but catches cache previews
+        document.addEventListener('turbo:load', function() {
+          requestAnimationFrame(initBootstrapComponents);
+        });
+        document.addEventListener('turbo:render', function() {
+          requestAnimationFrame(initBootstrapComponents);
         });
 
-        document.addEventListener('DOMContentLoaded', initToggle);
-        document.addEventListener('turbo:load', initToggle);
-        document.addEventListener('turbo:render', initToggle);
-      })();
+        // Dark mode click — event delegation, works on any DOM state
+        document.addEventListener('click', function(e) {
+          var btn = e.target.closest('#darkModeToggle, #darkModeToggleMobile');
+          if (!btn) return;
+          var next = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-bs-theme', next);
+          localStorage.setItem('theme', next);
+          var cls = next === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+          document.querySelectorAll('#darkModeToggle i, #darkModeToggleMobile i').forEach(function(i) {
+            i.className = cls;
+          });
+        });
+      }
     </script>
   </body>
 </html>

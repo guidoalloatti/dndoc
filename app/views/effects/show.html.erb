@@ -1,55 +1,137 @@
-<div class="container mt-5">
-  <div class="card shadow-lg border-0">
+<% color = effect_type_color(@effect.effect_type) %>
+<% icon = effect_type_icon(@effect.effect_type) %>
+
+<div class="container mt-4" style="max-width: 680px;">
+
+  <%# Top actions %>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <a href="<%= effects_path %>" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i><%= t('shared.back') %>
+    </a>
+    <div class="d-flex gap-1">
+      <a href="<%= edit_effect_path(@effect) %>" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-pencil me-1"></i><%= t('shared.edit') %>
+      </a>
+      <%= button_to effect_path(@effect), method: :delete, data: { turbo_confirm: t('shared.confirm_delete') }, class: "btn btn-sm btn-outline-danger" do %>
+        <i class="bi bi-trash3"></i>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Hero card %>
+  <div class="card border-0 shadow-sm mb-3">
     <div class="card-body">
-      <div class="text-center">
-        <h3 class="display-5 font-weight-bold text-primary"><%= @effect.name %></h3>
-        
-        <p class="display-6 text-secondary"><strong>Effect ID: </strong><%= @effect.id %></p>
+      <div class="d-flex align-items-start gap-3">
+        <div class="rounded-circle bg-<%= color %> bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+          <i class="bi bi-<%= icon %> text-<%= color %>" style="font-size: 1.3rem;"></i>
+        </div>
+        <div class="flex-grow-1 min-width-0">
+          <h4 class="fw-bold mb-1"><%= @effect.translated_name %></h4>
+          <div class="d-flex align-items-center gap-1 flex-wrap">
+            <span class="badge bg-<%= color %> bg-opacity-10 text-<%= color %>" style="font-size: 0.7rem;">
+              <i class="bi bi-<%= icon %> me-1"></i><%= @effect.effect_type %>
+            </span>
+          </div>
+        </div>
+        <div class="text-center flex-shrink-0">
+          <span class="badge rounded-pill bg-<%= color %>" style="font-size: 1.1rem; padding: 0.5em 0.75em;"><%= @effect.power_level %></span>
+          <div class="text-muted mt-1" style="font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.05em;"><%= t('effects.power_level') %></div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div class="row mt-4">
-    <div class="col-lg-6">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <h4 class="text-secondary">Effect Details</h4>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Effect Type:</strong> <%= @effect.effect_type %></li>
-            <li class="list-group-item"><strong>Power Level:</strong> <%= @effect.power_level %></li>
-          </ul>
+      <%# Description %>
+      <div class="mt-3 pt-3 border-top">
+        <% if @effect.translated_description.present? %>
+          <p class="mb-0 small" style="line-height: 1.6; color: var(--bs-secondary-color);"><%= @effect.translated_description %></p>
+        <% else %>
+          <p class="mb-0 small text-muted fst-italic"><%= t('effects.no_description') %></p>
+        <% end %>
+      </div>
+
+      <%# Meta %>
+      <div class="d-flex gap-3 mt-3 pt-3 border-top">
+        <div class="d-flex align-items-center gap-1">
+          <i class="bi bi-hash text-muted" style="font-size: 0.75rem;"></i>
+          <span class="fw-bold small"><%= @effect.id %></span>
+          <span class="text-muted" style="font-size: 0.65rem;">ID</span>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <i class="bi bi-box-seam text-muted" style="font-size: 0.75rem;"></i>
+          <span class="fw-bold small"><%= @effect.items.size %></span>
+          <span class="text-muted" style="font-size: 0.65rem;"><%= t('nav.items').downcase %></span>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+          <i class="bi bi-grid text-muted" style="font-size: 0.75rem;"></i>
+          <span class="fw-bold small"><%= @effect.categories.size %></span>
+          <span class="text-muted" style="font-size: 0.65rem;"><%= t('nav.categories').downcase %></span>
+        </div>
+        <div class="ms-auto d-flex align-items-center gap-1 text-muted" style="font-size: 0.6rem;">
+          <i class="bi bi-calendar3"></i>
+          <%= @effect.created_at.strftime("%b %d, %Y") %>
         </div>
       </div>
     </div>
+  </div>
 
-     <div class="col-lg-6">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <h4 class="text-secondary">Effect</h4>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <p><%= @effect.description %></p>
-                </div>
-              </li>
-            </ul>
-            <hr class="hr-cool">
-           <h4 class="text-secondary">Categories</h4>
-            <% @effect.categories.each do |category| %>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <h6 class="mx-2 mt-1 mb-1"><%= category.name %></h6>
-              </li>
-            <% end %>
-        </div>
+  <%# Categories %>
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <h6 class="text-muted text-uppercase small fw-semibold mb-0">
+      <i class="bi bi-grid me-1"></i><%= t('effects.categories') %>
+      <span class="badge bg-primary rounded-pill ms-1" style="font-size: 0.55rem;"><%= @effect.categories.size %></span>
+    </h6>
+  </div>
+
+  <% if @effect.categories.any? %>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <% @effect.categories.each do |category| %>
+        <a href="<%= category_path(category) %>" class="badge bg-body-secondary text-body text-decoration-none" style="font-size: 0.75rem; padding: 0.45em 0.7em;">
+          <i class="bi bi-<%= category_icon(category.name) %> me-1"></i><%= category.name %>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body py-3 text-center">
+        <i class="bi bi-grid text-muted" style="font-size: 1.5rem;"></i>
+        <p class="text-muted small mb-0 mt-1"><%= t('effects.no_categories') %></p>
       </div>
     </div>
+  <% end %>
+
+  <%# Items using this effect %>
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <h6 class="text-muted text-uppercase small fw-semibold mb-0">
+      <i class="bi bi-box-seam me-1"></i><%= t('effects.items_using') %>
+      <span class="badge bg-primary rounded-pill ms-1" style="font-size: 0.55rem;"><%= @effect.items.size %></span>
+    </h6>
   </div>
 
-  	<hr class="hr-cool">
+  <% if @effect.items.any? %>
+    <div class="d-flex flex-column gap-2 mb-3">
+      <% @effect.items.includes(:rarity, :category).each do |item| %>
+        <a href="<%= item_path(item) %>" class="card border-0 shadow-sm text-decoration-none">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-<%= category_icon(item.category.name) %> text-primary" style="font-size: 0.85rem;"></i>
+                <span class="fw-semibold small text-body"><%= item.name %></span>
+                <span class="badge bg-body-secondary text-body" style="font-size: 0.6rem;"><%= item.category.name %></span>
+              </div>
+              <span class="badge bg-body-secondary text-body" style="font-size: 0.65rem;">
+                <i class="bi bi-lightning-charge me-1"></i><%= item.power %>
+              </span>
+            </div>
+          </div>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body py-3 text-center">
+        <i class="bi bi-box-seam text-muted" style="font-size: 1.5rem;"></i>
+        <p class="text-muted small mb-0 mt-1"><%= t('effects.no_items') %></p>
+      </div>
+    </div>
+  <% end %>
 
-  	<div class="mt-4 text-center">
-    	<%= link_to 'Edit', edit_effect_path(@effect), class: "btn btn-secondary btn-lg mx-2" %> 
-    	<%= link_to 'Back', effects_path, class: "btn btn-danger btn-lg mx-2" %>
-  	</div>
-  </div>
 </div>

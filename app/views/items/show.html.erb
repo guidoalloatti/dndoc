@@ -115,14 +115,14 @@
             <div class="flex-grow-1 min-width-0">
               <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-1">
-                  <span class="fw-semibold small"><%= effect.name %></span>
+                  <span class="fw-semibold small"><%= effect.translated_name %></span>
                   <span class="badge bg-<%= color %> bg-opacity-10 text-<%= color %>" style="font-size: 0.55rem;"><%= effect.effect_type %></span>
                 </div>
                 <span class="badge bg-<%= color %> rounded-pill" style="font-size: 0.7rem; min-width: 22px;"><%= effect.power_level %></span>
               </div>
 
-              <% if effect.description.present? %>
-                <p class="mb-0 mt-1 text-muted" style="font-size: 0.72rem; line-height: 1.4;"><%= effect.description %></p>
+              <% if effect.translated_description.present? %>
+                <p class="mb-0 mt-1 text-muted" style="font-size: 0.72rem; line-height: 1.4;"><%= effect.translated_description %></p>
               <% end %>
             </div>
           </div>

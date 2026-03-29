@@ -1,1 +1,5 @@
 @import "bootstrap/scss/bootstrap";
+
+// Navbar buttons: more border-radius
+.navbar .btn { border-radius: 50rem; }
+.navbar .dropdown-menu { border-radius: .75rem; }

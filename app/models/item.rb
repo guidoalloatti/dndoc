@@ -7,6 +7,9 @@ class Item < ApplicationRecord
 
   validates :name, presence: true
   validates :item_type, presence: true
+  validates :power, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }, allow_nil: true
+  validates :price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :weight, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   scope :search_by_name, ->(query) { where("items.name ILIKE ?", "%#{query}%") if query.present? }
   scope :by_category, ->(id) { where(category_id: id) if id.present? }

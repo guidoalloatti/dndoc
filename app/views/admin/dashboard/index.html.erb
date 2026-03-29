@@ -13,9 +13,14 @@
         <small class="text-body-secondary"><%= t('admin.dashboard_subtitle') %></small>
       </div>
     </div>
-    <%= link_to admin_users_path, class: "btn btn-sm btn-primary" do %>
-      <i class="bi bi-people me-1"></i><%= t('admin.manage_users') %>
-    <% end %>
+    <div class="d-flex gap-2">
+      <%= link_to admin_character_classes_path, class: "btn btn-sm btn-outline-primary" do %>
+        <i class="bi bi-shield-shaded me-1"></i><%= t('character_classes.title') %>
+      <% end %>
+      <%= link_to admin_users_path, class: "btn btn-sm btn-primary" do %>
+        <i class="bi bi-people me-1"></i><%= t('admin.manage_users') %>
+      <% end %>
+    </div>
   </div>
 
   <%# ── Inline Stats Bar ── %>

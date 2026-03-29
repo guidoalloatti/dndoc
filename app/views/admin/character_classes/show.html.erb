@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0 fw-bold">
+      <i class="bi bi-shield-shaded text-primary me-1"></i> <%= @character_class.name %>
+      <% if @character_class.is_magic_user %>
+        <span class="badge bg-primary ms-2"><i class="bi bi-stars me-1"></i><%= t('character_classes.is_magic_user') %></span>
+      <% end %>
+    </h4>
+    <div class="d-flex gap-2">
+      <%= link_to admin_character_classes_path, class: "btn btn-sm btn-outline-secondary" do %>
+        <i class="bi bi-arrow-left me-1"></i><%= t('shared.back') %>
+      <% end %>
+      <%= link_to edit_admin_character_class_path(@character_class), class: "btn btn-sm btn-outline-primary" do %>
+        <i class="bi bi-pencil me-1"></i><%= t('shared.edit') %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @character_class.description.present? %>
+    <p class="text-muted"><%= @character_class.description %></p>
+  <% end %>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h6 class="text-muted text-uppercase small fw-semibold mb-3">
+        <i class="bi bi-grid me-1"></i> <%= t('character_classes.affinities') %>
+      </h6>
+      <% affinities = @character_class.class_category_affinities.includes(:category).order("categories.name") %>
+      <% if affinities.any? %>
+        <div class="d-flex flex-wrap gap-2">
+          <% affinities.each do |aff| %>
+            <div class="border rounded px-2 py-1 d-flex align-items-center gap-1">
+              <span class="small"><%= aff.category.name %></span>
+              <% aff.weight.times do %>
+                <i class="bi bi-star-fill text-warning" style="font-size: 0.65rem;"></i>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-muted small"><%= t('shared.no_records') %></p>
+      <% end %>
+    </div>
+  </div>
+</div>

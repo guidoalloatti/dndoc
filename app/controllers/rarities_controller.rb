@@ -1,14 +1,13 @@
 class RaritiesController < ApplicationController
   before_action :set_rarity, only: [:show, :edit, :update, :destroy]
+  before_action :require_admin!, only: [:new, :create, :edit, :update, :destroy]
 
   def index
     rarities = Rarity.includes(:items)
                      .search_by_name(params[:q])
                      .sorted(params[:sort], params[:dir])
 
-    per_page = [params[:per_page].to_i, 10].max rescue 20
-    per_page = [per_page, 100].min
-    @pagy, @rarities = pagy(rarities, limit: per_page)
+    @pagy, @rarities = pagy(rarities, limit: parse_per_page)
   end
 
   def new
@@ -18,7 +17,7 @@ class RaritiesController < ApplicationController
   def create
     @rarity = Rarity.new(rarity_params)
     if @rarity.save
-      redirect_to rarities_path, notice: "Rarity created successfully."
+      redirect_to rarities_path, notice: t("rarities.created")
     else
       render :new
     end
@@ -29,7 +28,7 @@ class RaritiesController < ApplicationController
 
   def update
     if @rarity.update(rarity_params)
-      redirect_to rarities_path, notice: "Rarity updated successfully."
+      redirect_to rarities_path, notice: t("rarities.updated")
     else
       render :edit
     end
@@ -37,14 +36,14 @@ class RaritiesController < ApplicationController
 
   def destroy
     @rarity.destroy
-    redirect_to rarities_path, notice: "Rarity deleted successfully."
+    redirect_to rarities_path, notice: t("rarities.deleted")
   end
 
   def get_rarities
     rarities = Rarity.all
 
     respond_to do |format|
-      format.json { render json: { status: 'success', data: rarities }}
+      format.json { render json: { status: "success", data: rarities } }
     end
   end
 

@@ -12,6 +12,7 @@ Rails.application.routes.draw do
           patch :toggle_admin
         end
       end
+      resources :character_classes
     end
 
     resource :profile, only: [:show, :edit, :update]
@@ -46,6 +47,7 @@ Rails.application.routes.draw do
       end
       member do
         post :get_effects_by_category
+        get :detail_panel
       end
     end
 
@@ -55,6 +57,14 @@ Rails.application.routes.draw do
       end
     end
     resources :weapons
+
+    resources :party_rewards, only: [:new] do
+      collection do
+        post :generate
+        post :regenerate_item
+        post :save_all
+      end
+    end
 
     root 'main#index'
   end

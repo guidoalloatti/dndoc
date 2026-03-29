@@ -8,5 +8,12 @@
     <% end %>
   </div>
 
+  <script>
+    window.editItemPreload = {
+      item: <%= @item.to_json.html_safe %>,
+      effects: <%= @item.effects.to_json.html_safe %>
+    };
+  </script>
+
   <%= render 'form', item: @item, weapons: @weapons, effects: @effects, categories: @categories, rarities: @rarities, action: "Update" %>
 </div>

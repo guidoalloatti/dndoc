@@ -1,51 +1,58 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom shadow-sm sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top bg-body border-bottom">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="<%= root_path %>">
-      <i class="bi bi-dice-5-fill me-1 text-primary"></i> <%= t('app_name') %>
+
+    <a class="navbar-brand fw-semibold" href="<%= root_path %>">
+      <i class="bi bi-dice-5-fill text-primary me-1"></i><%= t('app_name') %>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <%= link_to t('nav.home'), root_path, class: "nav-link #{'active fw-semibold' if controller_name == 'main'}" %>
-        </li>
-        <% if user_signed_in? %>
-          <li class="nav-item">
-            <%= link_to t('nav.items'), items_path, class: "nav-link #{'active fw-semibold' if controller_name == 'items'}" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to t('nav.categories'), categories_path, class: "nav-link #{'active fw-semibold' if controller_name == 'categories'}" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to t('nav.effects'), effects_path, class: "nav-link #{'active fw-semibold' if controller_name == 'effects'}" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to t('nav.rarities'), rarities_path, class: "nav-link #{'active fw-semibold' if controller_name == 'rarities'}" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to t('nav.weapons'), weapons_path, class: "nav-link #{'active fw-semibold' if controller_name == 'weapons'}" %>
-          </li>
-        <% end %>
-      </ul>
+    <div class="d-flex align-items-center gap-2 d-lg-none">
+      <button id="darkModeToggleMobile" class="btn btn-sm btn-outline-secondary border-0" type="button">
+        <i class="bi bi-moon-fill"></i>
+      </button>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
 
-      <div class="d-flex align-items-center gap-2">
+    <div class="collapse navbar-collapse" id="navContent">
+      <% if user_signed_in? %>
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link<%= ' active' if controller_name == 'items' %>" href="<%= items_path %>"><%= t('nav.items') %></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= ' active' if controller_name == 'categories' %>" href="<%= categories_path %>"><%= t('nav.categories') %></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= ' active' if controller_name == 'effects' %>" href="<%= effects_path %>"><%= t('nav.effects') %></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= ' active' if controller_name == 'rarities' %>" href="<%= rarities_path %>"><%= t('nav.rarities') %></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= ' active' if controller_name == 'weapons' %>" href="<%= weapons_path %>"><%= t('nav.weapons') %></a>
+          </li>
+        </ul>
+      <% else %>
+        <ul class="navbar-nav me-auto"></ul>
+      <% end %>
+
+      <div class="d-flex align-items-center gap-2 mb-2 mb-lg-0">
         <% if user_signed_in? %>
           <div class="dropdown">
             <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
               <i class="bi bi-plus-lg me-1"></i><%= t('shared.create') %>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><%= link_to raw('<i class="bi bi-magic me-2"></i>' + t('nav.item_wizard')), wizard_items_path, class: 'dropdown-item' %></li>
-              <li><%= link_to raw('<i class="bi bi-shuffle me-2"></i>' + t('nav.create_random_item')), create_random_items_path, class: 'dropdown-item' %></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li><a class="dropdown-item" href="<%= wizard_items_path %>"><i class="bi bi-magic me-2"></i><%= t('nav.item_wizard') %></a></li>
+              <li><a class="dropdown-item" href="<%= create_random_items_path %>"><i class="bi bi-shuffle me-2"></i><%= t('nav.create_random_item') %></a></li>
+              <li><a class="dropdown-item" href="<%= new_party_reward_path %>"><i class="bi bi-people-fill me-2"></i><%= t('nav.party_rewards') %></a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a href="/items/new" class="dropdown-item"><i class="bi bi-box-seam me-2"></i><%= t('nav.new_item') %></a></li>
-              <li><%= link_to raw('<i class="bi bi-magic me-2"></i>' + t('nav.new_effect')), new_effect_path, class: 'dropdown-item' %></li>
-              <li><%= link_to raw('<i class="bi bi-grid me-2"></i>' + t('nav.new_category')), new_category_path, class: 'dropdown-item' %></li>
-              <li><%= link_to raw('<i class="bi bi-gem me-2"></i>' + t('nav.new_rarity')), new_rarity_path, class: 'dropdown-item' %></li>
-              <li><%= link_to raw('<i class="bi bi-hammer me-2"></i>' + t('nav.new_weapon')), new_weapon_path, class: 'dropdown-item' %></li>
+              <li><a class="dropdown-item" href="<%= new_item_path %>"><i class="bi bi-box-seam me-2"></i><%= t('nav.new_item') %></a></li>
+              <li><a class="dropdown-item" href="<%= new_effect_path %>"><i class="bi bi-stars me-2"></i><%= t('nav.new_effect') %></a></li>
+              <li><a class="dropdown-item" href="<%= new_category_path %>"><i class="bi bi-grid me-2"></i><%= t('nav.new_category') %></a></li>
+              <li><a class="dropdown-item" href="<%= new_rarity_path %>"><i class="bi bi-gem me-2"></i><%= t('nav.new_rarity') %></a></li>
+              <li><a class="dropdown-item" href="<%= new_weapon_path %>"><i class="bi bi-hammer me-2"></i><%= t('nav.new_weapon') %></a></li>
             </ul>
           </div>
         <% end %>
@@ -54,48 +61,51 @@
           <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
             <i class="bi bi-translate me-1"></i><%= I18n.locale.upcase %>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><%= link_to "English", url_for(locale: :en), class: "dropdown-item #{'active' if I18n.locale == :en}" %></li>
-            <li><%= link_to "Espanol", url_for(locale: :es), class: "dropdown-item #{'active' if I18n.locale == :es}" %></li>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li><a class="dropdown-item<%= ' active' if I18n.locale == :en %>" href="<%= url_for(locale: :en) %>">English</a></li>
+            <li><a class="dropdown-item<%= ' active' if I18n.locale == :es %>" href="<%= url_for(locale: :es) %>">Espanol</a></li>
           </ul>
         </div>
 
-        <button id="darkModeToggle" class="btn btn-sm btn-outline-secondary" type="button" title="<%= t('toggle_dark_mode') %>">
+        <button id="darkModeToggle" class="btn btn-sm btn-outline-secondary d-none d-lg-inline-block" type="button">
           <i class="bi bi-moon-fill"></i>
         </button>
 
         <% if user_signed_in? %>
           <div class="dropdown">
-            <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
               <% if current_user.avatar.attached? %>
-                <%= image_tag current_user.avatar, class: "rounded-circle object-fit-cover", width: 22, height: 22, alt: "Avatar" %>
+                <%= image_tag current_user.avatar, width: 22, height: 22, class: "rounded-circle", alt: "" %>
               <% elsif current_user.avatar_url.present? %>
-                <img src="<%= current_user.avatar_url %>" class="rounded-circle object-fit-cover" width="22" height="22" alt="Avatar">
+                <img src="<%= current_user.avatar_url %>" width="22" height="22" class="rounded-circle" alt="">
               <% else %>
                 <i class="bi bi-person-circle"></i>
               <% end %>
               <span class="d-none d-md-inline"><%= current_user.full_name %></span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <h6 class="dropdown-header"><%= current_user.email %></h6>
-              </li>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li class="dropdown-header"><%= current_user.email %></li>
               <li><hr class="dropdown-divider"></li>
-              <li><%= link_to raw('<i class="bi bi-person me-2"></i>' + t('nav.profile')), profile_path, class: 'dropdown-item' %></li>
-              <li><%= link_to raw('<i class="bi bi-gear me-2"></i>' + t('nav.account_settings')), edit_user_registration_path, class: 'dropdown-item' %></li>
+              <li><a class="dropdown-item" href="<%= profile_path %>"><i class="bi bi-person me-2"></i><%= t('nav.profile') %></a></li>
+              <li><a class="dropdown-item" href="<%= edit_user_registration_path %>"><i class="bi bi-gear me-2"></i><%= t('nav.account_settings') %></a></li>
               <% if current_user.admin? %>
                 <li><hr class="dropdown-divider"></li>
-                <li><%= link_to raw('<i class="bi bi-shield-lock-fill me-2 text-danger"></i>' + t('admin.admin_panel')), admin_root_path, class: 'dropdown-item' %></li>
+                <li><a class="dropdown-item" href="<%= admin_root_path %>"><i class="bi bi-shield-lock me-2 text-danger"></i><%= t('admin.admin_panel') %></a></li>
               <% end %>
               <li><hr class="dropdown-divider"></li>
-              <li><%= button_to raw('<i class="bi bi-box-arrow-right me-2"></i>' + t('nav.sign_out')), destroy_user_session_path, method: :delete, class: 'dropdown-item' %></li>
+              <li>
+                <%= button_to destroy_user_session_path, method: :delete, class: "dropdown-item text-danger" do %>
+                  <i class="bi bi-box-arrow-right me-2"></i><%= t('nav.sign_out') %>
+                <% end %>
+              </li>
             </ul>
           </div>
         <% else %>
-          <%= link_to t('nav.sign_in'), new_user_session_path, class: 'btn btn-sm btn-outline-primary' %>
+          <a class="btn btn-sm btn-primary" href="<%= new_user_session_path %>"><%= t('nav.sign_in') %></a>
         <% end %>
       </div>
     </div>
+
   </div>
 </nav>
 

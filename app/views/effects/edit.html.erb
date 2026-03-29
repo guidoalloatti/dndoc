@@ -1,11 +1,13 @@
-<div class="container mt-4" style="max-width: 560px;">
+<div class="container mt-4" style="max-width: 680px;">
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h4 class="mb-0 fw-bold">
-      <i class="bi bi-pencil-square text-primary me-1"></i> <%= t('effects.edit') %>
+      <i class="bi bi-pencil-square text-primary me-1"></i><%= t('effects.edit') %>
     </h4>
-    <%= link_to effects_path, class: "btn btn-sm btn-outline-secondary" do %>
-      <i class="bi bi-arrow-left me-1"></i><%= t('shared.back') %>
-    <% end %>
+    <div class="d-flex gap-1">
+      <a href="<%= effect_path(@effect) %>" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i><%= t('shared.back') %>
+      </a>
+    </div>
   </div>
   <%= render 'form', effect: @effect %>
 </div>

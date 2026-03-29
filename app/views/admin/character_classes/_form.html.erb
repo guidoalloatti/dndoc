@@ -1,0 +1,52 @@
+<%= form_with(model: [:admin, character_class], local: true) do |form| %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold"><%= t('shared.name') %></label>
+          <%= form.text_field :name, class: "form-control form-control-sm" %>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold"><%= t('shared.description') %></label>
+          <%= form.text_field :description, class: "form-control form-control-sm" %>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-2">
+            <%= form.check_box :is_magic_user, class: "form-check-input" %>
+            <label class="form-check-label small"><%= t('character_classes.is_magic_user') %></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Category Affinities %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <h6 class="text-muted text-uppercase small fw-semibold mb-3">
+        <i class="bi bi-grid me-1"></i> <%= t('character_classes.affinities') %>
+      </h6>
+      <div class="row g-2">
+        <% categories.each do |cat| %>
+          <% existing = character_class.persisted? ? character_class.class_category_affinities.find_by(category_id: cat.id) : nil %>
+          <div class="col-md-4 col-sm-6">
+            <div class="d-flex align-items-center gap-2 p-2 border rounded">
+              <span class="small flex-grow-1"><%= cat.name %></span>
+              <select name="affinities[<%= cat.id %>]" class="form-select form-select-sm" style="width: 80px;">
+                <option value="0">—</option>
+                <option value="1" <%= 'selected' if existing&.weight == 1 %>>1</option>
+                <option value="2" <%= 'selected' if existing&.weight == 2 %>>2</option>
+                <option value="3" <%= 'selected' if existing&.weight == 3 %>>3</option>
+              </select>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= form.submit t(character_class.persisted? ? 'shared.update' : 'shared.create'), class: "btn btn-sm btn-primary" %>
+    <%= link_to t('shared.cancel'), admin_character_classes_path, class: "btn btn-sm btn-outline-secondary" %>
+  </div>
+<% end %>
