@@ -3,18 +3,26 @@ module Admin
     before_action :set_lore_entry, only: [:edit, :update, :destroy]
 
     def index
-      @lore_type = params[:lore_type]
-      @category  = params[:category]
-      @q         = params[:q]
+      @lore_type = params[:lore_type].presence
+      @category  = params[:category].presence
+      @q         = params[:q].presence
 
-      entries = LoreEntry.all
-      entries = entries.where(lore_type: @lore_type) if @lore_type.present?
-      entries = entries.where(category: @category)   if @category.present?
-      entries = entries.where("value ILIKE ?", "%#{@q}%") if @q.present?
-      entries = entries.order(:lore_type, :category, :key, :value)
-
-      @pagy, @lore_entries = pagy(entries, limit: parse_per_page(50))
-      @total_count = LoreEntry.count
+      if @lore_type.present? && @category.present?
+        entries = LoreEntry.where(lore_type: @lore_type, category: @category)
+        entries = entries.where("value ILIKE ?", "%#{@q}%") if @q.present?
+        entries = entries.order(:key, :id)
+        @pagy, @lore_entries = pagy(entries, limit: parse_per_page(100))
+        @keyed = LoreEntry::KEYED_CATEGORIES.include?(@category)
+        @mode  = :detail
+      else
+        counts_raw = LoreEntry.group(:lore_type, :category).count
+        @counts = counts_raw.each_with_object({}) do |((lt, cat), n), h|
+          h[lt] ||= {}
+          h[lt][cat] = n
+        end
+        @total = LoreEntry.count
+        @mode  = :overview
+      end
     end
 
     def new
