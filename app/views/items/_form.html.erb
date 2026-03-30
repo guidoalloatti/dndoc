@@ -2,6 +2,23 @@
 
 <%= form_with(model: @item, local: true) do |form| %>
 
+  <%# ── Lore Selector ── %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+      <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+        <i class="bi bi-book me-1"></i> <%= t('items.lore_setting') %>
+      </h6>
+      <div class="btn-group w-100" role="group" id="lorePicker">
+        <button type="button" class="btn btn-sm btn-primary lore-btn active" data-lore="faerun">
+          <i class="bi bi-globe-americas me-1"></i><%= t('items.lore_faerun') %>
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary lore-btn" data-lore="middle_earth">
+          <i class="bi bi-tree me-1"></i><%= t('items.lore_middle_earth') %>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <%# ── Category Picker (icon grid) ── %>
   <div class="card border-0 shadow-sm mb-3">
     <div class="card-body pb-2">

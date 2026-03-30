@@ -8,6 +8,26 @@ class PartyRewardEngine
 
   REWARD_LEVELS = REWARD_MULTIPLIERS.keys.freeze
 
+  # Race → preferred category names (combined with class affinities)
+  RACE_CATEGORY_PREFERENCES = {
+    "Human"      => [],
+    "Elf"        => %w[Scrolls Staffs Wands Rings Cloaks Ammunition],
+    "Dwarf"      => %w[Armor Shields Weapons Helms Gems],
+    "Halfling"   => %w[Weapons Rings Boots Trinkets],
+    "Half-Elf"   => %w[Rings Amulets Cloaks Scrolls],
+    "Half-Orc"   => %w[Weapons Armor Helms],
+    "Gnome"      => %w[Books Wands Trinkets Gems Scrolls],
+    "Tiefling"   => %w[Amulets Rings Staffs Potions],
+    "Dragonborn" => %w[Weapons Armor Shields Helms],
+    "Aasimar"    => %w[Amulets Scrolls Rings Cloaks],
+    "Tabaxi"     => %w[Boots Weapons Trinkets Cloaks],
+    "Genasi"     => %w[Potions Gems Rings Bracelet],
+    "Goliath"    => %w[Weapons Armor Shields Helms],
+    "Warforged"  => %w[Armor Shields Weapons],
+  }.freeze
+
+  RACES = RACE_CATEGORY_PREFERENCES.keys.freeze
+
   # Calculate item power from character level (1-20) and reward level
   def self.calculate_power(level, reward_level)
     base_power = (level / 20.0 * 10).ceil
@@ -15,9 +35,19 @@ class PartyRewardEngine
     (base_power * multiplier).round.clamp(1, 10)
   end
 
-  # Select a category appropriate for the character class
-  def self.select_category(character_class)
-    weighted_ids = character_class.weighted_category_ids
+  # Select a category appropriate for the character class and optionally race
+  def self.select_category(character_class, race = nil)
+    weighted_ids = character_class.weighted_category_ids.dup
+
+    # Add race preferences (weight 1 each) to class affinities
+    if race.present? && RACE_CATEGORY_PREFERENCES.key?(race)
+      race_names = RACE_CATEGORY_PREFERENCES[race]
+      if race_names.any?
+        race_category_ids = Category.where(name: race_names).pluck(:id)
+        weighted_ids.concat(race_category_ids)
+      end
+    end
+
     if weighted_ids.any?
       Category.find(weighted_ids.sample)
     else
@@ -26,27 +56,30 @@ class PartyRewardEngine
   end
 
   # Generate reward items for an entire party (returns hashes, not saved records)
-  def self.generate_party_rewards(party_members, items_per_member = 1)
+  def self.generate_party_rewards(party_members, items_per_member = 1, lore: "faerun")
     party_members.map do |member|
       char_class = CharacterClass.find(member[:character_class_id])
+      race = member[:race].presence
       items = items_per_member.times.map do
-        build_reward_item(char_class, member[:level].to_i, member[:reward_level])
+        build_reward_item(char_class, member[:level].to_i, member[:reward_level], race, lore: lore)
       end
 
       {
         name: member[:name].presence || char_class.name,
         character_class: char_class.name,
+        race: race,
         level: member[:level].to_i,
         reward_level: member[:reward_level],
+        character_id: member[:character_id].presence,
         items: items,
       }
     end
   end
 
   # Generate a single reward item (returns a hash, not saved)
-  def self.build_reward_item(character_class, level, reward_level)
+  def self.build_reward_item(character_class, level, reward_level, race = nil, lore: "faerun")
     power = calculate_power(level, reward_level)
-    category = select_category(character_class)
+    category = select_category(character_class, race)
     rarity_name = rarity_name_for_power(power)
     rarity = Rarity.find_by(name: rarity_name)
 
@@ -63,8 +96,8 @@ class PartyRewardEngine
       weapon_name = Weapon.order("RANDOM()").first&.name
     end
 
-    name = ItemEngine.generate_name(rarity_name, effects, category, weapon_name)
-    description = ItemEngine.generate_description(rarity_name, effects, category, weapon_name)
+    name = ItemEngine.generate_name(rarity_name, effects, category, weapon_name, lore: lore)
+    description = ItemEngine.generate_description(rarity_name, effects, category, weapon_name, lore: lore)
 
     {
       name: name,

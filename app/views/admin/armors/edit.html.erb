@@ -1,0 +1,16 @@
+<% content_for :admin_breadcrumb do %>
+  <span class="admin-breadcrumb">
+    <a href="<%= admin_root_path %>"><%= t('admin.dashboard') %></a>
+    <span class="sep">/</span>
+    <a href="<%= admin_armors_path %>"><%= t('nav.armors') %></a>
+    <span class="sep">/</span>
+    <span class="current"><%= t('admin.armors.edit') %>: <%= @armor.name %></span>
+  </span>
+<% end %>
+<div class="admin-page-header">
+  <div class="admin-page-title">
+    <div class="admin-title-icon bg-warning bg-opacity-10"><i class="bi bi-pencil text-warning"></i></div>
+    <div><h5><%= t('admin.armors.edit') %>: <%= @armor.name %></h5></div>
+  </div>
+</div>
+<%= render 'form', armor: @armor %>

@@ -20,27 +20,32 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="<%= content_for?(:body_class) ? yield(:body_class) : "" %>">
+
     <%= render "layouts/header" %>
 
-    <% if notice.present? %>
-      <div class="container mt-3">
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          <%= notice %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      </div>
-    <% end %>
-    <% if alert.present? %>
-      <div class="container mt-3">
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <%= alert %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      </div>
-    <% end %>
+    <div class="main-wrapper">
 
-    <%= yield %>
+      <% if notice.present? %>
+        <div class="px-3 pt-3">
+          <div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
+            <%= notice %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        </div>
+      <% end %>
+      <% if alert.present? %>
+        <div class="px-3 pt-3">
+          <div class="alert alert-danger alert-dismissible fade show mb-0" role="alert">
+            <%= alert %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        </div>
+      <% end %>
+
+      <%= yield %>
+
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -50,19 +55,15 @@
         document.documentElement.setAttribute('data-bs-theme', saved);
       })();
 
-      // Re-initialize ALL Bootstrap components after Turbo navigation
       function initBootstrapComponents() {
-        // Dropdowns
         document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el) {
           try { var inst = bootstrap.Dropdown.getInstance(el); if (inst) inst.dispose(); } catch(e) {}
           new bootstrap.Dropdown(el);
         });
-        // Collapses
         document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(el) {
           try { var inst = bootstrap.Collapse.getInstance(el); if (inst) inst.dispose(); } catch(e) {}
           new bootstrap.Collapse(el, { toggle: false });
         });
-        // Dark mode icons
         var theme = document.documentElement.getAttribute('data-bs-theme') || 'light';
         var cls = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
         document.querySelectorAll('#darkModeToggle i, #darkModeToggleMobile i').forEach(function(i) {
@@ -73,7 +74,6 @@
       if (!window._navInitBound) {
         window._navInitBound = true;
 
-        // turbo:load = page settled; turbo:render = early but catches cache previews
         document.addEventListener('turbo:load', function() {
           requestAnimationFrame(initBootstrapComponents);
         });
@@ -81,7 +81,6 @@
           requestAnimationFrame(initBootstrapComponents);
         });
 
-        // Dark mode click — event delegation, works on any DOM state
         document.addEventListener('click', function(e) {
           var btn = e.target.closest('#darkModeToggle, #darkModeToggleMobile');
           if (!btn) return;

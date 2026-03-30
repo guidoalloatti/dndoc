@@ -1,114 +1,250 @@
-<nav class="navbar navbar-expand-lg sticky-top bg-body border-bottom">
-  <div class="container">
+<%# ── Mobile Topbar ── %>
+<div id="mobile-topbar">
+  <button id="sidebarToggle" type="button" aria-label="<%= t('nav.toggle_menu', default: 'Toggle menu') %>">
+    <i class="bi bi-list"></i>
+  </button>
+  <a href="<%= root_path %>">
+    <i class="bi bi-dice-5-fill text-primary"></i><%= t('app_name') %>
+  </a>
+  <button id="darkModeToggleMobile" type="button" aria-label="<%= t('nav.toggle_theme', default: 'Toggle theme') %>">
+    <i class="bi bi-moon-fill"></i>
+  </button>
+</div>
 
-    <a class="navbar-brand fw-semibold" href="<%= root_path %>">
-      <i class="bi bi-dice-5-fill text-primary me-1"></i><%= t('app_name') %>
+<%# ── Overlay (mobile) ── %>
+<div id="sb-overlay"></div>
+
+<%# ── Sidebar ── %>
+<aside id="sidebar" role="navigation" aria-label="<%= t('nav.main_navigation', default: 'Main navigation') %>">
+
+  <%# Collapse toggle button %>
+  <button id="sb-collapse-btn" type="button" aria-label="<%= t('nav.collapse_sidebar', default: 'Collapse sidebar') %>">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+
+  <div id="sb-inner">
+
+    <%# Brand %>
+    <a id="sb-brand" href="<%= root_path %>">
+      <i class="bi bi-dice-5-fill text-primary"></i>
+      <span><%= t('app_name') %></span>
     </a>
 
-    <div class="d-flex align-items-center gap-2 d-lg-none">
-      <button id="darkModeToggleMobile" class="btn btn-sm btn-outline-secondary border-0" type="button">
-        <i class="bi bi-moon-fill"></i>
-      </button>
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </div>
-
-    <div class="collapse navbar-collapse" id="navContent">
+    <nav id="sb-nav">
       <% if user_signed_in? %>
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link<%= ' active' if controller_name == 'items' %>" href="<%= items_path %>"><%= t('nav.items') %></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link<%= ' active' if controller_name == 'categories' %>" href="<%= categories_path %>"><%= t('nav.categories') %></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link<%= ' active' if controller_name == 'effects' %>" href="<%= effects_path %>"><%= t('nav.effects') %></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link<%= ' active' if controller_name == 'rarities' %>" href="<%= rarities_path %>"><%= t('nav.rarities') %></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link<%= ' active' if controller_name == 'weapons' %>" href="<%= weapons_path %>"><%= t('nav.weapons') %></a>
-          </li>
-        </ul>
-      <% else %>
-        <ul class="navbar-nav me-auto"></ul>
+
+        <%# Catalog %>
+        <span class="sb-label"><%= t('nav.catalog') %></span>
+
+        <a class="sb-link <%= 'active' if controller_name == 'items' && !['wizard','create_random'].include?(action_name) %>" href="<%= items_path %>" data-tooltip="<%= t('nav.items') %>">
+          <i class="bi bi-box-seam"></i><span class="sb-link-text"><%= t('nav.items') %></span>
+        </a>
+        <a class="sb-link <%= 'active' if controller_name == 'categories' %>" href="<%= categories_path %>" data-tooltip="<%= t('nav.categories') %>">
+          <i class="bi bi-grid-3x3-gap"></i><span class="sb-link-text"><%= t('nav.categories') %></span>
+        </a>
+        <a class="sb-link <%= 'active' if controller_name == 'effects' %>" href="<%= effects_path %>" data-tooltip="<%= t('nav.effects') %>">
+          <i class="bi bi-stars"></i><span class="sb-link-text"><%= t('nav.effects') %></span>
+        </a>
+        <a class="sb-link <%= 'active' if controller_name == 'rarities' %>" href="<%= rarities_path %>" data-tooltip="<%= t('nav.rarities') %>">
+          <i class="bi bi-gem"></i><span class="sb-link-text"><%= t('nav.rarities') %></span>
+        </a>
+        <a class="sb-link <%= 'active' if controller_name == 'weapons' %>" href="<%= weapons_path %>" data-tooltip="<%= t('nav.weapons') %>">
+          <i class="bi bi-hammer"></i><span class="sb-link-text"><%= t('nav.weapons') %></span>
+        </a>
+        <a class="sb-link <%= 'active' if controller_name == 'lore_entries' %>" href="<%= lore_entries_path %>" data-tooltip="<%= t('nav.lore') %>">
+          <i class="bi bi-book"></i><span class="sb-link-text"><%= t('nav.lore') %></span>
+        </a>
+        <span class="sb-sep"></span>
+
+        <%# Parties & Characters %>
+        <span class="sb-label"><%= t('nav.adventure') %></span>
+
+        <a class="sb-link <%= 'active' if controller_name == 'parties' %>" href="<%= parties_path %>" data-tooltip="<%= t('nav.parties') %>">
+          <i class="bi bi-shield-fill"></i><span class="sb-link-text"><%= t('nav.parties') %></span>
+        </a>
+        <a class="sb-link <%= 'active' if controller_name == 'characters' %>" href="<%= characters_path %>" data-tooltip="<%= t('nav.characters') %>">
+          <i class="bi bi-person-badge"></i><span class="sb-link-text"><%= t('nav.characters') %></span>
+        </a>
+
+        <span class="sb-sep"></span>
+
+        <%# Generators %>
+        <span class="sb-label"><%= t('nav.generators') %></span>
+
+        <a class="sb-link <%= 'active' if controller_name == 'items' && action_name == 'wizard' %>" href="<%= wizard_items_path %>" data-tooltip="<%= t('nav.item_wizard') %>">
+          <i class="bi bi-magic"></i><span class="sb-link-text"><%= t('nav.item_wizard') %></span>
+        </a>
+        <a class="sb-link <%= 'active' if action_name == 'create_random' %>" href="<%= create_random_items_path %>" data-tooltip="<%= t('nav.create_random_item') %>">
+          <i class="bi bi-shuffle"></i><span class="sb-link-text"><%= t('nav.create_random_item') %></span>
+        </a>
+        <a class="sb-link <%= 'active' if controller_name == 'party_rewards' %>" href="<%= new_party_reward_path %>" data-tooltip="<%= t('nav.party_rewards') %>">
+          <i class="bi bi-people-fill"></i><span class="sb-link-text"><%= t('nav.party_rewards') %></span>
+        </a>
+
+        <span class="sb-sep"></span>
+
+        <%# Create %>
+        <span class="sb-label"><%= t('shared.create') %></span>
+
+        <a class="sb-link" href="<%= new_party_path %>" data-tooltip="<%= t('parties.new') %>">
+          <i class="bi bi-shield-plus"></i><span class="sb-link-text"><%= t('parties.new') %></span>
+        </a>
+        <a class="sb-link" href="<%= new_item_path %>" data-tooltip="<%= t('nav.new_item') %>">
+          <i class="bi bi-plus-circle"></i><span class="sb-link-text"><%= t('nav.new_item') %></span>
+        </a>
+        <a class="sb-link" href="<%= new_effect_path %>" data-tooltip="<%= t('nav.new_effect') %>">
+          <i class="bi bi-plus-square"></i><span class="sb-link-text"><%= t('nav.new_effect') %></span>
+        </a>
+        <a class="sb-link" href="<%= new_category_path %>" data-tooltip="<%= t('nav.new_category') %>">
+          <i class="bi bi-folder-plus"></i><span class="sb-link-text"><%= t('nav.new_category') %></span>
+        </a>
+        <a class="sb-link" href="<%= new_rarity_path %>" data-tooltip="<%= t('nav.new_rarity') %>">
+          <i class="bi bi-diamond"></i><span class="sb-link-text"><%= t('nav.new_rarity') %></span>
+        </a>
+        <a class="sb-link" href="<%= new_weapon_path %>" data-tooltip="<%= t('nav.new_weapon') %>">
+          <i class="bi bi-tools"></i><span class="sb-link-text"><%= t('nav.new_weapon') %></span>
+        </a>
+
       <% end %>
+    </nav>
 
-      <div class="d-flex align-items-center gap-2 mb-2 mb-lg-0">
-        <% if user_signed_in? %>
-          <div class="dropdown">
-            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-              <i class="bi bi-plus-lg me-1"></i><%= t('shared.create') %>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-              <li><a class="dropdown-item" href="<%= wizard_items_path %>"><i class="bi bi-magic me-2"></i><%= t('nav.item_wizard') %></a></li>
-              <li><a class="dropdown-item" href="<%= create_random_items_path %>"><i class="bi bi-shuffle me-2"></i><%= t('nav.create_random_item') %></a></li>
-              <li><a class="dropdown-item" href="<%= new_party_reward_path %>"><i class="bi bi-people-fill me-2"></i><%= t('nav.party_rewards') %></a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="<%= new_item_path %>"><i class="bi bi-box-seam me-2"></i><%= t('nav.new_item') %></a></li>
-              <li><a class="dropdown-item" href="<%= new_effect_path %>"><i class="bi bi-stars me-2"></i><%= t('nav.new_effect') %></a></li>
-              <li><a class="dropdown-item" href="<%= new_category_path %>"><i class="bi bi-grid me-2"></i><%= t('nav.new_category') %></a></li>
-              <li><a class="dropdown-item" href="<%= new_rarity_path %>"><i class="bi bi-gem me-2"></i><%= t('nav.new_rarity') %></a></li>
-              <li><a class="dropdown-item" href="<%= new_weapon_path %>"><i class="bi bi-hammer me-2"></i><%= t('nav.new_weapon') %></a></li>
-            </ul>
+    <%# Bottom %>
+    <div id="sb-foot">
+      <% if user_signed_in? %>
+
+        <%# User block %>
+        <div id="sb-user">
+          <div id="sb-user-avatar">
+            <% if current_user.avatar.attached? %>
+              <%= image_tag current_user.avatar, width: 32, height: 32, alt: "" %>
+            <% elsif current_user.avatar_url.present? %>
+              <img src="<%= current_user.avatar_url %>" width="32" height="32" alt="">
+            <% else %>
+              <%= current_user.initials %>
+            <% end %>
           </div>
-        <% end %>
-
-        <div class="dropdown">
-          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-            <i class="bi bi-translate me-1"></i><%= I18n.locale.upcase %>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-            <li><a class="dropdown-item<%= ' active' if I18n.locale == :en %>" href="<%= url_for(locale: :en) %>">English</a></li>
-            <li><a class="dropdown-item<%= ' active' if I18n.locale == :es %>" href="<%= url_for(locale: :es) %>">Espanol</a></li>
-          </ul>
+          <div id="sb-user-info">
+            <div id="sb-user-name"><%= current_user.full_name %></div>
+            <div id="sb-user-email"><%= current_user.email %></div>
+          </div>
         </div>
 
-        <button id="darkModeToggle" class="btn btn-sm btn-outline-secondary d-none d-lg-inline-block" type="button">
-          <i class="bi bi-moon-fill"></i>
-        </button>
+        <span class="sb-fdiv"></span>
 
-        <% if user_signed_in? %>
-          <div class="dropdown">
-            <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-              <% if current_user.avatar.attached? %>
-                <%= image_tag current_user.avatar, width: 22, height: 22, class: "rounded-circle", alt: "" %>
-              <% elsif current_user.avatar_url.present? %>
-                <img src="<%= current_user.avatar_url %>" width="22" height="22" class="rounded-circle" alt="">
-              <% else %>
-                <i class="bi bi-person-circle"></i>
-              <% end %>
-              <span class="d-none d-md-inline"><%= current_user.full_name %></span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-              <li class="dropdown-header"><%= current_user.email %></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="<%= profile_path %>"><i class="bi bi-person me-2"></i><%= t('nav.profile') %></a></li>
-              <li><a class="dropdown-item" href="<%= edit_user_registration_path %>"><i class="bi bi-gear me-2"></i><%= t('nav.account_settings') %></a></li>
-              <% if current_user.admin? %>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="<%= admin_root_path %>"><i class="bi bi-shield-lock me-2 text-danger"></i><%= t('admin.admin_panel') %></a></li>
-              <% end %>
-              <li><hr class="dropdown-divider"></li>
-              <li>
-                <%= button_to destroy_user_session_path, method: :delete, class: "dropdown-item text-danger" do %>
-                  <i class="bi bi-box-arrow-right me-2"></i><%= t('nav.sign_out') %>
-                <% end %>
-              </li>
-            </ul>
-          </div>
-        <% else %>
-          <a class="btn btn-sm btn-primary" href="<%= new_user_session_path %>"><%= t('nav.sign_in') %></a>
+        <a class="sb-foot-link" href="<%= profile_path %>" data-tooltip="<%= t('nav.profile') %>">
+          <i class="bi bi-person"></i><span class="sb-foot-text"><%= t('nav.profile') %></span>
+        </a>
+        <a class="sb-foot-link" href="<%= edit_user_registration_path %>" data-tooltip="<%= t('nav.account_settings') %>">
+          <i class="bi bi-gear"></i><span class="sb-foot-text"><%= t('nav.account_settings') %></span>
+        </a>
+        <% if current_user.admin? %>
+          <a class="sb-foot-link danger" href="<%= admin_root_path %>" data-tooltip="<%= t('admin.admin_panel') %>">
+            <i class="bi bi-shield-lock"></i><span class="sb-foot-text"><%= t('admin.admin_panel') %></span>
+          </a>
         <% end %>
-      </div>
+
+        <span class="sb-fdiv"></span>
+
+        <%# Language + Dark mode %>
+        <div id="sb-utils">
+          <a href="<%= url_for(locale: :es) %>" class="<%= 'on' if I18n.locale == :es %>">ES</a>
+          <span>|</span>
+          <a href="<%= url_for(locale: :en) %>" class="<%= 'on' if I18n.locale == :en %>">EN</a>
+          <button id="darkModeToggle" type="button" aria-label="<%= t('nav.toggle_theme', default: 'Toggle theme') %>">
+            <i class="bi bi-moon-fill"></i>
+          </button>
+        </div>
+
+        <%# Sign out %>
+        <%= button_to destroy_user_session_path, method: :delete, class: "sb-foot-link danger", data: { tooltip: t('nav.sign_out') } do %>
+          <i class="bi bi-box-arrow-right"></i><span class="sb-foot-text"><%= t('nav.sign_out') %></span>
+        <% end %>
+
+      <% else %>
+
+        <div id="sb-utils">
+          <a href="<%= url_for(locale: :es) %>" class="<%= 'on' if I18n.locale == :es %>">ES</a>
+          <span>|</span>
+          <a href="<%= url_for(locale: :en) %>" class="<%= 'on' if I18n.locale == :en %>">EN</a>
+          <button id="darkModeToggle" type="button" aria-label="<%= t('nav.toggle_theme', default: 'Toggle theme') %>">
+            <i class="bi bi-moon-fill"></i>
+          </button>
+        </div>
+
+        <div style="padding: 8px 12px;">
+          <a class="btn btn-sm btn-primary w-100" href="<%= new_user_session_path %>">
+            <i class="bi bi-person-fill me-1"></i><%= t('nav.sign_in') %>
+          </a>
+        </div>
+
+      <% end %>
     </div>
 
   </div>
-</nav>
+</aside>
 
 <div id="notifications" class="message-section" style="display: none;">
   <span id="notification_message"></span>
 </div>
+
+<script>
+(function() {
+  var toggle     = document.getElementById('sidebarToggle');
+  var sidebar    = document.getElementById('sidebar');
+  var overlay    = document.getElementById('sb-overlay');
+  var collapseBtn = document.getElementById('sb-collapse-btn');
+
+  // ── Mobile open/close ──
+  function openSidebar()  { sidebar.classList.add('open');  overlay.classList.add('open'); }
+  function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+
+  if (toggle)  toggle.addEventListener('click', openSidebar);
+  if (overlay) overlay.addEventListener('click', closeSidebar);
+
+  if (sidebar) {
+    sidebar.querySelectorAll('a.sb-link, a.sb-foot-link').forEach(function(link) {
+      link.addEventListener('click', function() {
+        if (window.innerWidth < 992) closeSidebar();
+      });
+    });
+  }
+
+  // ── Desktop collapse/expand (persistent) ──
+  var COLLAPSE_KEY = 'sidebar-collapsed';
+
+  function applySidebarState(collapsed) {
+    if (collapsed) {
+      sidebar.classList.add('collapsed');
+      document.body.classList.add('sb-collapsed');
+    } else {
+      sidebar.classList.remove('collapsed');
+      document.body.classList.remove('sb-collapsed');
+    }
+  }
+
+  // Restore saved state on load
+  if (sidebar && window.innerWidth >= 992) {
+    var saved = localStorage.getItem(COLLAPSE_KEY);
+    if (saved === 'true') applySidebarState(true);
+  }
+
+  if (collapseBtn) {
+    collapseBtn.addEventListener('click', function() {
+      var isCollapsed = sidebar.classList.contains('collapsed');
+      applySidebarState(!isCollapsed);
+      localStorage.setItem(COLLAPSE_KEY, !isCollapsed);
+    });
+  }
+
+  // Reset collapsed state if resizing to mobile
+  window.addEventListener('resize', function() {
+    if (window.innerWidth < 992) {
+      document.body.classList.remove('sb-collapsed');
+    } else {
+      if (localStorage.getItem(COLLAPSE_KEY) === 'true') {
+        applySidebarState(true);
+      }
+    }
+  });
+})();
+</script>

@@ -4,6 +4,7 @@ class User < ApplicationRecord
          :omniauthable, omniauth_providers: [:google_oauth2]
 
   has_many :items, dependent: :nullify
+  has_many :parties, dependent: :destroy
   has_one_attached :avatar
 
   validate :acceptable_avatar

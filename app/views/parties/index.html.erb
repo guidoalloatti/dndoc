@@ -1,0 +1,82 @@
+<div class="container mt-4" style="max-width: 860px;">
+
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h4 class="fw-bold mb-0">
+        <i class="bi bi-shield-fill text-primary me-2"></i><%= t("parties.title") %>
+      </h4>
+      <p class="text-muted small mb-0"><%= t("parties.subtitle") %></p>
+    </div>
+    <%= link_to new_party_path, class: "btn btn-primary btn-sm" do %>
+      <i class="bi bi-plus-lg me-1"></i><%= t("parties.new") %>
+    <% end %>
+  </div>
+
+  <% if @parties.empty? %>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-people display-4 d-block mb-3 opacity-25"></i>
+        <p class="mb-3"><%= t("parties.no_parties") %></p>
+        <%= link_to new_party_path, class: "btn btn-primary btn-sm" do %>
+          <i class="bi bi-plus-lg me-1"></i><%= t("parties.new") %>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="row g-3">
+      <% @parties.each do |party| %>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-3">
+              <div class="d-flex align-items-start justify-content-between mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <% if party.has_image? %>
+                    <div class="flex-shrink-0 overflow-hidden rounded-2" style="width:36px; height:36px;">
+                      <%= image_tag party.image, style: "width:100%; height:100%; object-fit:cover;", alt: "" %>
+                    </div>
+                  <% end %>
+                  <div>
+                    <h6 class="fw-bold mb-0"><%= link_to party.name, party_path(party), class: "text-decoration-none" %></h6>
+                    <span class="text-muted small">
+                      <i class="bi bi-people me-1"></i><%= party.characters.size %> <%= t("parties.characters_count") %>
+                    </span>
+                  </div>
+                </div>
+                <div class="d-flex gap-1">
+                  <%= link_to edit_party_path(party), class: "btn btn-sm btn-outline-secondary", title: t("shared.edit") do %>
+                    <i class="bi bi-pencil"></i>
+                  <% end %>
+                  <%= button_to party_path(party), method: :delete,
+                      class: "btn btn-sm btn-outline-danger",
+                      title: t("shared.delete"),
+                      data: { turbo_confirm: t("parties.confirm_destroy") } do %>
+                    <i class="bi bi-trash3"></i>
+                  <% end %>
+                </div>
+              </div>
+
+              <% if party.characters.any? %>
+                <div class="d-flex flex-wrap gap-1 mb-3">
+                  <% party.characters.each do |char| %>
+                    <div class="d-flex align-items-center gap-1 border rounded px-2 py-1 bg-body-tertiary" style="font-size:0.72rem;">
+                      <span class="fw-semibold"><%= char.name %></span>
+                      <% if char.race.present? %>
+                        <span class="text-muted">· <%= char.race %></span>
+                      <% end %>
+                      <span class="badge bg-primary bg-opacity-75" style="font-size:0.6rem;"><%= char.character_class.name %></span>
+                      <span class="text-muted">Lv.<%= char.level %></span>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <%= link_to new_party_reward_path(party_id: party.id), class: "btn btn-sm btn-primary w-100" do %>
+                <i class="bi bi-hammer me-1"></i><%= t("parties.forge_rewards") %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,182 @@
+<div class="container mt-4" style="max-width: 860px;">
+
+  <%# ── Breadcrumb / Header ── %>
+  <div class="mb-4">
+    <div class="d-flex align-items-center gap-1 text-muted small mb-2">
+      <%= link_to t("parties.title"), parties_path, class: "text-muted text-decoration-none" %>
+      <i class="bi bi-chevron-right" style="font-size:0.7rem;"></i>
+      <%= link_to @character.party.name, party_path(@character.party), class: "text-muted text-decoration-none" %>
+      <i class="bi bi-chevron-right" style="font-size:0.7rem;"></i>
+      <span><%= @character.name %></span>
+    </div>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 flex-shrink-0 overflow-hidden"
+             style="width:48px; height:48px;">
+          <% if @character.has_avatar? %>
+            <%= image_tag @character.avatar, style: "width:100%; height:100%; object-fit:cover; border-radius:50%;", alt: "" %>
+          <% else %>
+            <span class="fw-bold text-primary" style="font-size:1rem;"><%= @character.initials %></span>
+          <% end %>
+        </div>
+        <div>
+          <h4 class="fw-bold mb-0"><%= @character.name %></h4>
+          <div class="d-flex align-items-center gap-2 text-muted small">
+            <% if @character.race.present? %>
+              <span><%= @character.race %></span>
+              <span>&middot;</span>
+            <% end %>
+            <span class="badge bg-primary bg-opacity-75" style="font-size:0.65rem;"><%= @character.character_class.name %></span>
+            <span><%= t("parties.level_abbr") %> <%= @character.level %></span>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <%= link_to edit_character_path(@character), class: "btn btn-sm btn-outline-secondary" do %>
+          <i class="bi bi-pencil me-1"></i><%= t("shared.edit") %>
+        <% end %>
+        <%= link_to new_party_reward_path(party_id: @character.party_id), class: "btn btn-sm btn-primary" do %>
+          <i class="bi bi-hammer me-1"></i><%= t("parties.forge_rewards") %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Assign Item ── %>
+  <% unassigned_items = current_user.items.where(character_id: nil).includes(:category, :rarity).order(:name) %>
+  <% if unassigned_items.any? %>
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-body-tertiary border-0 py-2 px-3">
+        <h6 class="fw-semibold small text-muted text-uppercase mb-0">
+          <i class="bi bi-plus-circle me-1"></i><%= t("characters.assign_item") %>
+        </h6>
+      </div>
+      <div class="card-body py-2 px-3">
+        <%= form_tag assign_item_character_path(@character), method: :post, class: "d-flex align-items-center gap-2" do %>
+          <%= select_tag :item_id,
+                options_for_select(unassigned_items.map { |i| ["#{i.name} (#{i.rarity.name} #{i.category.name})", i.id] }),
+                class: "form-select form-select-sm", style: "max-width: 400px;" %>
+          <button type="submit" class="btn btn-sm btn-primary flex-shrink-0">
+            <i class="bi bi-plus-lg me-1"></i><%= t("characters.assign") %>
+          </button>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# ── Inventory ── %>
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-body-tertiary border-0 py-2 px-3 d-flex align-items-center justify-content-between">
+      <h6 class="fw-semibold small text-muted text-uppercase mb-0">
+        <i class="bi bi-bag-fill me-1"></i><%= t("characters.inventory") %>
+        <span class="badge bg-secondary bg-opacity-50 text-body ms-1 fw-normal"><%= @items.size %></span>
+      </h6>
+    </div>
+
+    <% if @items.empty? %>
+      <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-bag display-4 d-block mb-3 opacity-25"></i>
+        <p class="mb-0 small"><%= t("characters.no_items") %></p>
+      </div>
+    <% else %>
+      <div class="card-body p-2">
+        <div class="row g-2">
+          <% @items.each do |item| %>
+            <%
+              rarity_classes = {
+                "Common" => "bg-secondary", "Uncommon" => "bg-success",
+                "Rare" => "bg-info text-dark", "Very Rare" => "bg-primary",
+                "Legendary" => "bg-warning text-dark", "Ancestral" => "bg-danger"
+              }
+              rarity_icons = {
+                "Common" => "bi-circle", "Uncommon" => "bi-circle-half",
+                "Rare" => "bi-gem", "Very Rare" => "bi-star-fill",
+                "Legendary" => "bi-trophy-fill", "Ancestral" => "bi-lightning-charge-fill"
+              }
+              badge_cls = rarity_classes[item.rarity.name] || "bg-secondary"
+              r_icon    = rarity_icons[item.rarity.name] || "bi-circle"
+            %>
+            <div class="col-md-6">
+              <div class="card border h-100" style="border-color: rgba(0,0,0,.08) !important;">
+                <div class="card-body p-2">
+                  <div class="d-flex align-items-start gap-2">
+                    <div class="flex-grow-1 min-w-0">
+
+                      <%# Name + badges %>
+                      <div class="d-flex align-items-center flex-wrap gap-1 mb-1">
+                        <%= link_to item.name, item_path(item), class: "fw-semibold text-truncate text-decoration-none",
+                              style: "font-size:0.85rem; max-width:150px;", title: item.name %>
+                        <span class="badge <%= badge_cls %> d-flex align-items-center gap-1" style="font-size:0.6rem;">
+                          <i class="bi <%= r_icon %>"></i><%= item.rarity.name %>
+                        </span>
+                        <span class="badge bg-light text-dark border" style="font-size:0.6rem;"><%= item.category.name %></span>
+                        <% if item.requires_attunement %>
+                          <span class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle" style="font-size:0.6rem;">
+                            <i class="bi bi-link-45deg"></i>
+                          </span>
+                        <% end %>
+                      </div>
+
+                      <%# Stats %>
+                      <div class="d-flex gap-2 text-muted mb-1" style="font-size:0.72rem;">
+                        <span><i class="bi bi-lightning-charge-fill text-warning"></i> <%= item.power %></span>
+                        <span><i class="bi bi-coin text-warning"></i> <%= number_with_delimiter(item.price) %> gp</span>
+                        <span><i class="bi bi-feather"></i> <%= item.weight %></span>
+                      </div>
+
+                      <%# Effects %>
+                      <% if item.effects.any? %>
+                        <div class="d-flex flex-wrap gap-1">
+                          <% item.effects.each do |effect| %>
+                            <span class="badge bg-secondary bg-opacity-50 text-body" style="font-size:0.6rem;">
+                              <%= effect.translated_name %>
+                            </span>
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+
+                    <%# Actions %>
+                    <div class="d-flex flex-column gap-1 flex-shrink-0">
+                      <%= link_to edit_item_path(item), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center",
+                            title: t("shared.edit"), style: "width:28px; height:28px; padding:0;" do %>
+                        <i class="bi bi-pencil" style="font-size:0.75rem;"></i>
+                      <% end %>
+                      <%= button_to unassign_item_character_path(@character, item_id: item.id), method: :patch,
+                            class: "btn btn-sm btn-outline-warning d-flex align-items-center justify-content-center",
+                            title: t("characters.unassign"),
+                            style: "width:28px; height:28px; padding:0;",
+                            data: { turbo_confirm: t("characters.confirm_unassign") } do %>
+                        <i class="bi bi-person-dash" style="font-size:0.75rem;"></i>
+                      <% end %>
+                      <%= button_to item_path(item), method: :delete,
+                            class: "btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center",
+                            title: t("shared.delete"),
+                            style: "width:28px; height:28px; padding:0;",
+                            data: { turbo_confirm: t("shared.confirm_delete") } do %>
+                        <i class="bi bi-trash3" style="font-size:0.75rem;"></i>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# ── Footer actions ── %>
+  <div class="d-flex align-items-center justify-content-between mt-3">
+    <%= link_to party_path(@character.party), class: "btn btn-sm btn-outline-secondary" do %>
+      <i class="bi bi-arrow-left me-1"></i><%= @character.party.name %>
+    <% end %>
+    <%= button_to character_path(@character), method: :delete,
+          class: "btn btn-sm btn-outline-danger",
+          data: { turbo_confirm: t("characters.confirm_destroy") } do %>
+      <i class="bi bi-trash3 me-1"></i><%= t("shared.delete") %>
+    <% end %>
+  </div>
+</div>

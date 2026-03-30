@@ -1,0 +1,55 @@
+<%= form_with model: lore_entry, url: form_url, class: "needs-validation" do |f| %>
+  <% if lore_entry.errors.any? %>
+    <div class="alert alert-danger">
+      <% lore_entry.errors.full_messages.each do |msg| %>
+        <div><i class="bi bi-exclamation-circle me-1"></i><%= msg %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="row g-3">
+        <%# Lore Type %>
+        <div class="col-md-4">
+          <%= f.label :lore_type, t('lore_entries.lore_type'), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.select :lore_type,
+                options_for_select(LoreEntry::LORE_TYPES.map { |lt| [t("lore_entries.type_#{lt}"), lt] }, lore_entry.lore_type),
+                {},
+                class: "form-select", required: true %>
+        </div>
+
+        <%# Category %>
+        <div class="col-md-4">
+          <%= f.label :category, t('lore_entries.category_label'), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.select :category,
+                options_for_select(LoreEntry::CATEGORIES.map { |c| [t("lore_entries.cat_#{c}", default: c.humanize), c] }, lore_entry.category),
+                { include_blank: t('lore_entries.select_category') },
+                class: "form-select", required: true %>
+        </div>
+
+        <%# Key %>
+        <div class="col-md-4">
+          <%= f.label :key, t('lore_entries.key_label'), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.text_field :key, class: "form-control", placeholder: t('lore_entries.key_placeholder') %>
+          <div class="form-text small"><%= t('lore_entries.key_hint') %></div>
+        </div>
+
+        <%# Value %>
+        <div class="col-12">
+          <%= f.label :value, t('lore_entries.value_label'), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.text_area :value, class: "form-control", rows: 4, required: true,
+              placeholder: t('lore_entries.value_placeholder') %>
+          <div class="form-text small"><%= t('lore_entries.value_hint') %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit t('shared.save'), class: "btn btn-primary px-4" %>
+    <%= link_to t('shared.cancel'),
+        lore_entries_path(lore_type: lore_entry.lore_type, category: lore_entry.category, key: lore_entry.key),
+        class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

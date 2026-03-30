@@ -1,185 +1,363 @@
+<% content_for :admin_breadcrumb do %>
+  <span class="admin-breadcrumb">
+    <i class="bi bi-grid-fill text-danger me-1"></i>
+    <span class="current"><%= t('admin.dashboard') %></span>
+  </span>
+<% end %>
+
 <% rarity_colors = { 'Common' => 'secondary', 'Uncommon' => 'success', 'Rare' => 'info', 'Very Rare' => 'primary', 'Legendary' => 'warning', 'Ancestral' => 'danger' } %>
+<% effect_colors = { 'Buff' => 'success', 'Debuff' => 'danger', 'Utility' => 'info', 'Healing' => 'primary', 'Damage' => 'warning', 'Defense' => 'secondary' } %>
 
-<div class="container-fluid py-3 px-md-4" style="max-width: 1400px;">
-
-  <%# ── Compact Header ── %>
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <div class="d-flex align-items-center gap-2">
-      <div class="rounded-2 bg-danger bg-opacity-10 p-2 d-flex">
-        <i class="bi bi-shield-lock-fill text-danger fs-5"></i>
-      </div>
-      <div>
-        <h5 class="fw-bold mb-0 lh-1"><%= t('admin.dashboard') %></h5>
-        <small class="text-body-secondary"><%= t('admin.dashboard_subtitle') %></small>
-      </div>
+<%# ── Page Header ── %>
+<div class="admin-page-header">
+  <div class="admin-page-title">
+    <div class="admin-title-icon bg-danger bg-opacity-10">
+      <i class="bi bi-grid-fill text-danger"></i>
     </div>
-    <div class="d-flex gap-2">
-      <%= link_to admin_character_classes_path, class: "btn btn-sm btn-outline-primary" do %>
-        <i class="bi bi-shield-shaded me-1"></i><%= t('character_classes.title') %>
-      <% end %>
-      <%= link_to admin_users_path, class: "btn btn-sm btn-primary" do %>
-        <i class="bi bi-people me-1"></i><%= t('admin.manage_users') %>
-      <% end %>
+    <div>
+      <h5><%= t('admin.dashboard') %></h5>
+      <small><%= t('admin.dashboard_subtitle') %></small>
     </div>
   </div>
+  <div class="d-flex gap-2 align-items-center">
+    <span class="text-muted small"><%= Date.today.strftime("%B %d, %Y") %></span>
+  </div>
+</div>
 
-  <%# ── Inline Stats Bar ── %>
-  <div class="rounded-3 p-2 mb-3" style="background: var(--bs-tertiary-bg);">
-    <div class="d-flex flex-wrap justify-content-center gap-3">
-      <% [
-        { icon: "bi-people-fill", color: "primary", value: @stats[:total_users], label: t('admin.total_users') },
-        { icon: "bi-shield-fill", color: "danger", value: @stats[:admin_users], label: t('admin.admin_users') },
-        { icon: "bi-box-seam-fill", color: "success", value: @stats[:total_items], label: t('admin.total_items') },
-        { icon: "bi-magic", color: "info", value: @stats[:total_effects], label: t('admin.total_effects') },
-        { icon: "bi-grid-3x3-gap-fill", color: "warning", value: @stats[:total_categories], label: t('admin.total_categories') },
-        { icon: "bi-gem", color: "secondary", value: @stats[:total_rarities], label: t('admin.total_rarities') },
-        { icon: "bi-hammer", color: "dark", value: @stats[:total_weapons], label: t('admin.total_weapons') },
-      ].each do |stat| %>
-        <div class="d-flex align-items-center gap-2 px-2">
-          <i class="bi <%= stat[:icon] %> text-<%= stat[:color] %>"></i>
-          <span class="fw-bold text-<%= stat[:color] %>"><%= stat[:value] %></span>
-          <span class="text-body-secondary small"><%= stat[:label] %></span>
+<%# ── Stats Grid ── %>
+<div class="row g-3 mb-4">
+
+  <%# Users %>
+  <div class="col-6 col-md-4 col-xl-2">
+    <%= link_to admin_users_path, class: "text-decoration-none" do %>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon bg-primary bg-opacity-10">
+          <i class="bi bi-people-fill text-primary"></i>
         </div>
-      <% end %>
-    </div>
+        <div>
+          <div class="admin-stat-value"><%= @stats[:total_users] %></div>
+          <div class="admin-stat-label"><%= t('admin.total_users') %></div>
+        </div>
+      </div>
+    <% end %>
   </div>
 
-  <div class="row g-3">
-    <%# ── Left Column: Top Creators + Rarity Distribution ── %>
-    <div class="col-lg-4">
-      <%# Top Creators %>
-      <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body p-3">
-          <h6 class="fw-bold small text-uppercase text-muted mb-2">
-            <i class="bi bi-trophy-fill text-warning me-1"></i><%= t('admin.top_creators') %>
-          </h6>
-          <% @top_creators.each_with_index do |user, idx| %>
-            <div class="d-flex align-items-center gap-2 py-1 <%= idx < @top_creators.size - 1 ? 'border-bottom' : '' %>">
-              <span class="fw-bold text-<%= idx == 0 ? 'warning' : 'muted' %>" style="width: 16px; font-size: 0.75rem;"><%= idx + 1 %></span>
+  <%# Items %>
+  <div class="col-6 col-md-4 col-xl-2">
+    <%= link_to admin_items_path, class: "text-decoration-none" do %>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon bg-success bg-opacity-10">
+          <i class="bi bi-box-seam-fill text-success"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value"><%= @stats[:total_items] %></div>
+          <div class="admin-stat-label"><%= t('admin.total_items') %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Effects %>
+  <div class="col-6 col-md-4 col-xl-2">
+    <%= link_to admin_effects_path, class: "text-decoration-none" do %>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon bg-info bg-opacity-10">
+          <i class="bi bi-stars text-info"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value"><%= @stats[:total_effects] %></div>
+          <div class="admin-stat-label"><%= t('admin.total_effects') %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Parties %>
+  <div class="col-6 col-md-4 col-xl-2">
+    <%= link_to admin_parties_path, class: "text-decoration-none" do %>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon bg-warning bg-opacity-10">
+          <i class="bi bi-shield-fill text-warning"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value"><%= @stats[:total_parties] %></div>
+          <div class="admin-stat-label"><%= t('nav.parties') %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Characters %>
+  <div class="col-6 col-md-4 col-xl-2">
+    <%= link_to admin_characters_path, class: "text-decoration-none" do %>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon bg-purple bg-opacity-10" style="background: rgba(111,66,193,0.1);">
+          <i class="bi bi-person-badge" style="color:#6f42c1;"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value"><%= @stats[:total_characters] %></div>
+          <div class="admin-stat-label"><%= t('nav.characters') %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Lore Entries %>
+  <div class="col-6 col-md-4 col-xl-2">
+    <%= link_to admin_lore_entries_path, class: "text-decoration-none" do %>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon bg-secondary bg-opacity-10">
+          <i class="bi bi-book text-secondary"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value"><%= @stats[:total_lore] %></div>
+          <div class="admin-stat-label"><%= t('nav.lore') %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+</div>
+
+<%# ── Secondary Stats Row ── %>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="admin-stat-card" style="padding:10px 14px;">
+      <i class="bi bi-shield-fill text-danger me-2" style="font-size:0.9rem;"></i>
+      <div>
+        <div class="fw-bold" style="font-size:1.1rem;"><%= @stats[:admin_users] %></div>
+        <div style="font-size:0.68rem; color:var(--bs-secondary-color); text-transform:uppercase; letter-spacing:0.05em;"><%= t('admin.admin_users') %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="admin-stat-card" style="padding:10px 14px;">
+      <i class="bi bi-grid-3x3-gap me-2 text-warning" style="font-size:0.9rem;"></i>
+      <div>
+        <div class="fw-bold" style="font-size:1.1rem;"><%= @stats[:total_categories] %></div>
+        <div style="font-size:0.68rem; color:var(--bs-secondary-color); text-transform:uppercase; letter-spacing:0.05em;"><%= t('admin.total_categories') %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="admin-stat-card" style="padding:10px 14px;">
+      <i class="bi bi-hammer me-2 text-info" style="font-size:0.9rem;"></i>
+      <div>
+        <div class="fw-bold" style="font-size:1.1rem;"><%= @stats[:total_weapons] %></div>
+        <div style="font-size:0.68rem; color:var(--bs-secondary-color); text-transform:uppercase; letter-spacing:0.05em;"><%= t('admin.total_weapons') %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="admin-stat-card" style="padding:10px 14px;">
+      <i class="bi bi-shield-shaded me-2 text-success" style="font-size:0.9rem;"></i>
+      <div>
+        <div class="fw-bold" style="font-size:1.1rem;"><%= @stats[:total_classes] %></div>
+        <div style="font-size:0.68rem; color:var(--bs-secondary-color); text-transform:uppercase; letter-spacing:0.05em;"><%= t('character_classes.title') %></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# ── Main Content Grid ── %>
+<div class="row g-3">
+
+  <%# Left column %>
+  <div class="col-lg-4">
+
+    <%# Top Creators %>
+    <div class="admin-table-wrap mb-3">
+      <div class="d-flex align-items-center justify-content-between px-3 py-2" style="border-bottom:1px solid var(--bs-border-color); background:var(--bs-tertiary-bg);">
+        <span class="fw-semibold" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--bs-secondary-color);">
+          <i class="bi bi-trophy-fill text-warning me-1"></i><%= t('admin.top_creators') %>
+        </span>
+        <%= link_to t('admin.view_all_users'), admin_users_path, class: "small text-primary text-decoration-none" %>
+      </div>
+      <div class="p-2">
+        <% @top_creators.each_with_index do |user, idx| %>
+          <%= link_to admin_user_path(user), class: "d-flex align-items-center gap-2 px-2 py-2 rounded text-decoration-none mb-1", style: "transition:background 0.1s;" do %>
+            <span class="fw-bold text-muted" style="width:16px; font-size:0.7rem; text-align:right;"><%= idx + 1 %></span>
+            <% if user.has_avatar? %>
+              <% if user.avatar.attached? %>
+                <%= image_tag user.avatar, class: "rounded-circle flex-shrink-0", width: 26, height: 26, style: "object-fit:cover;" %>
+              <% else %>
+                <img src="<%= user.avatar_url %>" class="rounded-circle flex-shrink-0" width="26" height="26" style="object-fit:cover;">
+              <% end %>
+            <% else %>
+              <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width:26px;height:26px;">
+                <span style="font-size:0.6rem;" class="fw-bold text-primary"><%= user.initials %></span>
+              </div>
+            <% end %>
+            <span class="flex-grow-1 small fw-semibold text-truncate" style="color:var(--bs-body-color);"><%= user.full_name %></span>
+            <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size:0.65rem;"><%= user.items_count %> items</span>
+          <% end %>
+        <% end %>
+        <% if @top_creators.empty? %>
+          <p class="text-muted text-center small my-3 mb-0"><%= t('shared.no_records') %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Items by Rarity %>
+    <div class="admin-table-wrap mb-3">
+      <div class="px-3 py-2" style="border-bottom:1px solid var(--bs-border-color); background:var(--bs-tertiary-bg);">
+        <span class="fw-semibold" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--bs-secondary-color);">
+          <i class="bi bi-gem text-info me-1"></i><%= t('admin.items_by_rarity') %>
+        </span>
+      </div>
+      <div class="p-3">
+        <% total_items = @items_by_rarity.sum(&:items_count).to_f %>
+        <% @items_by_rarity.each do |r| %>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-<%= rarity_colors[r.name] || 'secondary' %>" style="width:72px; font-size:0.6rem; text-align:center;"><%= r.name %></span>
+            <div class="flex-grow-1">
+              <div class="progress" style="height:5px; border-radius:3px;">
+                <div class="progress-bar bg-<%= rarity_colors[r.name] || 'secondary' %>" style="width:<%= total_items > 0 ? (r.items_count / total_items * 100).round(1) : 0 %>%;"></div>
+              </div>
+            </div>
+            <span class="text-muted fw-semibold" style="font-size:0.72rem; min-width:20px; text-align:right;"><%= r.items_count %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Effects by Type %>
+    <div class="admin-table-wrap">
+      <div class="px-3 py-2" style="border-bottom:1px solid var(--bs-border-color); background:var(--bs-tertiary-bg);">
+        <span class="fw-semibold" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--bs-secondary-color);">
+          <i class="bi bi-stars text-info me-1"></i><%= t('admin.effects_by_type') %>
+        </span>
+      </div>
+      <div class="p-3">
+        <% total_fx = @effects_by_type.sum { |_, c| c }.to_f %>
+        <% @effects_by_type.each do |type, count| %>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span style="font-size:0.72rem; width:90px; color:var(--bs-secondary-color); text-truncate; white-space:nowrap; overflow:hidden;"><%= type %></span>
+            <div class="flex-grow-1">
+              <div class="progress" style="height:5px; border-radius:3px;">
+                <div class="progress-bar bg-info" style="width:<%= total_fx > 0 ? (count / total_fx * 100).round(1) : 0 %>%;"></div>
+              </div>
+            </div>
+            <span class="text-muted fw-semibold" style="font-size:0.72rem; min-width:20px; text-align:right;"><%= count %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+
+  <%# Right column %>
+  <div class="col-lg-8">
+
+    <%# Recent Users %>
+    <div class="admin-table-wrap mb-3">
+      <div class="d-flex align-items-center justify-content-between px-3 py-2" style="border-bottom:1px solid var(--bs-border-color); background:var(--bs-tertiary-bg);">
+        <span class="fw-semibold" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--bs-secondary-color);">
+          <i class="bi bi-person-plus-fill text-success me-1"></i><%= t('admin.recent_users') %>
+        </span>
+        <%= link_to t('admin.view_all_users'), admin_users_path, class: "small text-primary text-decoration-none" %>
+      </div>
+      <div class="p-2 d-flex flex-wrap gap-2">
+        <% @recent_users.each do |user| %>
+          <%= link_to admin_user_path(user), class: "text-decoration-none" do %>
+            <div class="d-flex align-items-center gap-2 rounded-pill px-2 py-1 border" style="background:var(--bs-tertiary-bg);">
               <% if user.has_avatar? %>
                 <% if user.avatar.attached? %>
-                  <%= image_tag user.avatar, class: "rounded-circle object-fit-cover", width: 24, height: 24 %>
+                  <%= image_tag user.avatar, class: "rounded-circle", width: 20, height: 20, style: "object-fit:cover;" %>
                 <% else %>
-                  <img src="<%= user.avatar_url %>" class="rounded-circle object-fit-cover" width="24" height="24">
+                  <img src="<%= user.avatar_url %>" class="rounded-circle" width="20" height="20" style="object-fit:cover;">
                 <% end %>
               <% else %>
-                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 24px; height: 24px;">
-                  <span style="font-size: 0.6rem;" class="fw-bold text-primary"><%= user.initials %></span>
+                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width:20px;height:20px;flex-shrink:0;">
+                  <span style="font-size:0.5rem;font-weight:700;" class="text-primary"><%= user.initials %></span>
                 </div>
               <% end %>
-              <div class="flex-grow-1 min-width-0">
-                <div class="fw-semibold small text-truncate"><%= user.full_name %></div>
-              </div>
-              <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size: 0.65rem;"><%= user.items_count %></span>
+              <span class="small fw-semibold" style="color:var(--bs-body-color);"><%= user.full_name %></span>
+              <% if user.admin? %><i class="bi bi-shield-fill text-danger" style="font-size:0.6rem;"></i><% end %>
+              <span class="text-muted" style="font-size:0.6rem;"><%= user.created_at.strftime("%b %d") %></span>
             </div>
           <% end %>
-          <% if @top_creators.empty? %>
-            <p class="text-muted text-center small my-2 mb-0"><%= t('shared.no_records') %></p>
-          <% end %>
-        </div>
-      </div>
-
-      <%# Rarity Distribution %>
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-3">
-          <h6 class="fw-bold small text-uppercase text-muted mb-2">
-            <i class="bi bi-gem text-info me-1"></i><%= t('admin.items_by_rarity') %>
-          </h6>
-          <% total_items = @items_by_rarity.sum(&:items_count).to_f %>
-          <% @items_by_rarity.each do |r| %>
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <span class="badge bg-<%= rarity_colors[r.name] || 'secondary' %> <%= r.name == 'Legendary' ? 'text-dark' : '' %>" style="width: 70px; font-size: 0.6rem;"><%= r.name %></span>
-              <div class="flex-grow-1">
-                <div class="progress" style="height: 4px;">
-                  <div class="progress-bar bg-<%= rarity_colors[r.name] || 'secondary' %>" style="width: <%= total_items > 0 ? (r.items_count / total_items * 100).round(1) : 0 %>%;"></div>
-                </div>
-              </div>
-              <span class="text-muted fw-semibold" style="font-size: 0.7rem; width: 24px; text-align: right;"><%= r.items_count %></span>
-            </div>
-          <% end %>
-        </div>
+        <% end %>
       </div>
     </div>
 
-    <%# ── Right Column: Activity Feed ── %>
-    <div class="col-lg-8">
-      <%# Recent Users %>
-      <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body p-3">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="fw-bold small text-uppercase text-muted mb-0">
-              <i class="bi bi-person-plus-fill text-success me-1"></i><%= t('admin.recent_users') %>
-            </h6>
-            <%= link_to t('admin.view_all_users'), admin_users_path, class: "small text-primary text-decoration-none fw-semibold" %>
-          </div>
-          <div class="d-flex flex-wrap gap-2">
-            <% @recent_users.each do |user| %>
-              <%= link_to admin_user_path(user), class: "text-decoration-none" do %>
-                <div class="d-flex align-items-center gap-2 rounded-pill px-3 py-1 border" style="background: var(--bs-tertiary-bg); transition: all 0.15s;">
-                  <% if user.has_avatar? %>
-                    <% if user.avatar.attached? %>
-                      <%= image_tag user.avatar, class: "rounded-circle object-fit-cover", width: 22, height: 22 %>
-                    <% else %>
-                      <img src="<%= user.avatar_url %>" class="rounded-circle object-fit-cover" width="22" height="22">
-                    <% end %>
-                  <% else %>
-                    <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 22px; height: 22px;">
-                      <span style="font-size: 0.55rem;" class="fw-bold text-primary"><%= user.initials %></span>
-                    </div>
-                  <% end %>
-                  <span class="small fw-semibold"><%= user.full_name %></span>
-                  <% if user.admin? %>
-                    <i class="bi bi-shield-fill text-danger" style="font-size: 0.6rem;"></i>
-                  <% end %>
-                  <% if user.google_linked? %>
-                    <i class="bi bi-google text-primary" style="font-size: 0.55rem;"></i>
-                  <% end %>
-                  <span class="text-muted" style="font-size: 0.6rem;"><%= user.created_at.strftime("%b %d") %></span>
-                </div>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
+    <%# Recent Items %>
+    <div class="admin-table-wrap mb-3">
+      <div class="d-flex align-items-center justify-content-between px-3 py-2" style="border-bottom:1px solid var(--bs-border-color); background:var(--bs-tertiary-bg);">
+        <span class="fw-semibold" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--bs-secondary-color);">
+          <i class="bi bi-box-seam-fill text-primary me-1"></i><%= t('admin.recent_items') %>
+        </span>
+        <%= link_to t('admin.view_all'), admin_items_path, class: "small text-primary text-decoration-none" %>
       </div>
-
-      <%# Recent Items %>
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-3">
-          <h6 class="fw-bold small text-uppercase text-muted mb-2">
-            <i class="bi bi-box-seam-fill text-primary me-1"></i><%= t('admin.recent_items') %>
-          </h6>
-          <% if @recent_items.any? %>
-            <% @recent_items.each_with_index do |item, idx| %>
-              <div class="d-flex align-items-center gap-2 py-2 <%= idx < @recent_items.size - 1 ? 'border-bottom' : '' %>">
-                <span class="badge bg-<%= rarity_colors[item.rarity&.name] || 'secondary' %> <%= item.rarity&.name == 'Legendary' ? 'text-dark' : '' %>" style="font-size: 0.55rem; width: 60px;"><%= item.rarity&.name %></span>
-                <div class="flex-grow-1 min-width-0">
-                  <%= link_to item.name, item_path(item), class: "fw-semibold small text-decoration-none text-truncate d-block" %>
-                </div>
-                <span class="text-muted small d-none d-md-inline"><%= item.category&.name %></span>
-                <span class="badge bg-primary rounded-pill" style="font-size: 0.6rem;"><%= item.power %></span>
-                <div class="d-flex align-items-center gap-1 d-none d-md-flex">
-                  <% if item.user %>
-                    <% if item.user.has_avatar? %>
-                      <% if item.user.avatar.attached? %>
-                        <%= image_tag item.user.avatar, class: "rounded-circle object-fit-cover", width: 18, height: 18 %>
-                      <% else %>
-                        <img src="<%= item.user.avatar_url %>" class="rounded-circle object-fit-cover" width="18" height="18">
-                      <% end %>
-                    <% else %>
-                      <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 18px; height: 18px;">
-                        <span style="font-size: 0.5rem;" class="fw-bold text-primary"><%= item.user.initials %></span>
-                      </div>
-                    <% end %>
-                  <% end %>
-                </div>
-                <span class="text-muted" style="font-size: 0.6rem;"><%= item.created_at.strftime("%b %d") %></span>
-              </div>
-            <% end %>
-          <% else %>
-            <p class="text-muted text-center small my-2 mb-0"><%= t('shared.no_records') %></p>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th><%= t('items.name') %></th>
+            <th><%= t('items.rarity') %></th>
+            <th class="d-none d-md-table-cell"><%= t('items.category') %></th>
+            <th class="d-none d-md-table-cell"><%= t('items.power') %></th>
+            <th class="d-none d-md-table-cell"><%= t('admin.owner') %></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_items.each do |item| %>
+            <tr>
+              <td class="fw-semibold text-truncate" style="max-width:180px;"><%= item.name %></td>
+              <td><span class="badge bg-<%= rarity_colors[item.rarity&.name] || 'secondary' %>" style="font-size:0.6rem;"><%= item.rarity&.name %></span></td>
+              <td class="text-muted small d-none d-md-table-cell"><%= item.category&.name %></td>
+              <td class="d-none d-md-table-cell"><span class="badge bg-primary rounded-pill" style="font-size:0.65rem;"><%= item.power %></span></td>
+              <td class="text-muted small d-none d-md-table-cell"><%= item.user&.full_name %></td>
+              <td class="actions">
+                <%= link_to admin_item_path(item), class: "btn btn-sm btn-outline-secondary" do %>
+                  <i class="bi bi-eye"></i>
+                <% end %>
+              </td>
+            </tr>
           <% end %>
-        </div>
-      </div>
+          <% if @recent_items.empty? %>
+            <tr><td colspan="6" class="text-center text-muted py-3 small"><%= t('shared.no_records') %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
+
+    <%# Recent Parties %>
+    <div class="admin-table-wrap">
+      <div class="d-flex align-items-center justify-content-between px-3 py-2" style="border-bottom:1px solid var(--bs-border-color); background:var(--bs-tertiary-bg);">
+        <span class="fw-semibold" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--bs-secondary-color);">
+          <i class="bi bi-shield-fill text-warning me-1"></i><%= t('admin.recent_parties') %>
+        </span>
+        <%= link_to t('admin.view_all'), admin_parties_path, class: "small text-primary text-decoration-none" %>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th><%= t('parties.name') %></th>
+            <th><%= t('admin.owner') %></th>
+            <th><%= t('nav.characters') %></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_parties.each do |party| %>
+            <tr>
+              <td class="fw-semibold"><%= party.name %></td>
+              <td class="text-muted small"><%= party.user&.full_name %></td>
+              <td><span class="badge bg-secondary rounded-pill" style="font-size:0.65rem;"><%= party.characters.size %></span></td>
+              <td class="actions">
+                <%= link_to admin_party_path(party), class: "btn btn-sm btn-outline-secondary" do %>
+                  <i class="bi bi-eye"></i>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @recent_parties.empty? %>
+            <tr><td colspan="4" class="text-center text-muted py-3 small"><%= t('shared.no_records') %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>

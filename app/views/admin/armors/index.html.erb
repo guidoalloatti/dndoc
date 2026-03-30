@@ -1,0 +1,104 @@
+<% content_for :admin_breadcrumb do %>
+  <span class="admin-breadcrumb">
+    <a href="<%= admin_root_path %>"><%= t('admin.dashboard') %></a>
+    <span class="sep">/</span>
+    <span class="current"><%= t('nav.armors') %></span>
+  </span>
+<% end %>
+
+<% type_colors = { 'Light' => 'success', 'Medium' => 'warning', 'Heavy' => 'danger', 'Shield' => 'info' } %>
+
+<div class="admin-page-header">
+  <div class="admin-page-title">
+    <div class="admin-title-icon bg-warning bg-opacity-10">
+      <i class="bi bi-shield-fill text-warning"></i>
+    </div>
+    <div>
+      <h5><%= t('nav.armors') %></h5>
+      <small><%= t('admin.armors.subtitle') %></small>
+    </div>
+  </div>
+  <%= link_to new_admin_armor_path, class: "btn btn-primary btn-sm" do %>
+    <i class="bi bi-plus-lg me-1"></i><%= t('admin.armors.new') %>
+  <% end %>
+</div>
+
+<%= form_with url: admin_armors_path, method: :get, local: true do |f| %>
+  <div class="admin-filter-bar">
+    <%= f.text_field :q, value: @q, placeholder: t('admin.search_placeholder'), class: "form-control", style: "max-width:200px;" %>
+    <%= f.select :armor_type, Armor::TYPES.map { |t| [t, t] }, { include_blank: t('armors.all_types') },
+        class: "form-select", style: "max-width:150px;" %>
+    <%= f.submit t('shared.filter'), class: "btn btn-primary" %>
+    <% if @q.present? || @type.present? %>
+      <%= link_to t('shared.clear'), admin_armors_path, class: "btn btn-outline-secondary" %>
+    <% end %>
+    <span class="admin-filter-count"><%= @pagy.count %> <%= t('shared.records') %></span>
+  </div>
+<% end %>
+
+<div class="admin-table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th><%= t('shared.name') %></th>
+        <th style="width:110px;"><%= t('armors.armor_type') %></th>
+        <th style="width:200px;"><%= t('armors.armor_class') %></th>
+        <th style="width:80px;"><%= t('armors.cost') %></th>
+        <th style="width:80px;"><%= t('armors.weight') %></th>
+        <th style="width:70px;" class="text-center"><%= t('armors.stealth') %></th>
+        <th style="width:70px;" class="text-center"><%= t('armors.str_req') %></th>
+        <th class="admin-th-actions"><%= t('shared.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @armors.each do |armor| %>
+        <tr>
+          <td class="fw-semibold"><%= armor.name %></td>
+          <td>
+            <span class="badge bg-<%= type_colors[armor.armor_type] || 'secondary' %> bg-opacity-75" style="font-size:0.62rem;">
+              <%= armor.armor_type %>
+            </span>
+          </td>
+          <td>
+            <span class="badge bg-dark bg-opacity-75" style="font-size:0.62rem;">AC <%= armor.armor_class %></span>
+          </td>
+          <td class="text-muted small"><%= number_with_delimiter(armor.cost) %> gp</td>
+          <td class="text-muted small"><%= armor.weight %> lb</td>
+          <td class="text-center">
+            <% if armor.stealth_disadvantage %>
+              <i class="bi bi-eye-slash text-danger" title="<%= t('armors.stealth_disadv') %>"></i>
+            <% else %>
+              <span class="text-muted opacity-25">—</span>
+            <% end %>
+          </td>
+          <td class="text-center">
+            <% if armor.str_requirement.present? %>
+              <span class="badge bg-secondary bg-opacity-75 rounded-pill" style="font-size:0.62rem;">Str <%= armor.str_requirement %></span>
+            <% else %>
+              <span class="text-muted opacity-25">—</span>
+            <% end %>
+          </td>
+          <td class="admin-td-actions">
+            <div class="admin-act-group">
+              <%= link_to edit_admin_armor_path(armor), class: "admin-act", title: t('shared.edit') do %>
+                <i class="bi bi-pencil"></i>
+              <% end %>
+              <%= button_to admin_armor_path(armor), method: :delete,
+                  class: "admin-act danger",
+                  title: t('shared.delete'),
+                  form: { data: { turbo_confirm: t('shared.confirm_delete') } } do %>
+                <i class="bi bi-trash3"></i>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      <% if @armors.empty? %>
+        <tr><td colspan="8" class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1 opacity-50"></i><%= t('shared.no_records') %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<% if @pagy.pages > 1 %>
+  <div class="d-flex justify-content-center mt-3"><%== pagy_bootstrap_nav(@pagy) %></div>
+<% end %>

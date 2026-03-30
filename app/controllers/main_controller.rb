@@ -3,11 +3,17 @@ class MainController < ApplicationController
 
   def index
     @stats = {
-      items: Item.count,
-      effects: Effect.count,
-      categories: Category.count,
-      weapons: Weapon.count,
-      rarities: Rarity.count,
+      items:            Item.count,
+      effects:          Effect.count,
+      categories:       Category.count,
+      weapons:          Weapon.count,
+      rarities:         Rarity.count,
+      lore:             LoreEntry.count,
+      lore_worlds:      LoreEntry.distinct.count(:lore_type),
+      armors:           defined?(Armor) ? Armor.count : 0,
+      parties:          Party.count,
+      characters:       Character.count,
+      character_classes: CharacterClass.count,
     }
 
     if user_signed_in?

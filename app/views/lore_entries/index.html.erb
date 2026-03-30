@@ -1,0 +1,243 @@
+<%
+  lore_meta = {
+    "faerun"       => { label: "Faerûn",       icon: "bi-globe-americas", color: "info" },
+    "middle_earth" => { label: "Middle-earth",  icon: "bi-tree",           color: "success" },
+  }
+
+  group_meta = {
+    "generation"  => { label: t('lore_entries.group_generation'),  icon: "bi-pencil-square" },
+    "world"       => { label: t('lore_entries.group_world'),        icon: "bi-globe" },
+    "description" => { label: t('lore_entries.group_description'),  icon: "bi-file-text" },
+    "effects"     => { label: t('lore_entries.group_effects'),      icon: "bi-stars" },
+    "character"   => { label: t('lore_entries.group_character'),    icon: "bi-person" },
+  }
+%>
+
+<% if @mode == :overview %>
+
+<%# ══════════════════════════════════════════════════════════════ %>
+<%# OVERVIEW MODE %>
+<%# ══════════════════════════════════════════════════════════════ %>
+
+<div class="container-fluid mt-4 px-3 px-lg-4" style="max-width:1300px;">
+
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h4 class="fw-bold mb-0"><i class="bi bi-book text-primary me-2"></i><%= t('lore_entries.title') %></h4>
+      <p class="text-muted small mb-0 mt-1"><%= @total %> <%= t('shared.records') %> &middot; <%= LoreEntry::CATEGORIES.size %> <%= t('lore_entries.categories') %> &middot; 2 <%= t('lore_entries.worlds') %></p>
+    </div>
+    <%= link_to new_lore_entry_path, class: "btn btn-sm btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i><%= t('lore_entries.new') %>
+    <% end %>
+  </div>
+
+  <div class="row g-4">
+    <% LoreEntry::LORE_TYPES.each do |lt| %>
+      <% meta = lore_meta[lt] %>
+      <div class="col-lg-6">
+        <%# Lore type header %>
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="badge bg-<%= meta[:color] %> px-3 py-2" style="font-size:0.85rem;">
+            <i class="bi <%= meta[:icon] %> me-1"></i><%= meta[:label] %>
+          </span>
+          <span class="text-muted small">
+            <%= (@counts[lt]&.values&.sum || 0) %> <%= t('shared.records') %>
+          </span>
+          <%= link_to new_lore_entry_path(lore_type: lt), class: "btn btn-outline-secondary btn-sm ms-auto", style: "font-size:0.7rem;" do %>
+            <i class="bi bi-plus-lg me-1"></i><%= t('lore_entries.add') %>
+          <% end %>
+        </div>
+
+        <%# Category groups %>
+        <% LoreEntriesController::CATEGORY_GROUPS.each do |group_key, cats| %>
+          <% gm = group_meta[group_key] %>
+          <div class="mb-3">
+            <div class="text-muted mb-1" style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">
+              <i class="bi <%= gm[:icon] %> me-1"></i><%= gm[:label] %>
+            </div>
+            <div class="card border" style="border-radius:8px;overflow:hidden;">
+              <% cats.each_with_index do |cat, idx| %>
+                <% count = @counts.dig(lt, cat) || 0 %>
+                <% is_keyed = LoreEntry::KEYED_CATEGORIES.include?(cat) %>
+                <% border_class = idx < cats.size - 1 ? " border-bottom" : "" %>
+                <%= link_to lore_entries_path(lore_type: lt, category: cat),
+                    class: "d-flex align-items-center px-3 py-2 text-decoration-none text-body lore-cat-row#{border_class}",
+                    style: "gap:10px;transition:background 0.1s;" do %>
+                  <i class="bi bi-tag-fill text-muted opacity-50" style="font-size:0.7rem;flex-shrink:0;"></i>
+                  <span class="small fw-semibold flex-grow-1"><%= t("lore_entries.cat_#{cat}", default: cat.humanize) %></span>
+                  <% if is_keyed %>
+                    <span class="badge bg-secondary bg-opacity-25 text-muted rounded-pill me-1" style="font-size:0.58rem;">keyed</span>
+                  <% end %>
+                  <span class="badge bg-secondary bg-opacity-75 text-white rounded-pill" style="font-size:0.68rem;min-width:28px;font-weight:600;">
+                    <%= count %>
+                  </span>
+                  <i class="bi bi-chevron-right text-muted opacity-30" style="font-size:0.65rem;"></i>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% else %>
+
+<%# ══════════════════════════════════════════════════════════════ %>
+<%# DETAIL MODE %>
+<%# ══════════════════════════════════════════════════════════════ %>
+
+<%
+  lt_meta   = lore_meta[@lore_type] || { label: @lore_type, icon: "bi-book", color: "secondary" }
+  cat_label = t("lore_entries.cat_#{@category}", default: @category.humanize)
+%>
+
+<div class="container-fluid mt-4 px-3 px-lg-4" style="max-width:1100px;">
+
+  <%# Breadcrumb %>
+  <nav class="mb-3" style="font-size:0.8rem;">
+    <%= link_to lore_entries_path, class: "text-muted text-decoration-none" do %>
+      <i class="bi bi-book me-1"></i><%= t('lore_entries.title') %>
+    <% end %>
+    <span class="text-muted mx-1">/</span>
+    <%= link_to lore_entries_path(lore_type: @lore_type), class: "text-decoration-none text-#{lt_meta[:color]}" do %>
+      <i class="bi <%= lt_meta[:icon] %> me-1"></i><%= lt_meta[:label] %>
+    <% end %>
+    <span class="text-muted mx-1">/</span>
+    <span class="fw-semibold"><%= cat_label %></span>
+  </nav>
+
+  <%# Header %>
+  <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-<%= lt_meta[:color] %> bg-opacity-15 text-<%= lt_meta[:color] %> px-2 py-1" style="font-size:0.72rem;">
+        <i class="bi <%= lt_meta[:icon] %> me-1"></i><%= lt_meta[:label] %>
+      </span>
+      <h5 class="fw-bold mb-0"><%= cat_label %></h5>
+      <span class="badge bg-secondary rounded-pill" style="font-size:0.7rem;"><%= @pagy.count %></span>
+      <% if @keyed %>
+        <span class="badge bg-secondary bg-opacity-25 text-muted rounded-pill" style="font-size:0.62rem;">keyed</span>
+      <% end %>
+    </div>
+    <div class="d-flex gap-2">
+      <%= form_with url: lore_entries_path, method: :get, local: true, class: "d-flex gap-1" do %>
+        <%= hidden_field_tag :lore_type, @lore_type %>
+        <%= hidden_field_tag :category, @category %>
+        <%= text_field_tag :q, @q, class: "form-control form-control-sm", placeholder: t('lore_entries.search_placeholder'), style: "max-width:180px;" %>
+        <% if @q.present? %>
+          <%= link_to lore_entries_path(lore_type: @lore_type, category: @category), class: "btn btn-sm btn-outline-secondary" do %>
+            <i class="bi bi-x-lg"></i>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%= link_to new_lore_entry_path(lore_type: @lore_type, category: @category), class: "btn btn-sm btn-primary" do %>
+        <i class="bi bi-plus-lg me-1"></i><%= t('lore_entries.add') %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Entries %>
+  <% if @lore_entries.empty? %>
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-inbox" style="font-size:2.5rem;opacity:0.2;"></i>
+      <p class="mt-2 small"><%= t('shared.no_records') %></p>
+    </div>
+  <% elsif @keyed %>
+    <%# Keyed: group by key, show entries within each key %>
+    <% grouped_by_key = @lore_entries.group_by(&:key) %>
+    <% grouped_by_key.each do |key, entries| %>
+      <div class="mb-3">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="text-muted fw-semibold" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;">
+            <%= key.present? ? key : t('lore_entries.no_key') %>
+          </span>
+          <span class="badge bg-secondary bg-opacity-25 text-muted rounded-pill" style="font-size:0.6rem;"><%= entries.size %></span>
+          <%= link_to new_lore_entry_path(lore_type: @lore_type, category: @category, key: key),
+              class: "btn btn-outline-secondary ms-auto", style: "padding:1px 7px;font-size:0.65rem;border-radius:4px;" do %>
+            <i class="bi bi-plus-lg"></i>
+          <% end %>
+        </div>
+        <div class="d-flex flex-wrap gap-1">
+          <% entries.each do |entry| %>
+            <div class="lore-chip border rounded px-2 py-1 d-flex align-items-center gap-1" style="max-width:340px;">
+              <span class="small text-truncate flex-grow-1" style="font-size:0.78rem;" title="<%= entry.value %>">
+                <%= entry.value %>
+              </span>
+              <div class="d-flex gap-1 flex-shrink-0 ms-1">
+                <%= link_to edit_lore_entry_path(entry), class: "lore-chip-action" do %>
+                  <i class="bi bi-pencil"></i>
+                <% end %>
+                <%= button_to lore_entry_path(entry), method: :delete,
+                    class: "lore-chip-action text-danger border-0 bg-transparent p-0",
+                    form: { data: { turbo_confirm: t('shared.confirm_delete') } } do %>
+                  <i class="bi bi-x-lg"></i>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <hr class="my-2 opacity-10">
+    <% end %>
+  <% else %>
+    <%# Non-keyed: flat chip grid %>
+    <div class="d-flex flex-wrap gap-1">
+      <% @lore_entries.each do |entry| %>
+        <div class="lore-chip border rounded px-2 py-1 d-flex align-items-center gap-1" style="max-width:420px;">
+          <span class="small flex-grow-1" style="font-size:0.78rem;"><%= entry.value %></span>
+          <div class="d-flex gap-1 flex-shrink-0 ms-1">
+            <%= link_to edit_lore_entry_path(entry), class: "lore-chip-action" do %>
+              <i class="bi bi-pencil"></i>
+            <% end %>
+            <%= button_to lore_entry_path(entry), method: :delete,
+                class: "lore-chip-action text-danger border-0 bg-transparent p-0",
+                form: { data: { turbo_confirm: t('shared.confirm_delete') } } do %>
+              <i class="bi bi-x-lg"></i>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# Pagination %>
+  <% if @pagy.pages > 1 %>
+    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+      <span class="small text-muted"><%= @pagy.from %>–<%= @pagy.to %> of <%= @pagy.count %></span>
+      <%== pagy_bootstrap_nav(@pagy) %>
+      <%= form_with url: lore_entries_path, method: :get, local: true, class: "d-flex align-items-center gap-1" do %>
+        <%= hidden_field_tag :lore_type, @lore_type %>
+        <%= hidden_field_tag :category, @category %>
+        <%= hidden_field_tag :q, @q if @q.present? %>
+        <%= select_tag :per_page, options_for_select([50, 100, 200], @pagy.limit),
+            class: "form-select form-select-sm", style: "width:70px;",
+            onchange: "this.form.requestSubmit()" %>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
+
+<% end %>
+
+<style>
+.lore-cat-row:hover { background: var(--bs-tertiary-bg); }
+.lore-chip {
+  background: var(--bs-body-bg);
+  transition: border-color 0.1s;
+}
+.lore-chip:hover { border-color: var(--bs-secondary-color) !important; }
+.lore-chip-action {
+  display: inline-flex;
+  align-items: center;
+  color: var(--bs-secondary-color);
+  font-size: 0.65rem;
+  text-decoration: none;
+  padding: 1px 3px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 0.1s;
+}
+.lore-chip-action:hover { color: var(--bs-body-color); }
+</style>

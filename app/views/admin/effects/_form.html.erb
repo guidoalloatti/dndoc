@@ -1,0 +1,48 @@
+<div class="admin-form-card">
+  <%= form_with model: [:admin, effect], local: true do |f| %>
+    <% if effect.errors.any? %>
+      <div class="alert alert-danger mb-3 py-2" style="font-size:0.8rem;">
+        <% effect.errors.full_messages.each do |msg| %>
+          <div><i class="bi bi-exclamation-circle me-1"></i><%= msg %></div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-8">
+        <%= f.label :name, t('shared.name') + " (EN)", class: "form-label" %>
+        <%= f.text_field :name, class: "form-control #{'is-invalid' if effect.errors[:name].any?}" %>
+      </div>
+      <div class="col-md-4">
+        <%= f.label :name_es, t('shared.name') + " (ES)", class: "form-label" %>
+        <%= f.text_field :name_es, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-8">
+        <%= f.label :effect_type, t('effects.type'), class: "form-label" %>
+        <%= f.text_field :effect_type, class: "form-control #{'is-invalid' if effect.errors[:effect_type].any?}" %>
+      </div>
+      <div class="col-md-4">
+        <%= f.label :power_level, t('effects.power_level'), class: "form-label" %>
+        <%= f.number_field :power_level, min: 0, max: 10, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :description, t('shared.description') + " (EN)", class: "form-label" %>
+      <%= f.text_area :description, rows: 3, class: "form-control" %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :description_es, t('shared.description') + " (ES)", class: "form-label" %>
+      <%= f.text_area :description_es, rows: 3, class: "form-control" %>
+    </div>
+
+    <div class="d-flex gap-2">
+      <%= f.submit t('shared.save'), class: "btn btn-primary" %>
+      <%= link_to t('shared.cancel'), admin_effects_path, class: "btn btn-outline-secondary" %>
+    </div>
+  <% end %>
+</div>

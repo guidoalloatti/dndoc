@@ -1,4 +1,4 @@
-<div class="container mt-4" style="max-width: 900px;">
+<div class="container mt-4" style="max-width: 960px;">
 
   <%# ── Header ── %>
   <div class="text-center mb-4">
@@ -8,22 +8,107 @@
     <p class="text-muted small mb-0"><%= t('party_rewards.subtitle') %></p>
   </div>
 
+  <%# ── Lore Selector ── %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+      <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+        <i class="bi bi-book me-1"></i> <%= t('items.lore_setting') %>
+      </h6>
+      <div class="btn-group w-100" role="group" id="lorePicker">
+        <button type="button" class="btn btn-sm btn-primary lore-btn active" data-lore="faerun">
+          <i class="bi bi-globe-americas me-1"></i><%= t('items.lore_faerun') %>
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary lore-btn" data-lore="middle_earth">
+          <i class="bi bi-tree me-1"></i><%= t('items.lore_middle_earth') %>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Reward Party ── %>
+  <% if @parties.any? %>
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body py-2 px-3">
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted small fw-semibold text-nowrap">
+            <i class="bi bi-shield-fill text-primary me-1"></i><%= t('party_rewards.reward_party') %>
+          </span>
+          <select id="partySelector" class="form-select form-select-sm" style="max-width:240px;">
+            <option value=""><%= t('party_rewards.select_party') %></option>
+            <% @parties.each do |p| %>
+              <option value="<%= p.id %>"
+                      data-party="<%= p.characters.map { |c| { id: c.id, name: c.name, race: c.race, character_class_id: c.character_class_id, level: c.level } }.to_json %>"
+                      <%= @preload_party_id.to_s == p.id.to_s ? 'selected' : '' %>>
+                <%= p.name %> (<%= p.characters.size %>)
+              </option>
+            <% end %>
+          </select>
+          <%= link_to parties_path, class: "btn btn-sm btn-outline-secondary ms-auto" do %>
+            <i class="bi bi-pencil me-1"></i><%= t('nav.parties') %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="d-flex justify-content-end mb-2">
+      <%= link_to new_party_path, class: "btn btn-sm btn-outline-secondary" do %>
+        <i class="bi bi-shield-plus me-1"></i><%= t('parties.new') %>
+      <% end %>
+    </div>
+  <% end %>
+
   <%# ── Configuration ── %>
   <div class="card border-0 shadow-sm mb-3">
-    <div class="card-body">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h6 class="text-muted text-uppercase small fw-semibold mb-0">
-          <i class="bi bi-gear me-1"></i> <%= t('party_rewards.items_per_member') %>
-        </h6>
+    <div class="card-body py-2 px-3">
+      <div class="d-flex align-items-center flex-wrap gap-3">
+        <%# Items per member %>
+        <span class="text-muted small fw-semibold text-nowrap">
+          <i class="bi bi-box-seam me-1"></i><%= t('party_rewards.items_per_member') %>
+        </span>
         <div class="d-flex gap-1">
           <% (1..5).each do |n| %>
             <button type="button"
                     class="btn btn-sm items-count-btn <%= n == 1 ? 'btn-primary text-white' : 'btn-outline-secondary' %>"
                     data-count="<%= n %>"
-                    style="width: 36px; height: 36px;">
+                    style="width: 32px; height: 32px; padding: 0;">
               <%= n %>
             </button>
           <% end %>
+        </div>
+
+        <span class="text-muted" style="font-size:0.6rem;">|</span>
+
+        <%# Reward level (global) %>
+        <span class="text-muted small fw-semibold text-nowrap">
+          <i class="bi bi-trophy me-1"></i><%= t('party_rewards.reward_level') %>
+        </span>
+        <div class="d-flex gap-1" id="globalRewardLevel">
+          <button type="button" class="btn btn-sm reward-global-btn btn-outline-secondary"
+                  data-reward="low" title="<%= t('party_rewards.reward_low') %>"
+                  style="width:32px; height:32px; padding:0;">
+            <i class="bi bi-circle"></i>
+          </button>
+          <button type="button" class="btn btn-sm reward-global-btn btn-success text-white active"
+                  data-reward="medium" title="<%= t('party_rewards.reward_medium') %>"
+                  style="width:32px; height:32px; padding:0;">
+            <i class="bi bi-star-fill"></i>
+          </button>
+          <button type="button" class="btn btn-sm reward-global-btn btn-outline-warning"
+                  data-reward="high" title="<%= t('party_rewards.reward_high') %>"
+                  style="width:32px; height:32px; padding:0;">
+            <i class="bi bi-gem"></i>
+          </button>
+          <button type="button" class="btn btn-sm reward-global-btn btn-outline-danger"
+                  data-reward="very_high" title="<%= t('party_rewards.reward_very_high') %>"
+                  style="width:32px; height:32px; padding:0;">
+            <i class="bi bi-trophy-fill"></i>
+          </button>
+        </div>
+
+        <div class="ms-auto">
+          <button id="addMemberBtn" class="btn btn-sm btn-outline-primary" type="button">
+            <i class="bi bi-plus-lg me-1"></i><%= t('party_rewards.add_member') %>
+          </button>
         </div>
       </div>
     </div>
@@ -31,18 +116,9 @@
 
   <%# ── Party Members ── %>
   <div class="card border-0 shadow-sm mb-3">
-    <div class="card-body">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <h6 class="text-muted text-uppercase small fw-semibold mb-0">
-          <i class="bi bi-people me-1"></i> <%= t('party_rewards.party_members') %>
-        </h6>
-        <button id="addMemberBtn" class="btn btn-sm btn-outline-primary" type="button">
-          <i class="bi bi-plus-lg me-1"></i><%= t('party_rewards.add_member') %>
-        </button>
-      </div>
-
+    <div class="card-body p-2">
       <div id="partyMembersList">
-        <%# Members are added dynamically via JS %>
+        <%# Members added dynamically via JS %>
       </div>
     </div>
   </div>
@@ -56,78 +132,76 @@
 
   <%# ── Results Area (hidden initially) ── %>
   <div id="resultsArea" style="display: none;">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h5 class="fw-bold mb-0">
-        <i class="bi bi-trophy-fill text-warning me-2"></i><%= t('party_rewards.results_title') %>
-      </h5>
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h6 class="fw-bold mb-0 text-uppercase small text-muted">
+        <i class="bi bi-trophy-fill text-warning me-1"></i><%= t('party_rewards.results_title') %>
+      </h6>
       <button id="saveAllBtn" class="btn btn-sm btn-success" type="button">
         <i class="bi bi-check2-all me-1"></i><%= t('party_rewards.save_all') %>
       </button>
     </div>
-    <div id="resultsContainer">
-      <%# Populated via JS %>
-    </div>
+    <div id="resultsContainer"></div>
   </div>
 </div>
 
 <%# ── Forge Animation Overlay ── %>
 <div id="forgeOverlay" class="forge-overlay" style="display:none;">
   <div class="forge-content text-center">
-    <div class="forge-anvil mb-3">
-      <i class="bi bi-hammer forge-hammer"></i>
-      <div class="forge-sparks">
-        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
-        <span class="spark"></span><span class="spark"></span><span class="spark"></span>
-      </div>
-      <div class="forge-fire">
-        <span class="flame flame-1"></span>
-        <span class="flame flame-2"></span>
-        <span class="flame flame-3"></span>
-      </div>
-    </div>
-    <h5 class="text-white fw-bold"><%= t('party_rewards.generating') %></h5>
-    <p class="text-white-50 small"><%= t('party_rewards.generating_desc') %></p>
+    <i class="bi bi-hammer forge-icon"></i>
+    <div class="spinner-border text-warning" role="status" style="width:1.5rem; height:1.5rem;"></div>
+    <p class="text-white fw-semibold mb-0"><%= t('party_rewards.generating') %></p>
   </div>
 </div>
 
 <%# ── Member Row Template (hidden) ── %>
 <template id="memberRowTemplate">
-  <div class="party-member-row border rounded p-3 mb-2 position-relative bg-body-tertiary">
-    <button type="button" class="btn btn-sm btn-link text-danger position-absolute top-0 end-0 mt-1 me-1 remove-member-btn" title="<%= t('party_rewards.remove_member') %>">
-      <i class="bi bi-x-lg"></i>
+  <div class="party-member-row d-flex align-items-center gap-2 p-2 mb-1 rounded border bg-body-tertiary position-relative">
+
+    <input type="hidden" class="member-character-id" value="">
+
+    <%# Delete button – large, always visible, proper cursor -%>
+    <button type="button"
+            class="btn btn-danger btn-sm remove-member-btn d-flex align-items-center justify-content-center flex-shrink-0"
+            title="<%= t('party_rewards.remove_member') %>"
+            style="width:34px; height:34px; cursor:pointer; border-radius:6px;">
+      <i class="bi bi-trash3-fill" style="font-size:0.85rem;"></i>
     </button>
-    <div class="row g-2 align-items-end">
-      <div class="col-md-3">
-        <label class="form-label small text-muted mb-1"><%= t('party_rewards.member_name') %></label>
-        <input type="text" class="form-control form-control-sm member-name" placeholder="<%= t('party_rewards.member_name_placeholder') %>">
-      </div>
-      <div class="col-md-3">
-        <label class="form-label small text-muted mb-1"><%= t('party_rewards.character_class') %></label>
-        <select class="form-select form-select-sm member-class">
-          <option value=""><%= t('party_rewards.select_class') %></option>
-          <% @character_classes.each do |cc| %>
-            <option value="<%= cc.id %>" data-magic="<%= cc.is_magic_user %>"><%= cc.name %></option>
-          <% end %>
-        </select>
-      </div>
-      <div class="col-md-2">
-        <label class="form-label small text-muted mb-1"><%= t('party_rewards.level') %></label>
-        <select class="form-select form-select-sm member-level">
-          <% (1..20).each do |lvl| %>
-            <option value="<%= lvl %>" <%= lvl == 5 ? 'selected' : '' %>><%= lvl %></option>
-          <% end %>
-        </select>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label small text-muted mb-1"><%= t('party_rewards.reward_level') %></label>
-        <div class="d-flex gap-1">
-          <button type="button" class="btn btn-sm reward-btn btn-outline-secondary flex-fill" data-reward="low"><%= t('party_rewards.reward_low') %></button>
-          <button type="button" class="btn btn-sm reward-btn btn-success text-white flex-fill active" data-reward="medium"><%= t('party_rewards.reward_medium') %></button>
-          <button type="button" class="btn btn-sm reward-btn btn-outline-warning flex-fill" data-reward="high"><%= t('party_rewards.reward_high') %></button>
-          <button type="button" class="btn btn-sm reward-btn btn-outline-danger flex-fill" data-reward="very_high"><%= t('party_rewards.reward_very_high') %></button>
-        </div>
-      </div>
+
+    <%# Name -%>
+    <div style="min-width:100px; flex:1.2;">
+      <input type="text" class="form-control form-control-sm member-name"
+             placeholder="<%= t('party_rewards.member_name_placeholder') %>">
     </div>
+
+    <%# Race -%>
+    <div style="min-width:110px; flex:1.1;">
+      <select class="form-select form-select-sm member-race">
+        <option value=""><%= t('party_rewards.select_race') %></option>
+        <% PartyRewardEngine::RACES.each do |race| %>
+          <option value="<%= race %>"><%= race %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <%# Class -%>
+    <div style="min-width:120px; flex:1.3;">
+      <select class="form-select form-select-sm member-class">
+        <option value=""><%= t('party_rewards.select_class') %></option>
+        <% @character_classes.each do |cc| %>
+          <option value="<%= cc.id %>" data-magic="<%= cc.is_magic_user %>"><%= cc.name %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <%# Level -%>
+    <div style="min-width:64px; flex:0.5;">
+      <select class="form-select form-select-sm member-level">
+        <% (1..20).each do |lvl| %>
+          <option value="<%= lvl %>" <%= lvl == 5 ? 'selected' : '' %>><%= lvl %></option>
+        <% end %>
+      </select>
+    </div>
+
   </div>
 </template>
 
@@ -142,11 +216,36 @@ $(function() {
   });
 
   let itemsPerMember = 1;
+  let globalRewardLevel = "medium";
   let generatedResults = null;
 
+  function getSelectedLore() {
+    const active = document.querySelector('.lore-btn.active');
+    return active ? active.dataset.lore : 'faerun';
+  }
+
+  $(document).on("click", ".lore-btn", function(e) {
+    e.preventDefault();
+    $(".lore-btn").removeClass("active btn-primary text-white").addClass("btn-outline-secondary");
+    $(this).removeClass("btn-outline-secondary").addClass("active btn-primary text-white");
+  });
+
   const rarityBadgeClass = {
-    'Common': 'bg-secondary', 'Uncommon': 'bg-success', 'Rare': 'bg-info',
-    'Very Rare': 'bg-primary', 'Legendary': 'bg-warning text-dark', 'Ancestral': 'bg-danger'
+    'Common':    'bg-secondary',
+    'Uncommon':  'bg-success',
+    'Rare':      'bg-info text-dark',
+    'Very Rare': 'bg-primary',
+    'Legendary': 'bg-warning text-dark',
+    'Ancestral': 'bg-danger',
+  };
+
+  const rarityIcon = {
+    'Common':    'bi-circle',
+    'Uncommon':  'bi-circle-half',
+    'Rare':      'bi-gem',
+    'Very Rare': 'bi-star-fill',
+    'Legendary': 'bi-trophy-fill',
+    'Ancestral': 'bi-lightning-charge-fill',
   };
 
   const effectColors = {
@@ -176,8 +275,41 @@ $(function() {
     updateGenerateButton();
   }
 
-  // Start with 4 members
-  for (let i = 0; i < 4; i++) addMember();
+  // ── Load saved party ──
+  function loadPartyFromData(characters) {
+    $("#partyMembersList").empty();
+    characters.forEach(function(char) {
+      const template = document.getElementById("memberRowTemplate");
+      const clone = template.content.cloneNode(true);
+      const row = $(clone);
+      row.find(".member-character-id").val(char.id || "");
+      row.find(".member-name").val(char.name || "");
+      row.find(".member-race").val(char.race || "");
+      row.find(".member-class").val(char.character_class_id || "");
+      row.find(".member-level").val(char.level || 5);
+      document.getElementById("partyMembersList").appendChild(row[0]);
+    });
+    updateGenerateButton();
+  }
+
+  $("#partySelector").on("change", function() {
+    const opt = $(this).find("option:selected");
+    const rawData = opt.data("party");
+    if (rawData && rawData.length) loadPartyFromData(rawData);
+  });
+
+  // Auto-load if party_id was passed via URL param
+  const preloadOpt = $("#partySelector option[selected]");
+  if (preloadOpt.length && preloadOpt.val()) {
+    const rawData = preloadOpt.data("party");
+    if (rawData && rawData.length) {
+      loadPartyFromData(rawData);
+    } else {
+      for (let i = 0; i < 4; i++) addMember();
+    }
+  } else {
+    for (let i = 0; i < 4; i++) addMember();
+  }
 
   $("#addMemberBtn").on("click", function(e) {
     e.preventDefault();
@@ -191,17 +323,20 @@ $(function() {
     updateGenerateButton();
   });
 
-  // ── Reward level picker ──
-  $(document).on("click", ".reward-btn", function(e) {
+  // ── Global reward level picker ──
+  $(document).on("click", ".reward-global-btn", function(e) {
     e.preventDefault();
-    const row = $(this).closest(".party-member-row");
-    row.find(".reward-btn").removeClass("active btn-success btn-warning btn-danger text-white").addClass("btn-outline-secondary");
-    $(this).removeClass("btn-outline-secondary");
+    $(".reward-global-btn")
+       .removeClass("active btn-secondary btn-success btn-warning btn-danger text-white")
+       .addClass("btn-outline-secondary");
+
     const reward = $(this).data("reward");
-    if (reward === "low") $(this).addClass("active btn-secondary text-white");
-    else if (reward === "medium") $(this).addClass("active btn-success text-white");
-    else if (reward === "high") $(this).addClass("active btn-warning text-white");
-    else $(this).addClass("active btn-danger text-white");
+    globalRewardLevel = reward;
+    $(this).removeClass("btn-outline-secondary btn-outline-warning btn-outline-danger");
+    if      (reward === "low")       $(this).addClass("active btn-secondary text-white");
+    else if (reward === "medium")    $(this).addClass("active btn-success text-white");
+    else if (reward === "high")      $(this).addClass("active btn-warning text-white");
+    else                             $(this).addClass("active btn-danger text-white");
   });
 
   // ── Validate & enable generate ──
@@ -212,11 +347,7 @@ $(function() {
     const allValid = rows.length > 0 && rows.toArray().every(function(row) {
       return $(row).find(".member-class").val() !== "";
     });
-    if (allValid) {
-      $("#generateRewardsBtn").prop("disabled", false).removeClass("disabled");
-    } else {
-      $("#generateRewardsBtn").prop("disabled", true).addClass("disabled");
-    }
+    $("#generateRewardsBtn").prop("disabled", !allValid).toggleClass("disabled", !allValid);
   }
 
   // ── Collect party data ──
@@ -225,10 +356,12 @@ $(function() {
     $(".party-member-row").each(function() {
       const row = $(this);
       members.push({
-        name: row.find(".member-name").val(),
+        character_id:       row.find(".member-character-id").val() || null,
+        name:               row.find(".member-name").val(),
+        race:               row.find(".member-race").val(),
         character_class_id: row.find(".member-class").val(),
-        level: row.find(".member-level").val(),
-        reward_level: row.find(".reward-btn.active").data("reward") || "medium",
+        level:              row.find(".member-level").val(),
+        reward_level:       globalRewardLevel,
       });
     });
     return members;
@@ -247,10 +380,10 @@ $(function() {
       type: "POST",
       contentType: "application/json",
       dataType: "json",
-      data: JSON.stringify({ party_members: members, items_per_member: itemsPerMember }),
+      data: JSON.stringify({ party_members: members, items_per_member: itemsPerMember, lore: getSelectedLore() }),
     });
 
-    const delay = new Promise(resolve => setTimeout(resolve, 2500));
+    const delay = new Promise(resolve => setTimeout(resolve, 1000));
 
     Promise.all([ajaxPromise, delay]).then(function(results) {
       generatedResults = results[0].results;
@@ -269,27 +402,38 @@ $(function() {
     container.empty();
 
     results.forEach(function(member, memberIdx) {
+      const raceBadge = member.race
+        ? `<span class="badge bg-secondary bg-opacity-50 text-body ms-1" style="font-size:0.65rem;">${member.race}</span>`
+        : '';
+
+      const rewardIcon = rewardIconClass(member.reward_level);
+      const rewardCls  = rewardBadgeClass(member.reward_level);
+
       const memberCard = $(`
         <div class="card border-0 shadow-sm mb-3" data-member-idx="${memberIdx}">
-          <div class="card-header bg-body-tertiary border-0 py-2">
-            <div class="d-flex align-items-center justify-content-between">
-              <div>
-                <span class="fw-bold"><i class="bi bi-person-fill me-1"></i>${member.name}</span>
-                <span class="badge bg-primary ms-2">${member.character_class}</span>
-                <span class="badge bg-secondary ms-1"><%= t('party_rewards.level') %> ${member.level}</span>
-              </div>
-              <span class="badge ${rewardBadgeClass(member.reward_level)} ms-2">${rewardLabel(member.reward_level)}</span>
+          <div class="card-header bg-body-tertiary border-bottom py-2 px-3">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-person-fill text-primary"></i>
+              <span class="fw-semibold">${member.name || member.character_class}</span>
+              <span class="badge bg-primary" style="font-size:0.65rem;">${member.character_class}</span>
+              ${raceBadge}
+              <span class="badge bg-dark bg-opacity-25 text-body" style="font-size:0.65rem;">Lv.${member.level}</span>
+              <span class="ms-auto badge ${rewardCls}" style="font-size:0.65rem;">
+                <i class="bi ${rewardIcon} me-1"></i>${rewardLabel(member.reward_level)}
+              </span>
             </div>
           </div>
-          <div class="card-body pt-2 pb-2">
-            <div class="member-items-container"></div>
+          <div class="card-body p-2">
+            <div class="member-items-container row g-2"></div>
           </div>
         </div>
       `);
 
       const itemsContainer = memberCard.find(".member-items-container");
       member.items.forEach(function(item, itemIdx) {
-        itemsContainer.append(buildItemCard(item, memberIdx, itemIdx));
+        const col = $('<div class="col-md-6"></div>');
+        col.append(buildItemCard(item, memberIdx, itemIdx));
+        itemsContainer.append(col);
       });
 
       container.append(memberCard);
@@ -301,59 +445,72 @@ $(function() {
 
   function buildItemCard(item, memberIdx, itemIdx) {
     const rarityClass = rarityBadgeClass[item.rarity_name] || 'bg-secondary';
+    const rIcon = rarityIcon[item.rarity_name] || 'bi-circle';
+
     let effectsHtml = "";
     item.effects.forEach(function(effect) {
       const color = getEffectColor(effect.effect_type);
       effectsHtml += `
-        <div class="d-inline-flex align-items-center me-2 mb-1">
-          <span class="badge bg-${color} me-1" style="font-size:0.65rem;">${effect.power_level}</span>
-          <span style="font-size:0.75rem;">${effect.name}</span>
-        </div>
-      `;
+        <div class="d-flex align-items-start gap-1 mb-1">
+          <span class="badge bg-${color} bg-opacity-85 flex-shrink-0 mt-1" style="font-size:0.6rem; min-width:18px;">${effect.power_level}</span>
+          <div>
+            <div class="fw-semibold" style="font-size:0.72rem; line-height:1.2;">${effect.name}</div>
+            <div class="text-muted" style="font-size:0.67rem; line-height:1.3;">${effect.description}</div>
+          </div>
+        </div>`;
     });
 
+    const attunement = item.requires_attunement
+      ? `<span class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle" style="font-size:0.6rem;"><i class="bi bi-link-45deg"></i></span>`
+      : '';
+
     return $(`
-      <div class="item-reward-card border rounded p-2 mb-2" data-member-idx="${memberIdx}" data-item-idx="${itemIdx}">
-        <div class="d-flex align-items-start justify-content-between">
-          <div class="flex-grow-1">
-            <div class="d-flex align-items-center mb-1">
-              <span class="fw-bold me-2">${item.name}</span>
-              <span class="badge ${rarityClass} me-1" style="font-size:0.65rem;">${item.rarity_name}</span>
-              <span class="badge bg-secondary" style="font-size:0.65rem;">${item.category_name}</span>
+      <div class="item-reward-card card border shadow-none h-100" data-member-idx="${memberIdx}" data-item-idx="${itemIdx}" style="border-color: rgba(0,0,0,.08) !important;">
+        <div class="card-body p-2">
+          <div class="d-flex align-items-start gap-2">
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex align-items-center flex-wrap gap-1 mb-1">
+                <span class="fw-semibold text-truncate" style="font-size:0.85rem; max-width:140px;" title="${item.name}">${item.name}</span>
+                <span class="badge ${rarityClass} d-flex align-items-center gap-1" style="font-size:0.6rem;">
+                  <i class="bi ${rIcon}"></i>${item.rarity_name}
+                </span>
+                <span class="badge bg-light text-dark border" style="font-size:0.6rem;">${item.category_name}</span>
+                ${attunement}
+              </div>
+              <div class="d-flex gap-2 text-muted mb-1" style="font-size:0.72rem;">
+                <span title="Power"><i class="bi bi-lightning-charge-fill text-warning"></i> ${item.power}</span>
+                <span title="Price"><i class="bi bi-coin text-warning"></i> ${item.price.toLocaleString()}<span class="text-muted"> gp</span></span>
+                <span title="Weight"><i class="bi bi-feather text-muted"></i> ${item.weight}</span>
+              </div>
+              <div class="d-flex flex-wrap">${effectsHtml}</div>
             </div>
-            <div class="d-flex align-items-center gap-3 mb-1 text-muted" style="font-size:0.75rem;">
-              <span><i class="bi bi-lightning-charge"></i> ${item.power}</span>
-              <span><i class="bi bi-coin"></i> ${item.price.toLocaleString()} gp</span>
-              <span><i class="bi bi-feather"></i> ${item.weight}</span>
-              ${item.requires_attunement ? '<span class="text-warning"><i class="bi bi-link-45deg"></i> Attunement</span>' : ''}
-            </div>
-            <div>${effectsHtml}</div>
+            <button class="btn btn-sm btn-outline-secondary regenerate-item-btn flex-shrink-0"
+                    data-member-idx="${memberIdx}" data-item-idx="${itemIdx}"
+                    title="<%= t('party_rewards.regenerate') %>"
+                    style="width:28px; height:28px; padding:0; cursor:pointer;">
+              <i class="bi bi-arrow-clockwise" style="font-size:0.8rem;"></i>
+            </button>
           </div>
-          <button class="btn btn-sm btn-outline-primary ms-2 regenerate-item-btn"
-                  data-member-idx="${memberIdx}" data-item-idx="${itemIdx}"
-                  title="<%= t('party_rewards.regenerate') %>">
-            <i class="bi bi-arrow-clockwise"></i>
-          </button>
         </div>
       </div>
     `);
   }
 
   function rewardBadgeClass(level) {
-    switch(level) {
-      case 'low': return 'bg-secondary';
-      case 'medium': return 'bg-success';
-      case 'high': return 'bg-warning text-dark';
-      case 'very_high': return 'bg-danger';
-      default: return 'bg-secondary';
-    }
+    const map = { low: 'bg-secondary', medium: 'bg-success', high: 'bg-warning text-dark', very_high: 'bg-danger' };
+    return map[level] || 'bg-secondary';
+  }
+
+  function rewardIconClass(level) {
+    const map = { low: 'bi-circle', medium: 'bi-star-fill', high: 'bi-gem', very_high: 'bi-trophy-fill' };
+    return map[level] || 'bi-circle';
   }
 
   function rewardLabel(level) {
     const labels = {
-      'low': '<%= t("party_rewards.reward_low") %>',
-      'medium': '<%= t("party_rewards.reward_medium") %>',
-      'high': '<%= t("party_rewards.reward_high") %>',
+      'low':       '<%= t("party_rewards.reward_low") %>',
+      'medium':    '<%= t("party_rewards.reward_medium") %>',
+      'high':      '<%= t("party_rewards.reward_high") %>',
       'very_high': '<%= t("party_rewards.reward_very_high") %>',
     };
     return labels[level] || level;
@@ -364,14 +521,13 @@ $(function() {
     e.preventDefault();
     const btn = $(this);
     const memberIdx = parseInt(btn.data("member-idx"));
-    const itemIdx = parseInt(btn.data("item-idx"));
-    const member = generatedResults[memberIdx];
+    const itemIdx   = parseInt(btn.data("item-idx"));
+    const member    = generatedResults[memberIdx];
 
-    btn.prop("disabled", true).html('<i class="bi bi-hourglass-split"></i>');
+    btn.prop("disabled", true).html('<i class="bi bi-hourglass-split" style="font-size:0.8rem;"></i>');
 
-    // Find the member's party data from the form
     const rows = $(".party-member-row");
-    const row = $(rows[memberIdx]);
+    const row  = $(rows[memberIdx]);
 
     $.ajax({
       url: localePrefix + "/party_rewards/regenerate_item",
@@ -380,19 +536,20 @@ $(function() {
       dataType: "json",
       data: JSON.stringify({
         character_class_id: row.find(".member-class").val(),
-        level: row.find(".member-level").val(),
-        reward_level: row.find(".reward-btn.active").data("reward") || "medium",
+        race:               row.find(".member-race").val(),
+        level:              row.find(".member-level").val(),
+        reward_level:       globalRewardLevel,
+        lore:               getSelectedLore(),
       }),
       success: function(response) {
         generatedResults[memberIdx].items[itemIdx] = response.item;
         const card = $(`.item-reward-card[data-member-idx="${memberIdx}"][data-item-idx="${itemIdx}"]`);
-        card.replaceWith(buildItemCard(response.item, memberIdx, itemIdx));
+        const newCard = buildItemCard(response.item, memberIdx, itemIdx);
+        card.replaceWith(newCard);
       },
-      error: function(err) {
-        console.error("Regenerate error:", err);
-      },
+      error: function(err) { console.error("Regenerate error:", err); },
       complete: function() {
-        btn.prop("disabled", false).html('<i class="bi bi-arrow-clockwise"></i>');
+        btn.prop("disabled", false).html('<i class="bi bi-arrow-clockwise" style="font-size:0.8rem;"></i>');
       },
     });
   });
@@ -409,16 +566,17 @@ $(function() {
     generatedResults.forEach(function(member) {
       member.items.forEach(function(item) {
         items.push({
-          name: item.name,
-          description: item.description,
-          item_type: item.item_type,
-          power: item.power,
-          weight: item.weight,
-          price: item.price,
+          character_id:       member.character_id || null,
+          name:               item.name,
+          description:        item.description,
+          item_type:          item.item_type,
+          power:              item.power,
+          weight:             item.weight,
+          price:              item.price,
           requires_attunement: item.requires_attunement,
-          category_id: item.category_id,
-          rarity_id: item.rarity_id,
-          effect_ids: item.effects.map(function(e) { return e.id; }),
+          category_id:        item.category_id,
+          rarity_id:          item.rarity_id,
+          effect_ids:         item.effects.map(function(e) { return e.id; }),
         });
       });
     });
@@ -429,12 +587,10 @@ $(function() {
       contentType: "application/json",
       dataType: "json",
       data: JSON.stringify({ items: items }),
-      success: function(response) {
+      success: function() {
         btn.removeClass("btn-success").addClass("btn-outline-success")
            .html('<i class="bi bi-check2-all me-1"></i><%= t("party_rewards.saved") %>');
-        setTimeout(function() {
-          window.location.href = localePrefix + "/items";
-        }, 1500);
+        setTimeout(function() { window.location.href = localePrefix + "/items"; }, 1500);
       },
       error: function(err) {
         console.error("Save error:", err);

@@ -1,0 +1,13 @@
+<div class="container mt-4" style="max-width: 720px;">
+  <div class="d-flex align-items-center gap-1 text-muted small mb-2">
+    <%= link_to t("lore_entries.title"), lore_entries_path, class: "text-muted text-decoration-none" %>
+    <i class="bi bi-chevron-right" style="font-size:0.7rem;"></i>
+    <span><%= t("lore_entries.edit") %></span>
+  </div>
+
+  <h4 class="fw-bold mb-3">
+    <i class="bi bi-pencil text-primary me-2"></i><%= t("lore_entries.edit") %>
+  </h4>
+
+  <%= render "form", lore_entry: @lore_entry, form_url: lore_entry_path(@lore_entry) %>
+</div>

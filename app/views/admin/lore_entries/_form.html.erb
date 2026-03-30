@@ -1,0 +1,41 @@
+<div class="admin-form-card">
+  <%= form_with model: [:admin, lore_entry], local: true do |f| %>
+    <% if lore_entry.errors.any? %>
+      <div class="alert alert-danger mb-3 py-2" style="font-size:0.8rem;">
+        <% lore_entry.errors.full_messages.each do |msg| %>
+          <div><i class="bi bi-exclamation-circle me-1"></i><%= msg %></div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <%= f.label :lore_type, t('lore_entries.lore_type'), class: "form-label" %>
+        <%= f.select :lore_type, [["Faerûn (D&D)", "faerun"], ["Middle-earth (Tolkien)", "middle_earth"]],
+            { prompt: "—" }, class: "form-select #{'is-invalid' if lore_entry.errors[:lore_type].any?}" %>
+      </div>
+      <div class="col-md-6">
+        <%= f.label :category, t('lore_entries.category_label'), class: "form-label" %>
+        <%= f.select :category, LoreEntry::CATEGORIES.map { |c| [c.humanize, c] },
+            { prompt: "—" }, class: "form-select #{'is-invalid' if lore_entry.errors[:category].any?}" %>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :key, t('lore_entries.key_label'), class: "form-label" %>
+      <%= f.text_field :key, placeholder: t('lore_entries.key_hint'), class: "form-control" %>
+      <div class="form-text"><%= t('lore_entries.key_hint') %></div>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :value, t('lore_entries.value_label'), class: "form-label" %>
+      <%= f.text_area :value, rows: 4, class: "form-control #{'is-invalid' if lore_entry.errors[:value].any?}" %>
+      <div class="form-text"><%= t('lore_entries.value_hint') %></div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <%= f.submit t('shared.save'), class: "btn btn-primary" %>
+      <%= link_to t('shared.cancel'), admin_lore_entries_path, class: "btn btn-outline-secondary" %>
+    </div>
+  <% end %>
+</div>

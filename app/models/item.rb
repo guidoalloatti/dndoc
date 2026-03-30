@@ -2,6 +2,7 @@ class Item < ApplicationRecord
   belongs_to :category
   belongs_to :rarity
   belongs_to :user, optional: true
+  belongs_to :character, optional: true
   has_many :item_effects
   has_many :effects, through: :item_effects
 

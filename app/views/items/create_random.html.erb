@@ -8,6 +8,23 @@
     <p class="text-muted small mb-0"><%= t('items.random_subtitle') %></p>
   </div>
 
+  <%# ── Lore Selector ── %>
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+      <h6 class="text-muted text-uppercase small fw-semibold mb-2">
+        <i class="bi bi-book me-1"></i> <%= t('items.lore_setting') %>
+      </h6>
+      <div class="btn-group w-100" role="group" id="lorePicker">
+        <button type="button" class="btn btn-sm btn-primary lore-btn active" data-lore="faerun">
+          <i class="bi bi-globe-americas me-1"></i><%= t('items.lore_faerun') %>
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary lore-btn" data-lore="middle_earth">
+          <i class="bi bi-tree me-1"></i><%= t('items.lore_middle_earth') %>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <%# ── Configuration Card ── %>
   <div class="card border-0 shadow-sm mb-3">
     <div class="card-body">
@@ -194,6 +211,15 @@ $(document).ready(function() {
   // ── State ──
   let selectedCategoryId = "";
   let selectedPower = "";
+  let selectedLore = "faerun";
+
+  // ── Lore Picker ──
+  $(document).on("click", ".lore-btn", function(e) {
+    e.preventDefault();
+    $(".lore-btn").removeClass("active btn-primary text-white").addClass("btn-outline-secondary");
+    $(this).removeClass("btn-outline-secondary").addClass("active btn-primary text-white");
+    selectedLore = $(this).data("lore");
+  });
 
   // ── Category Picker ──
   $(document).on("click", ".category-rand-btn", function(e) {
@@ -259,7 +285,7 @@ $(document).ready(function() {
     // Show forge animation
     $("#forgeOverlay").fadeIn(200);
 
-    const data = { fully_random: fullyRandom.toString() };
+    const data = { fully_random: fullyRandom.toString(), lore: selectedLore };
     if (!fullyRandom) {
       if (selectedCategoryId !== "") data.category_id = selectedCategoryId;
       else data.fully_random = "true"; // no category = random

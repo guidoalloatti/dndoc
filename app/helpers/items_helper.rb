@@ -63,6 +63,16 @@ module ItemsHelper
     }.fetch(name, "question-circle")
   end
 
+  def armor_icon(armor)
+    case armor.armor_type
+    when "Light"   then "person"
+    when "Medium"  then "shield-half"
+    when "Heavy"   then "shield-fill"
+    when "Shield"  then "shield-check"
+    else "shield"
+    end
+  end
+
   def weapon_icon(name)
     icons = {
       "Club" => "tree",

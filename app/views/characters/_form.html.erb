@@ -1,0 +1,80 @@
+<%= form_with model: character, url: form_url, class: "needs-validation" do |f| %>
+  <% if character.errors.any? %>
+    <div class="alert alert-danger">
+      <% character.errors.full_messages.each do |msg| %>
+        <div><i class="bi bi-exclamation-circle me-1"></i><%= msg %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <%# Avatar %>
+      <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+        <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 flex-shrink-0 overflow-hidden"
+             style="width:64px; height:64px;">
+          <% if character.has_avatar? %>
+            <%= image_tag character.avatar, style: "width:100%; height:100%; object-fit:cover; border-radius:50%;", alt: "" %>
+          <% else %>
+            <i class="bi bi-person-fill text-primary" style="font-size:1.8rem;"></i>
+          <% end %>
+        </div>
+        <div class="flex-grow-1">
+          <%= f.label :avatar, t("characters.avatar"), class: "form-label fw-semibold small text-muted text-uppercase mb-1" %>
+          <%= f.file_field :avatar, class: "form-control form-control-sm", accept: "image/jpeg,image/png,image/gif,image/webp" %>
+          <div class="form-text" style="font-size:0.7rem;"><%= t("profiles.avatar_hint") %></div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <%# Name %>
+        <div class="col-md-6">
+          <%= f.label :name, t("shared.name"), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.text_field :name, class: "form-control", placeholder: t("parties.char_name_placeholder"), required: true %>
+        </div>
+
+        <%# Party %>
+        <div class="col-md-6">
+          <%= f.label :party_id, t("characters.party"), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.select :party_id,
+                options_for_select(parties.map { |p| [p.name, p.id] }, character.party_id),
+                { include_blank: t("characters.select_party") },
+                class: "form-select", required: true %>
+        </div>
+
+        <%# Race %>
+        <div class="col-md-6">
+          <%= f.label :race, t("party_rewards.race"), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.select :race,
+                options_for_select(PartyRewardEngine::RACES.map { |r| [r, r] }, character.race),
+                { include_blank: t("party_rewards.select_race") },
+                class: "form-select" %>
+        </div>
+
+        <%# Class %>
+        <div class="col-md-6">
+          <%= f.label :character_class_id, t("party_rewards.character_class"), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.select :character_class_id,
+                options_for_select(character_classes.map { |cc| [cc.name, cc.id] }, character.character_class_id),
+                { include_blank: t("party_rewards.select_class") },
+                class: "form-select", required: true %>
+        </div>
+
+        <%# Level %>
+        <div class="col-md-6">
+          <%= f.label :level, t("party_rewards.level"), class: "form-label fw-semibold small text-muted text-uppercase" %>
+          <%= f.select :level,
+                options_for_select((1..20).to_a, character.level),
+                {},
+                class: "form-select" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit t("shared.save"), class: "btn btn-primary px-4" %>
+    <% back_path = character.persisted? ? character_path(character) : (character.party ? party_path(character.party) : characters_path) %>
+    <%= link_to t("shared.cancel"), back_path, class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

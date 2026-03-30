@@ -1,0 +1,59 @@
+<% content_for :admin_breadcrumb do %>
+  <span class="admin-breadcrumb">
+    <a href="<%= admin_root_path %>"><%= t('admin.dashboard') %></a>
+    <span class="sep">/</span>
+    <a href="<%= admin_parties_path %>"><%= t('nav.parties') %></a>
+    <span class="sep">/</span>
+    <span class="current"><%= @party.name %></span>
+  </span>
+<% end %>
+
+<div class="admin-page-header">
+  <div class="admin-page-title">
+    <div class="admin-title-icon bg-warning bg-opacity-10">
+      <i class="bi bi-shield-fill text-warning"></i>
+    </div>
+    <div>
+      <h5><%= @party.name %></h5>
+      <small><%= t('admin.owner') %>: <%= @party.user&.full_name %></small>
+    </div>
+  </div>
+  <%= button_to admin_party_path(@party), method: :delete,
+      class: "btn btn-sm btn-outline-danger",
+      form: { data: { turbo_confirm: t('shared.confirm_delete') } } do %>
+    <i class="bi bi-trash3 me-1"></i><%= t('shared.delete') %>
+  <% end %>
+</div>
+
+<div class="admin-table-wrap">
+  <div class="px-3 py-2" style="border-bottom:1px solid var(--bs-border-color); background:var(--bs-tertiary-bg);">
+    <span class="fw-semibold" style="font-size:0.78rem; color:var(--bs-secondary-color); text-transform:uppercase; letter-spacing:0.05em;">
+      <i class="bi bi-person-badge me-1"></i><%= t('nav.characters') %>
+    </span>
+  </div>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th><%= t('shared.name') %></th>
+        <th><%= t('characters.race') %></th>
+        <th><%= t('characters.class') %></th>
+        <th><%= t('characters.level') %></th>
+        <th><%= t('nav.items') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @party.characters.each do |char| %>
+        <tr>
+          <td class="fw-semibold"><%= char.name %></td>
+          <td class="text-muted small"><%= char.race %></td>
+          <td class="text-muted small"><%= char.character_class&.name %></td>
+          <td><span class="badge bg-secondary rounded-pill" style="font-size:0.65rem;">Lv <%= char.level %></span></td>
+          <td><span class="badge bg-success bg-opacity-75 rounded-pill" style="font-size:0.65rem;"><%= char.items.size %></span></td>
+        </tr>
+      <% end %>
+      <% if @party.characters.empty? %>
+        <tr><td colspan="5" class="text-center text-muted py-3"><%= t('shared.no_records') %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

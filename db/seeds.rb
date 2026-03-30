@@ -25,6 +25,8 @@ if answer == "yes" || answer == "y"
   puts "Destroyed rarities"
   Weapon.destroy_all
   puts "Destroyed weapons"
+  Armor.destroy_all
+  puts "Destroyed armors"
   CharacterClass.destroy_all
   puts "Destroyed character_classes"
   puts "------------- All is clean! -------------"
@@ -74,6 +76,27 @@ Weapon.create([
   { name: "Crossbow, heavy", cost: 50, damage: "1d10 piercing", weight: 18, properties: "Ammunition (range 100/400), heavy, loading, two-handed" },
   { name: "Longbow", cost: 50, damage: "1d8 piercing", weight: 2, properties: "Ammunition (range 150/600), heavy, two-handed" },
   { name: "Net", cost: 1, damage: "-", weight: 3, properties: "Special, thrown (range 5/15)" }
+])
+
+puts "Creating Armors..."
+Armor.create([
+  # Light Armor
+  { name: "Padded",          armor_type: "Light",  armor_class: "11 + Dex mod",              cost: 5,    weight: 8,  str_requirement: nil, stealth_disadvantage: true,  properties: "Padded armor consists of quilted layers of cloth and batting." },
+  { name: "Leather",         armor_type: "Light",  armor_class: "11 + Dex mod",              cost: 10,   weight: 10, str_requirement: nil, stealth_disadvantage: false, properties: "The breastplate and shoulder protectors of this armor are made of leather." },
+  { name: "Studded Leather", armor_type: "Light",  armor_class: "12 + Dex mod",              cost: 45,   weight: 13, str_requirement: nil, stealth_disadvantage: false, properties: "Made from tough but flexible leather, studded with close-set rivets or spikes." },
+  # Medium Armor
+  { name: "Hide",            armor_type: "Medium", armor_class: "12 + Dex mod (max 2)",      cost: 10,   weight: 12, str_requirement: nil, stealth_disadvantage: false, properties: "This crude armor consists of thick furs and pelts." },
+  { name: "Chain Shirt",     armor_type: "Medium", armor_class: "13 + Dex mod (max 2)",      cost: 50,   weight: 20, str_requirement: nil, stealth_disadvantage: false, properties: "Made of interlocking metal rings, a chain shirt is worn between layers of clothing or leather." },
+  { name: "Scale Mail",      armor_type: "Medium", armor_class: "14 + Dex mod (max 2)",      cost: 50,   weight: 45, str_requirement: nil, stealth_disadvantage: true,  properties: "Consists of a coat and leggings (and perhaps a separate skirt) of leather covered with overlapping pieces of metal." },
+  { name: "Breastplate",     armor_type: "Medium", armor_class: "14 + Dex mod (max 2)",      cost: 400,  weight: 20, str_requirement: nil, stealth_disadvantage: false, properties: "Consists of a fitted metal chest piece worn with supple leather. Although it leaves the legs and arms relatively unprotected, this armor provides good protection for the wearer's vital organs." },
+  { name: "Half Plate",      armor_type: "Medium", armor_class: "15 + Dex mod (max 2)",      cost: 750,  weight: 40, str_requirement: nil, stealth_disadvantage: true,  properties: "Consists of shaped metal plates that cover most of the wearer's body. It does not include leg protection beyond simple greaves that are attached with leather straps." },
+  # Heavy Armor
+  { name: "Ring Mail",       armor_type: "Heavy",  armor_class: "14",                         cost: 30,   weight: 40, str_requirement: nil, stealth_disadvantage: true,  properties: "This armor is leather armor with heavy rings sewn into it. The rings help reinforce the armor against blows from swords and axes." },
+  { name: "Chain Mail",      armor_type: "Heavy",  armor_class: "16",                         cost: 75,   weight: 55, str_requirement: 13,  stealth_disadvantage: true,  properties: "Made of interlocking metal rings, chain mail includes a layer of quilted fabric worn underneath the mail to prevent chafing and to cushion the impact of blows." },
+  { name: "Splint",          armor_type: "Heavy",  armor_class: "17",                         cost: 200,  weight: 60, str_requirement: 15,  stealth_disadvantage: true,  properties: "Made of narrow vertical strips of metal riveted to a backing of leather that is worn over cloth padding. Flexible chain mail protects the joints." },
+  { name: "Plate",           armor_type: "Heavy",  armor_class: "18",                         cost: 1500, weight: 65, str_requirement: 15,  stealth_disadvantage: true,  properties: "Plate consists of shaped, interlocking metal plates to cover the entire body. A suit of plate includes gauntlets, heavy leather boots, a visored helmet, and thick layers of padding underneath the armor." },
+  # Shield
+  { name: "Shield",          armor_type: "Shield", armor_class: "+2",                         cost: 10,   weight: 6,  str_requirement: nil, stealth_disadvantage: false, properties: "A shield is made from wood or metal and is carried in one hand. Wielding a shield increases your Armor Class by 2. You can benefit from only one shield at a time." }
 ])
 
 puts "Creating Categories..."
@@ -165,7 +188,7 @@ Effect.create!([
   { name: "Echo Strike", effect_type: "Material", power_level: 1, description: "After a successful hit, creates a magical echo dealing 1 additional force damage", name_es: "Golpe Eco", description_es: "Tras un golpe exitoso, crea un eco mágico que inflige 1 punto adicional de daño de Fuerza", categories: [weapon_category] },
   { name: "Gravity Defier", effect_type: "Material", power_level: 2, description: "Defies normal physics, allowing the wielder to leap an additional 5 feet horizontally or vertically", name_es: "Desafiador de Gravedad", description_es: "Desafía la física normal, permitiendo al portador saltar 1,5 metros adicionales horizontal o verticalmente", categories: [weapon_category, boots_category] },
   { name: "Phantom Reach", effect_type: "Material", power_level: 2, description: "Extends melee reach by an additional 5 feet", name_es: "Alcance Fantasmal", description_es: "Extiende el alcance cuerpo a cuerpo en 1,5 metros adicionales", categories: [weapon_category] },
-  { name: "Veil of Shadows", effect_type: "Material", power_level: 3, description: "When activated, cloaks the wielder in shadow, granting advantage on Stealth checks", name_es: "Velo de Sombras", description_es: "Al activarse, envuelve al portador en sombras, otorgando ventaja en las pruebas de Sigilo", categories: [weapon_category, cloak_category] },
+  # "Veil of Shadows" removed — merged into "Shadow Veil" (Stealth type)
   { name: "Mithril Ward", effect_type: "Material", power_level: 3, description: "The wielder gains resistance to slashing damage while holding this item", name_es: "Protección de Mithril", description_es: "El portador obtiene resistencia al daño Cortante mientras sostiene este objeto", categories: [weapon_category, shield_category, armor_category] },
   { name: "Ethereal Step", effect_type: "Material", power_level: 4, description: "Allows the wielder to move through non-magical obstacles as if they were ethereal", name_es: "Paso Etéreo", description_es: "Permite al portador moverse a través de obstáculos no mágicos como si fuera etéreo", categories: [weapon_category, shield_category] },
   { name: "Elemental Infusion", effect_type: "Material", power_level: 3, description: "Can be infused with elemental energy (fire, cold, lightning), dealing an extra 1d6 damage of that type", name_es: "Infusión Elemental", description_es: "Puede ser imbuido con energía elemental (fuego, frío, relámpago), infligiendo 1d6 de daño adicional de ese tipo", categories: [weapon_category] },
@@ -380,7 +403,7 @@ Effect.create!([
   { name: "Poison Cloud", effect_type: "Attack", power_level: 3, description: "Releases a small cloud of poison gas that lingers for 1 minute, dealing poison damage to anyone inside", name_es: "Nube de Veneno", description_es: "Libera una pequeña nube de gas venenoso que persiste durante 1 minuto, infligiendo daño de veneno a cualquiera dentro de ella", categories: [amulet_category, ring_category, gem_category, bracelet_category] },
   { name: "Healing Aura", effect_type: "Restoration", power_level: 2, description: "Provides a regenerative effect that restores 1 HP per turn for 5 turns", name_es: "Aura de Curación", description_es: "Proporciona un efecto regenerativo que restaura 1 PG por turno durante 5 turnos", categories: [amulet_category, ring_category, gem_category] },
 
-  { name: "Shadow Veil", effect_type: "Stealth", power_level: 3, description: "Cloaks the user in shadows, granting advantage on stealth checks in dim light or darkness", name_es: "Velo de Sombra", description_es: "Envuelve al usuario en sombras, otorgando ventaja en las pruebas de sigilo en luz tenue u oscuridad", categories: [cloak_category] },
+  { name: "Shadow Veil", effect_type: "Stealth", power_level: 3, description: "Cloaks the user in shadows, granting advantage on stealth checks in dim light or darkness", name_es: "Velo de Sombra", description_es: "Envuelve al usuario en sombras, otorgando ventaja en las pruebas de sigilo en luz tenue u oscuridad", categories: [weapon_category, cloak_category] },
   { name: "Cloak of Mists", effect_type: "Protection", power_level: 3, description: "Creates a misty shroud around the user, giving enemies disadvantage on attack rolls for 1 minute", name_es: "Capa de Nieblas", description_es: "Crea un manto de niebla alrededor del usuario, dando desventaja a los enemigos en las tiradas de ataque durante 1 minuto", categories: [cloak_category] },
   { name: "Cloak of Change", effect_type: "Utility", power_level: 1, description: "The item can change its style, color, and appearance at will", name_es: "Capa del Cambio", description_es: "El objeto puede cambiar su estilo, color y apariencia a voluntad", categories: [cloak_category, gloves_category, bracelet_category] },
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_29_034927) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_30_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,19 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_29_034927) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "armors", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "armor_type", null: false
+    t.string "armor_class", null: false
+    t.integer "cost", default: 0
+    t.float "weight", default: 0.0
+    t.integer "str_requirement"
+    t.boolean "stealth_disadvantage", default: false, null: false
+    t.text "properties"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.string "description"
@@ -66,6 +79,18 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_29_034927) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_character_classes_on_name", unique: true
+  end
+
+  create_table "characters", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "race"
+    t.integer "level", default: 1, null: false
+    t.bigint "character_class_id", null: false
+    t.bigint "party_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_class_id"], name: "index_characters_on_character_class_id"
+    t.index ["party_id"], name: "index_characters_on_party_id"
   end
 
   create_table "class_category_affinities", force: :cascade do |t|
@@ -110,9 +135,30 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_29_034927) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
+    t.bigint "character_id"
     t.index ["category_id"], name: "index_items_on_category_id"
+    t.index ["character_id"], name: "index_items_on_character_id"
     t.index ["rarity_id"], name: "index_items_on_rarity_id"
     t.index ["user_id"], name: "index_items_on_user_id"
+  end
+
+  create_table "lore_entries", force: :cascade do |t|
+    t.string "lore_type", null: false
+    t.string "category", null: false
+    t.string "key"
+    t.text "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lore_type", "category", "key"], name: "index_lore_entries_on_lore_type_and_category_and_key"
+    t.index ["lore_type", "category"], name: "index_lore_entries_on_lore_type_and_category"
+  end
+
+  create_table "parties", force: :cascade do |t|
+    t.string "name", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_parties_on_user_id"
   end
 
   create_table "rarities", force: :cascade do |t|
@@ -157,11 +203,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_29_034927) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "categories_effects", "categories"
   add_foreign_key "categories_effects", "effects"
+  add_foreign_key "characters", "character_classes"
+  add_foreign_key "characters", "parties"
   add_foreign_key "class_category_affinities", "categories"
   add_foreign_key "class_category_affinities", "character_classes"
   add_foreign_key "item_effects", "effects"
   add_foreign_key "item_effects", "items"
   add_foreign_key "items", "categories"
+  add_foreign_key "items", "characters"
   add_foreign_key "items", "rarities"
   add_foreign_key "items", "users"
+  add_foreign_key "parties", "users"
 end

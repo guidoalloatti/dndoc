@@ -1,0 +1,31 @@
+<div class="character-row d-flex align-items-center gap-2 p-2 mb-1 rounded border bg-body-tertiary" id="char_<%= f.object.object_id %>">
+  <%= f.hidden_field :_destroy, value: false, class: "char-destroy-field" %>
+
+  <button type="button" class="btn btn-danger btn-sm remove-char-btn flex-shrink-0 d-flex align-items-center justify-content-center"
+          style="width:34px; height:34px; padding:0; cursor:pointer; border-radius:6px;">
+    <i class="bi bi-trash3-fill" style="font-size:0.85rem;"></i>
+  </button>
+
+  <div style="min-width:100px; flex:1.2;">
+    <%= f.text_field :name, class: "form-control form-control-sm",
+                     placeholder: t("parties.char_name_placeholder") %>
+  </div>
+
+  <div style="min-width:110px; flex:1.1;">
+    <%= f.select :race,
+          options_for_select([["#{t('party_rewards.select_race')}", ""]] + PartyRewardEngine::RACES.map { |r| [r, r] }, f.object.race),
+          {}, class: "form-select form-select-sm" %>
+  </div>
+
+  <div style="min-width:130px; flex:1.4;">
+    <%= f.select :character_class_id,
+          options_for_select([["#{t('party_rewards.select_class')}", ""]] + character_classes.map { |cc| [cc.name, cc.id] }, f.object.character_class_id),
+          { required: true }, class: "form-select form-select-sm char-class-select" %>
+  </div>
+
+  <div style="min-width:70px; flex:0.5;">
+    <%= f.select :level,
+          options_for_select((1..20).map { |lvl| [lvl, lvl] }, f.object.level || 5),
+          {}, class: "form-select form-select-sm" %>
+  </div>
+</div>

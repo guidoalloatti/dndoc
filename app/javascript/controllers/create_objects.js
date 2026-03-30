@@ -72,6 +72,22 @@ function initCreateObjects() {
     }
   });
 
+  // ── Lore selection (shared across new/edit/wizard) ──
+  function getSelectedLore() {
+    const active = document.querySelector('.lore-btn.active');
+    return active ? active.dataset.lore : 'faerun';
+  }
+
+  $(document).on('click.co', '.lore-btn', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.lore-btn').forEach(b => {
+      b.classList.remove('active', 'btn-primary', 'text-white');
+      b.classList.add('btn-outline-secondary');
+    });
+    this.classList.remove('btn-outline-secondary');
+    this.classList.add('active', 'btn-primary', 'text-white');
+  });
+
   // ── Category Picker ──
   let selectedCategoryId = null;
   let selectedCategoryName = null;
@@ -579,7 +595,7 @@ function initCreateObjects() {
       $.ajax({
         url: localePrefix + '/items/get_item_name',
         type: 'POST',
-        data: { category: category, weapon: weapon, power: power, effects: effects },
+        data: { category: category, weapon: weapon, power: power, effects: effects, lore: getSelectedLore() },
         success: function(response) {
           $("#item_name").val(response.data);
           $("#generateNameBtn").prop('disabled', false).html('<i class="bi bi-magic me-1"></i>Generate');
@@ -613,7 +629,7 @@ function initCreateObjects() {
       const ajaxPromise = $.ajax({
         url: localePrefix + '/items/create_item',
         type: 'POST',
-        data: { name: name, category: category, weapon: weapon, rarity: rarity, power: power, effects: effects }
+        data: { name: name, category: category, weapon: weapon, rarity: rarity, power: power, effects: effects, lore: getSelectedLore() }
       });
 
       const animationDelay = new Promise(resolve => setTimeout(resolve, 2000));
@@ -656,7 +672,7 @@ function initCreateObjects() {
       const ajaxPromise = $.ajax({
         url: localePrefix + '/items/update_item',
         type: 'POST',
-        data: { id: id, name: name, category: category, weapon: weapon, rarity: rarity, power: power, effects: effects }
+        data: { id: id, name: name, category: category, weapon: weapon, rarity: rarity, power: power, effects: effects, lore: getSelectedLore() }
       });
 
       const animationDelay = new Promise(resolve => setTimeout(resolve, 2000));

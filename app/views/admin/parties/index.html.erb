@@ -1,0 +1,77 @@
+<% content_for :admin_breadcrumb do %>
+  <span class="admin-breadcrumb">
+    <a href="<%= admin_root_path %>"><%= t('admin.dashboard') %></a>
+    <span class="sep">/</span>
+    <span class="current"><%= t('nav.parties') %></span>
+  </span>
+<% end %>
+
+<div class="admin-page-header">
+  <div class="admin-page-title">
+    <div class="admin-title-icon bg-warning bg-opacity-10">
+      <i class="bi bi-shield-fill text-warning"></i>
+    </div>
+    <div>
+      <h5><%= t('nav.parties') %></h5>
+      <small><%= t('admin.parties.subtitle') %></small>
+    </div>
+  </div>
+</div>
+
+<%= form_with url: admin_parties_path, method: :get, local: true do |f| %>
+  <div class="admin-filter-bar">
+    <%= f.text_field :q, value: @q, placeholder: t('admin.search_placeholder'), class: "form-control", style: "max-width:260px;" %>
+    <%= f.submit t('shared.filter'), class: "btn btn-primary" %>
+    <% if @q.present? %>
+      <%= link_to t('shared.clear'), admin_parties_path, class: "btn btn-outline-secondary" %>
+    <% end %>
+    <span class="admin-filter-count"><%= @pagy.count %> <%= t('shared.records') %></span>
+  </div>
+<% end %>
+
+<div class="admin-table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th style="width:40px;">#</th>
+        <th><%= t('parties.name') %></th>
+        <th><%= t('admin.owner') %></th>
+        <th style="width:90px;"><%= t('nav.characters') %></th>
+        <th class="d-none d-lg-table-cell" style="width:110px;"><%= t('shared.created_at') %></th>
+        <th class="admin-th-actions"><%= t('shared.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @parties.each do |party| %>
+        <tr>
+          <td class="text-muted" style="font-size:0.7rem;"><%= party.id %></td>
+          <td class="fw-semibold"><%= party.name %></td>
+          <td class="text-muted small"><%= party.user&.full_name || "—" %></td>
+          <td>
+            <span class="badge bg-primary bg-opacity-75 rounded-pill" style="font-size:0.65rem;"><%= party.characters.size %></span>
+          </td>
+          <td class="text-muted d-none d-lg-table-cell" style="font-size:0.72rem;"><%= party.created_at.strftime("%b %d, %Y") %></td>
+          <td class="admin-td-actions">
+            <div class="admin-act-group">
+              <%= link_to admin_party_path(party), class: "admin-act", title: t('shared.show') do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
+              <%= button_to admin_party_path(party), method: :delete,
+                  class: "admin-act danger",
+                  title: t('shared.delete'),
+                  form: { data: { turbo_confirm: t('shared.confirm_delete') } } do %>
+                <i class="bi bi-trash3"></i>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      <% if @parties.empty? %>
+        <tr><td colspan="6" class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1 opacity-50"></i><%= t('shared.no_records') %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<% if @pagy.pages > 1 %>
+  <div class="d-flex justify-content-center mt-3"><%== pagy_bootstrap_nav(@pagy) %></div>
+<% end %>

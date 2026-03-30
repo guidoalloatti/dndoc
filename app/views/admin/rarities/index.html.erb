@@ -1,0 +1,72 @@
+<% content_for :admin_breadcrumb do %>
+  <span class="admin-breadcrumb">
+    <a href="<%= admin_root_path %>"><%= t('admin.dashboard') %></a>
+    <span class="sep">/</span>
+    <span class="current"><%= t('nav.rarities') %></span>
+  </span>
+<% end %>
+
+<% rarity_colors = { 'Common' => 'secondary', 'Uncommon' => 'success', 'Rare' => 'info', 'Very Rare' => 'primary', 'Legendary' => 'warning', 'Ancestral' => 'danger' } %>
+
+<div class="admin-page-header">
+  <div class="admin-page-title">
+    <div class="admin-title-icon bg-info bg-opacity-10">
+      <i class="bi bi-gem text-info"></i>
+    </div>
+    <div>
+      <h5><%= t('nav.rarities') %></h5>
+      <small><%= t('admin.rarities.subtitle') %></small>
+    </div>
+  </div>
+  <%= link_to new_admin_rarity_path, class: "btn btn-primary btn-sm" do %>
+    <i class="bi bi-plus-lg me-1"></i><%= t('admin.rarities.new') %>
+  <% end %>
+</div>
+
+<div class="admin-table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th><%= t('shared.name') %></th>
+        <th style="width:120px;"><%= t('rarities.power_range') %></th>
+        <th><%= t('rarities.price_range') %></th>
+        <th style="width:60px;"><%= t('nav.items') %></th>
+        <th class="admin-th-actions"><%= t('shared.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @rarities.each do |rarity| %>
+        <tr>
+          <td>
+            <span class="badge bg-<%= rarity_colors[rarity.name] || 'secondary' %>"><%= rarity.name %></span>
+          </td>
+          <td>
+            <span class="text-muted small"><%= rarity.min_power %>–<%= rarity.max_power %></span>
+          </td>
+          <td class="text-muted small">
+            <%= number_with_delimiter(rarity.min_price) %>–<%= number_with_delimiter(rarity.max_price) %> gp
+          </td>
+          <td>
+            <span class="badge bg-secondary bg-opacity-75 rounded-pill" style="font-size:0.65rem;"><%= rarity.items.size %></span>
+          </td>
+          <td class="admin-td-actions">
+            <div class="admin-act-group">
+              <%= link_to edit_admin_rarity_path(rarity), class: "admin-act", title: t('shared.edit') do %>
+                <i class="bi bi-pencil"></i>
+              <% end %>
+              <%= button_to admin_rarity_path(rarity), method: :delete,
+                  class: "admin-act danger",
+                  title: t('shared.delete'),
+                  form: { data: { turbo_confirm: t('shared.confirm_delete') } } do %>
+                <i class="bi bi-trash3"></i>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      <% if @rarities.empty? %>
+        <tr><td colspan="5" class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1 opacity-50"></i><%= t('shared.no_records') %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,5 +1,5 @@
 class ItemsController < ApplicationController
-  before_action :set_own_item, only: [:edit, :update, :destroy]
+  before_action :set_own_item, only: [:edit, :update, :destroy, :remove_character]
 
   def index
     base = if current_user&.admin?
@@ -33,6 +33,7 @@ class ItemsController < ApplicationController
   def new
     @item = Item.new
     @weapons = Weapon.all
+    @armors = Armor.order(:armor_type, :name)
     @categories = Category.all
     @rarities = Rarity.all
     @effects = Effect.all
@@ -59,14 +60,14 @@ class ItemsController < ApplicationController
 
     effect_ids = params[:effects] || []
     effects = Effect.where(id: effect_ids)
-    weapon = params[:weapon].presence
+    weapon = params[:weapon].presence || params[:armor].presence
     power = params[:power].to_i.clamp(0, 10)
 
     item.update!(
       name:               params[:name],
       category:           category,
       rarity:             rarity,
-      description:        ItemEngine.generate_description(rarity.name, effects, category, weapon),
+      description:        ItemEngine.generate_description(rarity.name, effects, category, weapon, lore: lore_param),
       item_type:          category.name,
       power:              power,
       weight:             rand(category.min_weight..category.max_weight),
@@ -89,14 +90,14 @@ class ItemsController < ApplicationController
 
     effect_ids = params[:effects] || []
     effects = Effect.where(id: effect_ids)
-    weapon = params[:weapon].presence
+    weapon = params[:weapon].presence || params[:armor].presence
     power = params[:power].to_i.clamp(0, 10)
 
     item = Item.create!(
       name:               params[:name],
       category:           category,
       rarity:             rarity,
-      description:        ItemEngine.generate_description(rarity.name, effects, category, weapon),
+      description:        ItemEngine.generate_description(rarity.name, effects, category, weapon, lore: lore_param),
       item_type:          category.name,
       power:              power,
       weight:             rand(category.min_weight..category.max_weight),
@@ -126,6 +127,7 @@ class ItemsController < ApplicationController
 
   def edit
     @weapons = Weapon.all
+    @armors = Armor.order(:armor_type, :name)
     @categories = Category.all
     @rarities = Rarity.all
     @effects = Effect.all
@@ -143,6 +145,12 @@ class ItemsController < ApplicationController
     @item.item_effects.destroy_all
     @item.destroy
     redirect_to items_path, notice: t("items.deleted")
+  end
+
+  def remove_character
+    character = @item.character
+    @item.update!(character: nil)
+    redirect_back fallback_location: (character ? character_path(character) : items_path)
   end
 
   # ── Create Random Items ──
@@ -208,6 +216,22 @@ class ItemsController < ApplicationController
           selected_types << effect.effect_type
         end
       end
+    elsif category.name == "Armor" || category.name == "Shields"
+      effect = find_attack_effect(available_power, category, "Defense")
+      if effect
+        item.effects << effect
+        available_power -= effect.power_level
+        selected_types << effect.effect_type
+      end
+
+      if available_power > 0
+        effect = find_attack_effect(available_power, category, "Resistance")
+        if effect
+          item.effects << effect
+          available_power -= effect.power_level
+          selected_types << effect.effect_type
+        end
+      end
     end
 
     attempts = 0
@@ -231,8 +255,8 @@ class ItemsController < ApplicationController
     item.rarity = rarity
     item.price = rand(rarity.min_price..rarity.max_price)
     item.requires_attunement = actual_power > 2
-    item.name = ItemEngine.generate_name(rarity_name, item.effects, category, nil)
-    item.description = ItemEngine.generate_description(rarity_name, item.effects, category)
+    item.name = ItemEngine.generate_name(rarity_name, item.effects, category, nil, lore: lore_param)
+    item.description = ItemEngine.generate_description(rarity_name, item.effects, category, nil, lore: lore_param)
     item.save!
     item
   end
@@ -243,11 +267,11 @@ class ItemsController < ApplicationController
 
     effect_ids = params[:effects] || []
     effects = Effect.where(id: effect_ids)
-    weapon = params[:weapon].presence
+    weapon = params[:weapon].presence || params[:armor].presence
     power = (params[:power] || 0).to_i.clamp(0, 10)
     rarity_name = get_rarity_name(power)
 
-    name = ItemEngine.generate_name(rarity_name, effects, category, weapon)
+    name = ItemEngine.generate_name(rarity_name, effects, category, weapon, lore: lore_param)
 
     respond_to do |format|
       format.json { render json: { status: "success", data: name } }
@@ -295,6 +319,7 @@ class ItemsController < ApplicationController
   def wizard
     @categories = Category.all
     @weapons = Weapon.all
+    @armors = Armor.order(:armor_type, :name)
     @rarities = Rarity.all
   end
 
@@ -355,6 +380,10 @@ class ItemsController < ApplicationController
           { name: e.name, effect_type: e.effect_type, power_level: e.power_level, description: e.description }
         }
       }
+    end
+
+    def lore_param
+      %w[faerun middle_earth].include?(params[:lore]) ? params[:lore] : "faerun"
     end
 
     def item_params

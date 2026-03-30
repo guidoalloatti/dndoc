@@ -1,0 +1,90 @@
+<% content_for :admin_breadcrumb do %>
+  <span class="admin-breadcrumb">
+    <a href="<%= admin_root_path %>"><%= t('admin.dashboard') %></a>
+    <span class="sep">/</span>
+    <span class="current"><%= t('nav.lore') %></span>
+  </span>
+<% end %>
+
+<div class="admin-page-header">
+  <div class="admin-page-title">
+    <div class="admin-title-icon bg-secondary bg-opacity-10">
+      <i class="bi bi-book text-secondary"></i>
+    </div>
+    <div>
+      <h5><%= t('nav.lore') %></h5>
+      <small><%= number_with_delimiter(@total_count) %> <%= t('shared.records') %> total</small>
+    </div>
+  </div>
+  <%= link_to new_admin_lore_entry_path(lore_type: @lore_type, category: @category), class: "btn btn-primary btn-sm" do %>
+    <i class="bi bi-plus-lg me-1"></i><%= t('admin.lore_entries.new') %>
+  <% end %>
+</div>
+
+<%= form_with url: admin_lore_entries_path, method: :get, local: true do |f| %>
+  <div class="admin-filter-bar">
+    <%= f.text_field :q, value: @q, placeholder: t('admin.search_placeholder'), class: "form-control", style: "max-width:180px;" %>
+    <%= f.select :lore_type, [["Faerûn", "faerun"], ["Middle-earth", "middle_earth"]], { include_blank: t('lore_entries.all_types') },
+        class: "form-select", style: "max-width:160px;" %>
+    <%= f.select :category, LoreEntry::CATEGORIES.map { |c| [c.tr('_', ' ').capitalize, c] }, { include_blank: t('lore_entries.all_categories') },
+        class: "form-select", style: "max-width:175px;" %>
+    <%= f.submit t('shared.filter'), class: "btn btn-primary" %>
+    <% if @q.present? || @lore_type.present? || @category.present? %>
+      <%= link_to t('shared.clear'), admin_lore_entries_path, class: "btn btn-outline-secondary" %>
+    <% end %>
+    <span class="admin-filter-count"><%= @pagy.count %> <%= t('shared.records') %></span>
+  </div>
+<% end %>
+
+<div class="admin-table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th style="width:110px;"><%= t('lore_entries.lore_type') %></th>
+        <th style="width:150px;"><%= t('lore_entries.category_label') %></th>
+        <th style="width:120px;"><%= t('lore_entries.key_label') %></th>
+        <th><%= t('lore_entries.value_label') %></th>
+        <th class="admin-th-actions"><%= t('shared.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @lore_entries.each do |entry| %>
+        <tr>
+          <td>
+            <span class="badge <%= entry.lore_type == 'faerun' ? 'bg-info' : 'bg-success' %> bg-opacity-75 text-dark" style="font-size:0.6rem;">
+              <%= entry.lore_type == 'faerun' ? 'Faerûn' : 'Middle-earth' %>
+            </span>
+          </td>
+          <td>
+            <%= link_to entry.category.tr('_', ' ').capitalize,
+                admin_lore_entries_path(lore_type: entry.lore_type, category: entry.category),
+                class: "badge bg-secondary bg-opacity-50 text-body text-decoration-none", style: "font-size:0.65rem;" %>
+          </td>
+          <td class="text-muted small"><%= entry.key.presence || "—" %></td>
+          <td style="max-width:320px;">
+            <span class="d-block text-truncate small"><%= entry.value %></span>
+          </td>
+          <td class="admin-td-actions">
+            <div class="admin-act-group">
+              <%= link_to edit_admin_lore_entry_path(entry), class: "admin-act", title: t('shared.edit') do %>
+                <i class="bi bi-pencil"></i>
+              <% end %>
+              <%= button_to admin_lore_entry_path(entry), method: :delete,
+                  class: "admin-act danger",
+                  title: t('shared.delete'),
+                  form: { data: { turbo_confirm: t('shared.confirm_delete') } } do %>
+                <i class="bi bi-trash3"></i>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      <% if @lore_entries.empty? %>
+        <tr><td colspan="5" class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1 opacity-50"></i><%= t('shared.no_records') %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<% if @pagy.pages > 1 %>
+  <div class="d-flex justify-content-center mt-3"><%== pagy_bootstrap_nav(@pagy) %></div>
+<% end %>

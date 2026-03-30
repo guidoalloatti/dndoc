@@ -1,0 +1,78 @@
+<div class="container mt-4" style="max-width: 860px;">
+
+  <div class="d-flex align-items-start justify-content-between mb-4">
+    <div>
+      <h4 class="fw-bold mb-0">
+        <i class="bi bi-person-badge text-primary me-2"></i><%= t("characters.title") %>
+      </h4>
+      <p class="text-muted small mb-0"><%= t("characters.subtitle") %></p>
+    </div>
+  </div>
+
+  <% if @characters.any? %>
+    <% grouped = @characters.group_by(&:party) %>
+    <% grouped.each do |party, characters| %>
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-body-tertiary border-0 py-2 px-3 d-flex align-items-center justify-content-between">
+          <h6 class="fw-semibold small text-muted text-uppercase mb-0">
+            <i class="bi bi-shield me-1"></i>
+            <%= link_to party.name, party_path(party), class: "text-muted text-decoration-none" %>
+          </h6>
+          <%= link_to new_party_character_path(party), class: "btn btn-sm btn-outline-primary", style: "font-size:0.75rem; padding: 2px 8px;" do %>
+            <i class="bi bi-plus-lg me-1"></i><%= t("parties.add_character") %>
+          <% end %>
+        </div>
+        <div class="card-body p-0">
+          <% characters.each do |char| %>
+            <div class="d-flex align-items-center gap-3 px-3 py-2 border-bottom">
+              <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 flex-shrink-0 overflow-hidden"
+                   style="width:36px; height:36px;">
+                <% if char.has_avatar? %>
+                  <%= image_tag char.avatar, style: "width:100%; height:100%; object-fit:cover; border-radius:50%;", alt: "" %>
+                <% else %>
+                  <span class="fw-bold text-primary" style="font-size:0.7rem;"><%= char.initials %></span>
+                <% end %>
+              </div>
+              <div class="flex-grow-1">
+                <%= link_to char.name, character_path(char), class: "fw-semibold text-decoration-none" %>
+                <div class="text-muted small d-flex align-items-center gap-2">
+                  <% if char.race.present? %>
+                    <span><%= char.race %></span>
+                  <% end %>
+                  <span class="badge bg-primary bg-opacity-75" style="font-size:0.65rem;"><%= char.character_class.name %></span>
+                  <span><%= t("parties.level_abbr") %> <%= char.level %></span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-1">
+                <% item_count = char.items.size %>
+                <% if item_count > 0 %>
+                  <span class="badge bg-secondary bg-opacity-50 text-body">
+                    <i class="bi bi-bag me-1"></i><%= item_count %>
+                  </span>
+                <% end %>
+                <%= link_to edit_character_path(char), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center",
+                      title: t("shared.edit"), style: "width:28px; height:28px; padding:0;" do %>
+                  <i class="bi bi-pencil" style="font-size:0.75rem;"></i>
+                <% end %>
+                <%= link_to character_path(char), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center",
+                      style: "width:28px; height:28px; padding:0;" do %>
+                  <i class="bi bi-chevron-right" style="font-size:0.75rem;"></i>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-person-plus display-4 d-block mb-3 opacity-25"></i>
+        <p class="mb-1 small"><%= t("characters.no_characters") %></p>
+        <%= link_to parties_path, class: "btn btn-sm btn-outline-primary mt-2" do %>
+          <i class="bi bi-shield-plus me-1"></i><%= t("characters.go_to_parties") %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

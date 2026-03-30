@@ -13,6 +13,15 @@ Rails.application.routes.draw do
         end
       end
       resources :character_classes
+      resources :items,      only: [:index, :show, :destroy]
+      resources :categories
+      resources :effects
+      resources :rarities
+      resources :weapons
+      resources :armors
+      resources :parties,    only: [:index, :show, :destroy]
+      resources :characters, only: [:index, :show, :destroy]
+      resources :lore_entries, except: [:show]
     end
 
     resource :profile, only: [:show, :edit, :update]
@@ -32,6 +41,7 @@ Rails.application.routes.draw do
       end
       member do
         post :destroy
+        patch :remove_character
         post :get_item_name
         post :create_item
         post :get_item
@@ -57,6 +67,25 @@ Rails.application.routes.draw do
       end
     end
     resources :weapons
+
+    resources :parties do
+      member do
+        get :load_data
+      end
+    end
+
+    resources :characters, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
+      member do
+        post :assign_item
+        patch :unassign_item
+      end
+    end
+    # Nested new/create under parties
+    resources :parties, only: [] do
+      resources :characters, only: [:new, :create]
+    end
+
+    resources :lore_entries, except: [:show]
 
     resources :party_rewards, only: [:new] do
       collection do

@@ -1,0 +1,194 @@
+<div class="container mt-4" style="max-width: 900px;">
+
+  <%# ── Header ── %>
+  <div class="d-flex align-items-start justify-content-between mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <%= link_to parties_path, class: "text-muted text-decoration-none small" do %>
+          <i class="bi bi-chevron-left"></i> <%= t("parties.title") %>
+        <% end %>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <% if @party.has_image? %>
+          <div class="flex-shrink-0 overflow-hidden rounded-3" style="width:48px; height:48px;">
+            <%= image_tag @party.image, style: "width:100%; height:100%; object-fit:cover;", alt: "" %>
+          </div>
+        <% end %>
+        <h4 class="fw-bold mb-0">
+          <% unless @party.has_image? %><i class="bi bi-shield-fill text-primary me-2"></i><% end %>
+          <%= @party.name %>
+        </h4>
+      </div>
+      <p class="text-muted small mb-0">
+        <i class="bi bi-people me-1"></i><%= @party.characters.size %> <%= t("parties.characters_count") %>
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <%= link_to edit_party_path(@party), class: "btn btn-sm btn-outline-secondary" do %>
+        <i class="bi bi-pencil me-1"></i><%= t("shared.edit") %>
+      <% end %>
+      <%= link_to new_party_reward_path(party_id: @party.id), class: "btn btn-sm btn-primary" do %>
+        <i class="bi bi-hammer me-1"></i><%= t("parties.forge_rewards") %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ── Characters ── %>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h6 class="fw-semibold small text-muted text-uppercase mb-0">
+      <i class="bi bi-people me-1"></i><%= t("parties.characters") %>
+    </h6>
+    <%= link_to new_party_character_path(@party), class: "btn btn-sm btn-outline-primary" do %>
+      <i class="bi bi-person-plus me-1"></i><%= t("parties.add_character") %>
+    <% end %>
+  </div>
+
+  <% if @party.characters.any? %>
+    <% @party.characters.sort_by(&:id).each do |char| %>
+      <div class="card border-0 shadow-sm mb-3">
+        <%# Character header %>
+        <div class="card-header bg-body-tertiary border-0 py-2 px-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 flex-shrink-0 overflow-hidden"
+                 style="width:42px; height:42px;">
+              <% if char.has_avatar? %>
+                <%= image_tag char.avatar, style: "width:100%; height:100%; object-fit:cover; border-radius:50%;", alt: "" %>
+              <% else %>
+                <span class="fw-bold text-primary" style="font-size:0.8rem;"><%= char.initials %></span>
+              <% end %>
+            </div>
+            <div class="flex-grow-1">
+              <%= link_to char.name, character_path(char), class: "fw-bold text-decoration-none", style: "font-size:0.95rem;" %>
+              <div class="d-flex align-items-center gap-2 text-muted small">
+                <% if char.race.present? %>
+                  <span><%= char.race %></span>
+                  <span>&middot;</span>
+                <% end %>
+                <span class="badge bg-primary bg-opacity-75" style="font-size:0.65rem;"><%= char.character_class.name %></span>
+                <% if char.character_class.is_magic_user %>
+                  <span class="badge bg-info bg-opacity-25 text-info-emphasis" style="font-size:0.6rem;">
+                    <i class="bi bi-stars"></i>
+                  </span>
+                <% end %>
+                <span><%= t("parties.level_abbr") %> <%= char.level %></span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-1">
+              <%= link_to edit_character_path(char), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center",
+                    title: t("shared.edit"), style: "width:28px; height:28px; padding:0;" do %>
+                <i class="bi bi-pencil" style="font-size:0.75rem;"></i>
+              <% end %>
+              <%= button_to character_path(char), method: :delete,
+                    class: "btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center",
+                    title: t("shared.delete"),
+                    style: "width:28px; height:28px; padding:0;",
+                    data: { turbo_confirm: t("characters.confirm_destroy") } do %>
+                <i class="bi bi-trash3" style="font-size:0.75rem;"></i>
+              <% end %>
+              <%= link_to character_path(char), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center",
+                    title: t("shared.show"), style: "width:28px; height:28px; padding:0;" do %>
+                <i class="bi bi-chevron-right" style="font-size:0.75rem;"></i>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <%# Inventory %>
+        <div class="card-body p-2">
+          <% items = char.items.sort_by(&:created_at).reverse %>
+          <% if items.any? %>
+            <div class="row g-2">
+              <% items.each do |item| %>
+                <%
+                  rarity_classes = {
+                    "Common" => "bg-secondary", "Uncommon" => "bg-success",
+                    "Rare" => "bg-info text-dark", "Very Rare" => "bg-primary",
+                    "Legendary" => "bg-warning text-dark", "Ancestral" => "bg-danger"
+                  }
+                  rarity_icons = {
+                    "Common" => "bi-circle", "Uncommon" => "bi-circle-half",
+                    "Rare" => "bi-gem", "Very Rare" => "bi-star-fill",
+                    "Legendary" => "bi-trophy-fill", "Ancestral" => "bi-lightning-charge-fill"
+                  }
+                  badge_cls = rarity_classes[item.rarity.name] || "bg-secondary"
+                  r_icon    = rarity_icons[item.rarity.name] || "bi-circle"
+                %>
+                <div class="col-md-6">
+                  <div class="border rounded-2 p-2 h-100" style="border-color: rgba(0,0,0,.06) !important;">
+                    <div class="d-flex align-items-start gap-2">
+                      <div class="flex-grow-1 min-w-0">
+                        <div class="d-flex align-items-center flex-wrap gap-1 mb-1">
+                          <%= link_to item.name, item_path(item), class: "fw-semibold text-truncate text-decoration-none",
+                                style: "font-size:0.82rem; max-width:160px;", title: item.name %>
+                          <span class="badge <%= badge_cls %> d-flex align-items-center gap-1" style="font-size:0.58rem;">
+                            <i class="bi <%= r_icon %>"></i><%= item.rarity.name %>
+                          </span>
+                          <span class="badge bg-light text-dark border" style="font-size:0.58rem;"><%= item.category.name %></span>
+                          <% if item.requires_attunement %>
+                            <span class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle" style="font-size:0.58rem;" title="<%= t('items.attunement_required') %>">
+                              <i class="bi bi-link-45deg"></i>
+                            </span>
+                          <% end %>
+                        </div>
+                        <div class="d-flex gap-2 text-muted" style="font-size:0.7rem;">
+                          <span><i class="bi bi-lightning-charge-fill text-warning"></i> <%= item.power %></span>
+                          <span><i class="bi bi-coin text-warning"></i> <%= number_with_delimiter(item.price) %> gp</span>
+                          <span><i class="bi bi-feather"></i> <%= item.weight %></span>
+                        </div>
+                        <% if item.effects.any? %>
+                          <div class="d-flex flex-wrap gap-1 mt-1">
+                            <% item.effects.each do |effect| %>
+                              <span class="badge bg-secondary bg-opacity-50 text-body" style="font-size:0.55rem;">
+                                <%= effect.translated_name %>
+                              </span>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
+                      <div class="d-flex flex-column gap-1 flex-shrink-0">
+                        <%= link_to edit_item_path(item), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center",
+                              title: t("shared.edit"), style: "width:24px; height:24px; padding:0;" do %>
+                          <i class="bi bi-pencil" style="font-size:0.65rem;"></i>
+                        <% end %>
+                        <%= link_to item_path(item), class: "btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center",
+                              title: t("shared.show"), style: "width:24px; height:24px; padding:0;" do %>
+                          <i class="bi bi-eye" style="font-size:0.65rem;"></i>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center text-muted py-3 small">
+              <i class="bi bi-bag opacity-25 me-1"></i><%= t("characters.no_items") %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-person-plus display-4 d-block mb-3 opacity-25"></i>
+        <p class="mb-1 small"><%= t("parties.no_characters_yet") %></p>
+        <%= link_to new_party_character_path(@party), class: "btn btn-sm btn-outline-primary mt-2" do %>
+          <i class="bi bi-person-plus me-1"></i><%= t("parties.add_character") %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# ── Footer actions ── %>
+  <div class="d-flex align-items-center justify-content-between mt-1">
+    <%= link_to parties_path, class: "btn btn-sm btn-outline-secondary" do %>
+      <i class="bi bi-arrow-left me-1"></i><%= t("shared.back") %>
+    <% end %>
+    <%= button_to party_path(@party), method: :delete,
+          class: "btn btn-sm btn-outline-danger",
+          data: { turbo_confirm: t("parties.confirm_destroy") } do %>
+      <i class="bi bi-trash3 me-1"></i><%= t("shared.delete") %>
+    <% end %>
+  </div>
+</div>
