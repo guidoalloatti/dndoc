@@ -78,6 +78,11 @@
       <% @items.each do |item| %>
         <div class="col-12 col-sm-6 col-lg-4">
           <div class="index-card rarity-<%= rarity_css_class(item.rarity.name) %>">
+            <% if item.image.attached? %>
+              <div class="index-card-img-strip">
+                <%= image_tag item.image, alt: item.name %>
+              </div>
+            <% end %>
             <div class="d-flex justify-content-between align-items-start">
               <div class="flex-grow-1 min-width-0">
                 <div class="d-flex align-items-center gap-1 mb-1">

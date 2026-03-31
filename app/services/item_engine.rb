@@ -54,48 +54,43 @@ class ItemEngine
   # NAME GENERATION
   # ══════════════════════════════════════════════════════
 
-  def self.generate_name(rarity_name, effects, category, weapon = nil, lore: "faerun")
+  def self.generate_name(rarity_name, effects, category, weapon = nil, lore: "faerun", origin: nil)
     lt = lore.to_s
+
+    # Legendary/Ancestral: 50% chance of a proper (famous) name
+    # Very Rare: 20% chance
+    proper_chance = case rarity_name
+                    when "Ancestral"  then 0.9
+                    when "Legendary"  then 0.7
+                    when "Very Rare"  then 0.5
+                    when "Rare"       then 0.3
+                    else                   0
+                    end
+    if proper_chance > 0 && rand < proper_chance
+      return generate_proper_name(lt, rarity_name, effects, category, weapon, origin)
+    end
 
     prefixes = lore(lt, "prefix", rarity_name)
     prefixes = lore(lt, "prefix", "Common") if prefixes.empty?
     prefix = prefixes.sample
 
     # Category-based title
-    cat_name = category.name
-    if (cat_name == "Weapons" || cat_name == "Armor" || cat_name == "Shields") && weapon.present?
-      base = weapon
-    else
-      titles = lore(lt, "category_title", cat_name)
-      base = titles.any? ? titles.sample : cat_name.singularize
-    end
+    base = item_base(lt, category, weapon)
 
-    # Effect-based flavor (shared across lores from DB)
-    primary_effect = effects.max_by(&:power_level) if effects.any?
-    flavor = nil
-    if primary_effect
-      flavors = lore(lt, "effect_flavor", primary_effect.effect_type)
-      flavor = flavors.sample if flavors.any?
-    end
-
-    # Suffix based on rarity
+    # Suffix: only Rare+, lower probability to keep names short
     suffix = case rarity_name
              when "Legendary", "Ancestral"
-               lore_sample(lt, "suffix")
-             when "Very Rare", "Rare"
-               rand < 0.6 ? lore_sample(lt, "suffix") : lore_sample(lt, "simple_suffix")
-             when "Uncommon"
-               rand < 0.3 ? lore_sample(lt, "simple_suffix") : nil
+               rand < 0.6 ? lore_sample(lt, "suffix") : nil
+             when "Very Rare"
+               rand < 0.4 ? lore_sample(lt, "suffix") : nil
+             when "Rare"
+               rand < 0.25 ? lore_sample(lt, "simple_suffix") : nil
              else
                nil
              end
 
-    parts = []
-    parts << flavor if flavor && rand < 0.7
-    parts << prefix
-    parts << base
+    parts = [prefix, base]
     parts << suffix if suffix
-
     parts.join(" ")
   end
 
@@ -122,22 +117,54 @@ class ItemEngine
     when "Legendary", "Ancestral"
       build_epic_description(lt, rarity_name, item_word, effect_types, power)
     else
-      "A mysterious #{item_word} of unknown origin."
+      "#{item_word.capitalize} misterioso de origen desconocido."
     end
   end
 
   private
 
+  # ── Return the base word for an item (weapon name or category title) ──
+  def self.item_base(lt, category, weapon)
+    cat_name = category.name
+    if (cat_name == "Weapons" || cat_name == "Armor" || cat_name == "Shields") && weapon.present?
+      weapon
+    else
+      titles = lore(lt, "category_title", cat_name)
+      titles.any? ? titles.sample : cat_name.singularize
+    end
+  end
+
+  # ── Generate a proper/famous name for powerful items ──
+  #    Tries the `proper_name` lore category first, then builds a thematic
+  #    name using the item's primary effect and base type.
+  def self.generate_proper_name(lt, rarity_name, effects, category, weapon, origin = nil)
+    # Try origin-specific name first (e.g. elvish, dwarven, human, divine)
+    if origin.present? && origin != "Desconocido"
+      origin_key = origin.downcase  # "elfico", "enano", "humano", "divino"
+      proper = lore_sample(lt, "proper_name", origin_key)
+      return proper if proper.present?
+    end
+
+    # Fall back to generic proper names — single short words like "Narsil", "Anduril"
+    proper = lore_sample(lt, "proper_name")
+    return proper if proper.present?
+
+    # Last resort: prefix + base (2 words max)
+    prefixes = lore(lt, "prefix", rarity_name)
+    prefixes = lore(lt, "prefix", "Common") if prefixes.empty?
+    "#{prefixes.sample} #{item_base(lt, category, weapon)}"
+  end
+
   # ── Fill template placeholders with random lore from DB ──
   def self.fill_placeholders(text, lt)
-    text.gsub("%{smith}",        lore_sample(lt, "smith") || "an unknown smith")
-        .gsub("%{wielder}",      lore_sample(lt, "wielder") || "a forgotten hero")
-        .gsub("%{event}",        lore_sample(lt, "event") || "a great battle")
-        .gsub("%{place}",        lore_sample(lt, "place") || "a forgotten forge")
-        .gsub("%{material}",     lore_sample(lt, "material") || "a rare metal")
-        .gsub("%{organization}", lore_sample(lt, "organization") || "an ancient order")
-        .gsub("%{deity}",        lore_sample(lt, "deity") || "a forgotten god")
-        .gsub("%{era}",          lore_sample(lt, "age") || "an ancient era")
+    text.gsub("%{smith}",        lore_sample(lt, "smith") || "un herrero desconocido")
+        .gsub("%{wielder}",      lore_sample(lt, "wielder") || "un héroe olvidado")
+        .gsub("%{event}",        lore_sample(lt, "event") || "una gran batalla")
+        .gsub("%{place}",        lore_sample(lt, "place") || "una forja olvidada")
+        .gsub("%{material}",     lore_sample(lt, "material") || "un metal raro")
+        .gsub("%{organization}", lore_sample(lt, "organization") || "una orden antigua")
+        .gsub("%{deity}",        lore_sample(lt, "deity") || "un dios olvidado")
+        .gsub("%{era}",          lore_sample(lt, "age") || "una era antigua")
   end
 
   # ── Get an effect description, filling placeholders ──
@@ -149,10 +176,10 @@ class ItemEngine
   # ── Common: 1-2 sentences ──
   def self.build_simple_description(lt, item_word, effect_types)
     origin = fill_placeholders(lore_sample(lt, "origin", "Common") || "", lt)
-    desc = "A reliable #{item_word} of honest craftsmanship. #{origin}"
+    desc = "#{item_word.capitalize} de artesanía sencilla y confiable. #{origin}"
     if effect_types.any?
       effect_desc = effect_desc_for(lt, effect_types.first)
-      desc += " It #{effect_desc}." if effect_desc
+      desc += " #{effect_desc}." if effect_desc
     end
     desc
   end
@@ -160,7 +187,7 @@ class ItemEngine
   # ── Uncommon: 2-3 sentences ──
   def self.build_uncommon_description(lt, rarity_name, item_word, effect_types)
     origin = fill_placeholders(lore_sample(lt, "origin", rarity_name) || "", lt)
-    desc = "An unusual #{item_word} that stands apart from ordinary craftsmanship. #{origin}"
+    desc = "#{item_word.capitalize} inusual, de factura superior a lo común. #{origin}"
     if effect_types.any?
       transition = lore_sample(lt, "effect_transition")
       effect_desc = effect_desc_for(lt, effect_types.first)
@@ -173,7 +200,7 @@ class ItemEngine
   # ── Rare: 3-5 sentences ──
   def self.build_rare_description(lt, rarity_name, item_word, effect_types, power)
     origin = fill_placeholders(lore_sample(lt, "origin", rarity_name) || "", lt)
-    desc = "A remarkable #{item_word} that radiates quiet power. #{origin}"
+    desc = "#{item_word.capitalize} notable que emana un poder silencioso. #{origin}"
 
     transitions = lore(lt, "effect_transition").shuffle
     effect_types.first(2).each_with_index do |et, i|
@@ -247,7 +274,7 @@ class ItemEngine
     traits.each { |t| desc += " #{t}" }
 
     curse = lore_sample(lt, "curse")
-    desc += " Furthermore, #{fill_placeholders(curse, lt)}." if curse
+    desc += " Además, #{fill_placeholders(curse, lt)}." if curse
     if rand < 0.6
       prophecy = lore_sample(lt, "prophecy")
       desc += " #{fill_placeholders(prophecy, lt)}" if prophecy

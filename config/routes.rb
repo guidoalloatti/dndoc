@@ -32,6 +32,7 @@ Rails.application.routes.draw do
         get :create_random
         post :create_random
         post :get_item_name
+        post :get_item_description
         post :create_item
         post :get_item
         post :update_item
@@ -42,6 +43,7 @@ Rails.application.routes.draw do
       member do
         post :destroy
         patch :remove_character
+        patch :update_image
         post :get_item_name
         post :create_item
         post :get_item

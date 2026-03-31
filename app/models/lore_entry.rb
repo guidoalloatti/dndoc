@@ -14,7 +14,7 @@ class LoreEntry < ApplicationRecord
   ].freeze
 
   # Categories that require a key (grouped by rarity, effect_type, or category name)
-  KEYED_CATEGORIES = %w[prefix category_title origin effect_description effect_flavor].freeze
+  KEYED_CATEGORIES = %w[prefix category_title origin effect_description effect_flavor proper_name].freeze
 
   scope :for_lore, ->(lore_type) { where(lore_type: lore_type) }
   scope :for_category, ->(category) { where(category: category) }

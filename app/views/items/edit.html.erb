@@ -15,5 +15,60 @@
     };
   </script>
 
+  <%# ── Item Image Upload ── %>
+  <%= form_with model: @item, url: update_image_item_path(@item), method: :patch, local: true, multipart: true do |f| %>
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body py-2 px-3">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <%# Current image preview %>
+          <div class="item-img-preview flex-shrink-0">
+            <% if @item.image.attached? %>
+              <%= image_tag @item.image, class: "item-img-thumb", id: "itemImgPreview" %>
+            <% else %>
+              <div class="item-img-thumb item-img-thumb-empty" id="itemImgPreview">
+                <%= category_image_or_placeholder(@item.category, size: 60) %>
+              </div>
+            <% end %>
+          </div>
+          <%# Controls %>
+          <div class="flex-grow-1 min-width-0">
+            <div class="form-label-compact mb-2"><i class="bi bi-image me-1"></i><%= t('items.item_image') %></div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <label class="btn btn-xs btn-outline-primary mb-0" style="cursor:pointer;">
+                <i class="bi bi-upload me-1"></i><%= t('shared.upload') %>
+                <%= f.file_field :image, accept: "image/*", class: "d-none", id: "itemImageFile", onchange: "previewItemImage(this)" %>
+              </label>
+              <% if @item.image.attached? %>
+                <button type="submit" name="remove_image" value="1" class="btn btn-xs btn-outline-danger"
+                        data-turbo-confirm="<%= t('shared.confirm_delete') %>">
+                  <i class="bi bi-trash3 me-1"></i><%= t('items.remove_image') %>
+                </button>
+              <% end %>
+              <button type="submit" class="btn btn-xs btn-primary" id="itemImgSaveBtn" style="display:none;">
+                <i class="bi bi-check-lg me-1"></i><%= t('shared.save') %>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <script>
+    function previewItemImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('itemImgPreview');
+          if (preview) {
+            preview.outerHTML = '<img src="' + e.target.result + '" class="item-img-thumb" id="itemImgPreview">';
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+        document.getElementById('itemImgSaveBtn').style.display = '';
+      }
+    }
+  </script>
+
   <%= render 'form', item: @item, weapons: @weapons, effects: @effects, categories: @categories, rarities: @rarities, action: "Update" %>
 </div>

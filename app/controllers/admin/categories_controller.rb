@@ -44,7 +44,7 @@ module Admin
     end
 
     def category_params
-      params.require(:category).permit(:name, :description, :min_weight, :max_weight)
+      params.require(:category).permit(:name, :description, :min_weight, :max_weight, :image)
     end
   end
 end

@@ -1,5 +1,5 @@
 class ItemsController < ApplicationController
-  before_action :set_own_item, only: [:edit, :update, :destroy, :remove_character]
+  before_action :set_own_item, only: [:edit, :update, :destroy, :remove_character, :update_image]
 
   def index
     base = if current_user&.admin?
@@ -10,7 +10,7 @@ class ItemsController < ApplicationController
              Item
            end
 
-    items = base.includes(:category, :rarity, :effects)
+    items = base.includes(:category, :rarity, :effects).with_attached_image
                 .search_by_name(params[:q])
                 .by_category(params[:category_id])
                 .by_rarity(params[:rarity_id])
@@ -34,7 +34,7 @@ class ItemsController < ApplicationController
     @item = Item.new
     @weapons = Weapon.all
     @armors = Armor.order(:armor_type, :name)
-    @categories = Category.all
+    @categories = Category.with_attached_image.all
     @rarities = Rarity.all
     @effects = Effect.all
   end
@@ -45,7 +45,7 @@ class ItemsController < ApplicationController
     return render json: { status: "error", message: t("shared.not_found") }, status: :not_found unless item
 
     respond_to do |format|
-      format.json { render json: { status: "success", item: item, effects: item.effects.map { |e| { id: e.id, name: e.translated_name, effect_type: e.effect_type, power_level: e.power_level, description: e.translated_description } } } }
+      format.json { render json: { status: "success", item: item.as_json.merge(origin: item.origin, lore: item.lore, weapon_name: item.weapon_name), effects: item.effects.map { |e| { id: e.id, name: e.translated_name, effect_type: e.effect_type, power_level: e.power_level, description: e.translated_description } } } }
     end
   end
 
@@ -63,16 +63,25 @@ class ItemsController < ApplicationController
     weapon = params[:weapon].presence || params[:armor].presence
     power = params[:power].to_i.clamp(0, 10)
 
+    description = if params[:description_locked] == "true" && params[:description].present?
+                    params[:description]
+                  else
+                    ItemEngine.generate_description(rarity.name, effects, category, weapon, lore: lore_param)
+                  end
+
     item.update!(
       name:               params[:name],
       category:           category,
       rarity:             rarity,
-      description:        ItemEngine.generate_description(rarity.name, effects, category, weapon, lore: lore_param),
+      description:        description,
       item_type:          category.name,
       power:              power,
       weight:             rand(category.min_weight..category.max_weight),
       price:              calculate_price(rarity),
       requires_attunement: power > 2,
+      origin:             origin_param,
+      lore:               lore_param,
+      weapon_name:        weapon.presence,
     )
     item.effects = effects
 
@@ -93,16 +102,25 @@ class ItemsController < ApplicationController
     weapon = params[:weapon].presence || params[:armor].presence
     power = params[:power].to_i.clamp(0, 10)
 
+    description = if params[:description_locked] == "true" && params[:description].present?
+                    params[:description]
+                  else
+                    ItemEngine.generate_description(rarity.name, effects, category, weapon, lore: lore_param)
+                  end
+
     item = Item.create!(
       name:               params[:name],
       category:           category,
       rarity:             rarity,
-      description:        ItemEngine.generate_description(rarity.name, effects, category, weapon, lore: lore_param),
+      description:        description,
       item_type:          category.name,
       power:              power,
       weight:             rand(category.min_weight..category.max_weight),
       price:              calculate_price(rarity),
       requires_attunement: power > 2,
+      origin:             origin_param,
+      lore:               lore_param,
+      weapon_name:        weapon.presence,
       user:               current_user,
     )
     item.effects = effects
@@ -128,7 +146,7 @@ class ItemsController < ApplicationController
   def edit
     @weapons = Weapon.all
     @armors = Armor.order(:armor_type, :name)
-    @categories = Category.all
+    @categories = Category.with_attached_image.all
     @rarities = Rarity.all
     @effects = Effect.all
   end
@@ -145,6 +163,15 @@ class ItemsController < ApplicationController
     @item.item_effects.destroy_all
     @item.destroy
     redirect_to items_path, notice: t("items.deleted")
+  end
+
+  def update_image
+    if params.dig(:item, :image).present?
+      @item.image.attach(params[:item][:image])
+    elsif params[:remove_image] == "1" && @item.image.attached?
+      @item.image.purge
+    end
+    redirect_to edit_item_path(@item), notice: t("items.image_updated")
   end
 
   def remove_character
@@ -261,6 +288,21 @@ class ItemsController < ApplicationController
     item
   end
 
+  def get_item_description
+    category = Category.find_by(id: params[:category])
+    rarity = Rarity.find_by(name: params[:rarity])
+    return render json: { status: "error", message: t("shared.invalid_params") }, status: :unprocessable_entity unless category && rarity
+
+    effect_ids = params[:effects] || []
+    effects = Effect.where(id: effect_ids)
+    weapon = params[:weapon].presence || params[:armor].presence
+
+    description = ItemEngine.generate_description(rarity.name, effects, category, weapon, lore: lore_param)
+    render json: { status: "success", data: description }
+  rescue => e
+    render json: { status: "error", message: e.message }, status: :unprocessable_entity
+  end
+
   def get_item_name
     category = Category.find_by(id: params[:category])
     return render json: { status: "error", message: t("shared.invalid_params") }, status: :unprocessable_entity unless category
@@ -271,7 +313,7 @@ class ItemsController < ApplicationController
     power = (params[:power] || 0).to_i.clamp(0, 10)
     rarity_name = get_rarity_name(power)
 
-    name = ItemEngine.generate_name(rarity_name, effects, category, weapon, lore: lore_param)
+    name = ItemEngine.generate_name(rarity_name, effects, category, weapon, lore: lore_param, origin: origin_param)
 
     respond_to do |format|
       format.json { render json: { status: "success", data: name } }
@@ -384,6 +426,10 @@ class ItemsController < ApplicationController
 
     def lore_param
       %w[faerun middle_earth].include?(params[:lore]) ? params[:lore] : "faerun"
+    end
+
+    def origin_param
+      Item::ORIGINS.include?(params[:origin]) ? params[:origin] : "Desconocido"
     end
 
     def item_params

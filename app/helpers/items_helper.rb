@@ -177,6 +177,69 @@ module ItemsHelper
     }.fetch(type, "primary")
   end
 
+  # Returns an <img> tag if the category has an uploaded image,
+  # otherwise a styled placeholder div with the category icon.
+  def category_image_or_placeholder(category, opts = {})
+    size   = opts.fetch(:size, 80)
+    klass  = opts.fetch(:class, "")
+    style  = opts.fetch(:style, "")
+
+    if category&.image&.attached?
+      image_tag category.image,
+        class: "category-img #{klass}",
+        style: "width:#{size}px;height:#{size}px;object-fit:cover;border-radius:12px;#{style}"
+    else
+      icon  = category_icon(category&.name.to_s)
+      color = category_placeholder_color(category&.name.to_s)
+      content_tag :div,
+        content_tag(:i, "", class: "bi bi-#{icon}"),
+        class: "category-img-placeholder #{klass}",
+        style: "width:#{size}px;height:#{size}px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:#{size * 0.4}px;#{color}#{style}"
+    end
+  end
+
+  def category_placeholder_color(name)
+    palette = {
+      "Weapons"             => "background:linear-gradient(135deg,#dc354522,#dc354511);color:#dc3545;",
+      "Armor"               => "background:linear-gradient(135deg,#0d6efd22,#0d6efd11);color:#0d6efd;",
+      "Shields"             => "background:linear-gradient(135deg,#0d6efd22,#0d6efd11);color:#0d6efd;",
+      "Potions"             => "background:linear-gradient(135deg,#19875422,#19875411);color:#198754;",
+      "Elixirs"             => "background:linear-gradient(135deg,#19875422,#19875411);color:#198754;",
+      "Scrolls"             => "background:linear-gradient(135deg,#6f42c122,#6f42c111);color:#6f42c1;",
+      "Books"               => "background:linear-gradient(135deg,#6f42c122,#6f42c111);color:#6f42c1;",
+      "Rings"               => "background:linear-gradient(135deg,#ffc10722,#ffc10711);color:#b08800;",
+      "Amulets"             => "background:linear-gradient(135deg,#ffc10722,#ffc10711);color:#b08800;",
+      "Gems"                => "background:linear-gradient(135deg,#0dcaf022,#0dcaf011);color:#0aa2ba;",
+      "Wands"               => "background:linear-gradient(135deg,#6f42c122,#6f42c111);color:#6f42c1;",
+      "Staffs"              => "background:linear-gradient(135deg,#6f42c122,#6f42c111);color:#6f42c1;",
+      "Artifacts"           => "background:linear-gradient(135deg,#fd7e1422,#fd7e1411);color:#fd7e14;",
+      "Trinkets"            => "background:linear-gradient(135deg,#6c757d22,#6c757d11);color:#6c757d;",
+      "Miscellaneous"       => "background:linear-gradient(135deg,#6c757d22,#6c757d11);color:#6c757d;",
+      "Boots"               => "background:linear-gradient(135deg,#6c757d22,#6c757d11);color:#6c757d;",
+      "Gloves"              => "background:linear-gradient(135deg,#6c757d22,#6c757d11);color:#6c757d;",
+      "Helms"               => "background:linear-gradient(135deg,#0d6efd22,#0d6efd11);color:#0d6efd;",
+      "Cloak"               => "background:linear-gradient(135deg,#6c757d22,#6c757d11);color:#6c757d;",
+      "Tools"               => "background:linear-gradient(135deg,#19875422,#19875411);color:#198754;",
+      "Ammunition"          => "background:linear-gradient(135deg,#dc354522,#dc354511);color:#dc3545;",
+      "Food"                => "background:linear-gradient(135deg,#19875422,#19875411);color:#198754;",
+      "Candle"              => "background:linear-gradient(135deg,#ffc10722,#ffc10711);color:#b08800;",
+      "Horns"               => "background:linear-gradient(135deg,#6c757d22,#6c757d11);color:#6c757d;",
+      "Bracelet"            => "background:linear-gradient(135deg,#ffc10722,#ffc10711);color:#b08800;",
+      "Potent Ingredients"  => "background:linear-gradient(135deg,#19875422,#19875411);color:#198754;",
+    }
+    palette[name] || "background:linear-gradient(135deg,#6c757d22,#6c757d11);color:#6c757d;"
+  end
+
+  def origin_icon(origin)
+    {
+      "Divino"      => "brightness-high-fill",
+      "Elfico"      => "tree-fill",
+      "Enano"       => "hammer",
+      "Humano"      => "person-fill",
+      "Desconocido" => "question-circle"
+    }.fetch(origin, "question-circle")
+  end
+
   def power_badge_class(power)
     case power
     when 0..2  then "bg-secondary"

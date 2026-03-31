@@ -1,4 +1,8 @@
 class Item < ApplicationRecord
+  ORIGINS = %w[Divino Elfico Enano Humano Desconocido].freeze
+
+  has_one_attached :image
+
   belongs_to :category
   belongs_to :rarity
   belongs_to :user, optional: true
@@ -11,6 +15,7 @@ class Item < ApplicationRecord
   validates :power, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }, allow_nil: true
   validates :price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :weight, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :origin, inclusion: { in: ORIGINS }, allow_nil: true
 
   scope :search_by_name, ->(query) { where("items.name ILIKE ?", "%#{query}%") if query.present? }
   scope :by_category, ->(id) { where(category_id: id) if id.present? }

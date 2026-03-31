@@ -3,7 +3,7 @@ class LoreEntriesController < ApplicationController
   before_action :set_lore_entry, only: [:edit, :update, :destroy]
 
   CATEGORY_GROUPS = {
-    "generation"  => %w[prefix suffix simple_suffix category_title],
+    "generation"  => %w[prefix suffix simple_suffix category_title proper_name],
     "world"       => %w[smith wielder place event deity organization material age],
     "description" => %w[origin historical_anecdote effect_transition dramatic_closing],
     "effects"     => %w[effect_description effect_flavor],
