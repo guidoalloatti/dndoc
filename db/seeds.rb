@@ -11,8 +11,17 @@ puts "Welcome to the DnDoc database seeding script!"
 puts "Before we proceed, please note that running this script will reset"
 puts "the database and delete all existing records."
 puts "-------------------------------------------"
-puts "Do you want to reset the database? (yes/y to confirm, anything else to cancel)"
-answer = $stdin.gets.chomp.downcase
+
+if ENV["FORCE_SEED"] == "1"
+  puts "FORCE_SEED=1 detected — skipping confirmation."
+  answer = "yes"
+elsif $stdin.isatty
+  puts "Do you want to reset the database? (yes/y to confirm, anything else to cancel)"
+  answer = $stdin.gets.chomp.downcase
+else
+  puts "Non-interactive environment — skipping. Use FORCE_SEED=1 to run without prompt."
+  answer = "no"
+end
 
 unless answer == "yes" || answer == "y"
   puts "Seeding cancelled."
