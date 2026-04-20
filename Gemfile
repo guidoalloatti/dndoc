@@ -32,7 +32,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 
 # Bootstrap
-gem 'bootstrap', '~> 4.1.1'
+gem 'bootstrap', '~> 5.3.3'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
